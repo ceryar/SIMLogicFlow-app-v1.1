@@ -1,0 +1,252 @@
+/* ==========================================================
+   MOBILE EXPERIENCE ENHANCEMENT PROFILE
+   Optimized for SimLogicFlow
+   ========================================================== */
+
+@media (max-width: 768px) {
+    :root {
+        --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+        --mobile-nav-height: 65px;
+    }
+
+    body {
+        -webkit-tap-highlight-color: transparent;
+        font-size: 15px;
+        background-color: #f8fafc !important;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        body {
+            background-color: #0f172a !important;
+        }
+    }
+
+    /* 1. Universal Touch Optimization */
+    button,
+    .admin-nav-item,
+    .uc-user-item,
+    .admin-table tr {
+        cursor: pointer;
+        transition: transform 0.1s active;
+    }
+
+    button:active {
+        transform: scale(0.97);
+    }
+
+    /* Forms */
+    input,
+    select,
+    textarea {
+        font-size: 16px !important;
+        /* Prevents iOS zoom */
+        padding: 12px 16px !important;
+        border-radius: 12px !important;
+    }
+
+    /* 2. Premium Fixed Navbar */
+    .navbar {
+        height: 60px;
+        padding: 0 16px !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        background: rgba(255, 255, 255, 0.8) !important;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    @media (prefers-color-scheme: dark) {
+        .navbar {
+            background: rgba(15, 23, 42, 0.8) !important;
+            border-bottom-color: rgba(255, 255, 255, 0.1);
+        }
+    }
+
+    .nav-brand {
+        font-size: 1.1rem !important;
+    }
+
+    .user-email,
+    .user-role {
+        display: none !important;
+    }
+
+    /* Simplify header */
+    .nav-user {
+        width: auto !important;
+    }
+
+    /* 3. Dynamic Bottom Navigation (Replaces Sidebar) */
+    .admin-container {
+        flex-direction: column !important;
+        padding-bottom: calc(var(--mobile-nav-height) + 20px + var(--safe-area-bottom)) !important;
+    }
+
+    .admin-sidebar {
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: var(--mobile-nav-height) !important;
+        background: rgba(255, 255, 255, 0.9) !important;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-top: 1px solid rgba(0, 0, 0, 0.08);
+        z-index: 1000;
+        padding: 0 !important;
+        display: block !important;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        .admin-sidebar {
+            background: rgba(30, 41, 59, 0.9) !important;
+            border-top-color: rgba(255, 255, 255, 0.1);
+        }
+    }
+
+    .admin-title {
+        display: none;
+    }
+
+    .admin-nav {
+        display: flex !important;
+        flex-direction: row !important;
+        height: 100%;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        padding: 0 10px !important;
+        gap: 0 !important;
+    }
+
+    .admin-nav::-webkit-scrollbar {
+        display: none;
+    }
+
+    .admin-nav-item {
+        flex: 0 0 80px;
+        scroll-snap-align: center;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px !important;
+        color: #64748b !important;
+        padding: 5px 2px !important;
+        margin: 0 !important;
+        border-radius: 0 !important;
+        position: relative;
+    }
+
+    .admin-nav-item.active {
+        color: #3b82f6 !important;
+        background: transparent !important;
+    }
+
+    .admin-nav-item.active::after {
+        content: "";
+        position: absolute;
+        bottom: 12px;
+        width: 4px;
+        height: 4px;
+        background: #3b82f6;
+        border-radius: 50%;
+    }
+
+    /* Handle groups on mobile by flattening them or hiding them */
+    .admin-nav-group {
+        margin: 0 !important;
+    }
+
+    .admin-nav-group-header {
+        display: none !important;
+    }
+
+    .admin-nav-group-content {
+        display: flex !important;
+        flex-direction: row !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    /* 4. Content Area & Buttons */
+    .admin-content {
+        padding: 16px !important;
+    }
+
+    .admin-header {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 12px !important;
+    }
+
+    .btn-primary {
+        width: 100% !important;
+        height: 50px;
+        border-radius: 14px !important;
+        justify-content: center !important;
+        font-size: 1rem !important;
+        box-shadow: 0 10px 20px rgba(59, 130, 246, 0.2) !important;
+    }
+
+    /* 5. Statistics Panel Mobile Layout */
+    .statistics-container>div {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* 6. Improved Table Cards */
+    .admin-table tr {
+        margin-bottom: 16px !important;
+        border: none !important;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
+        background: white !important;
+        padding: 8px !important;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        .admin-table tr {
+            background: #1e293b !important;
+        }
+    }
+
+    .admin-table td {
+        padding: 10px 12px !important;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.03) !important;
+    }
+
+    .admin-table td:last-child {
+        background: transparent !important;
+        border-bottom: none !important;
+    }
+
+    /* 7. Modals for Mobile */
+    .modal-content {
+        width: 100% !important;
+        margin: 0 !important;
+        max-height: 90vh !important;
+        padding: 20px !important;
+        border-radius: 24px 24px 0 0 !important;
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        animation: slideUp 0.3s ease-out;
+    }
+
+    @keyframes slideUp {
+        from {
+            transform: translateY(100%);
+        }
+
+        to {
+            transform: translateY(0);
+        }
+    }
+}
