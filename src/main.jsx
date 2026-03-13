@@ -46,7 +46,6 @@ axios.interceptors.request.use((config) => {
 });
 
 // ── Service Worker Registration ──────────────────────────────────────────────
-/*
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker
@@ -61,7 +60,6 @@ if ('serviceWorker' in navigator) {
           newWorker.addEventListener('statechange', () => {
             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
               console.log('[SW] Nueva versión disponible');
-              // El usePWA hook detectará esto via reg.waiting
               window.dispatchEvent(new CustomEvent('sw-update-available'));
             }
           });
@@ -71,7 +69,6 @@ if ('serviceWorker' in navigator) {
         console.warn('[SW] Error en registro:', err);
       });
 
-    // Cuando un nuevo SW toma el control → recargar la página
     let refreshing = false;
     navigator.serviceWorker.addEventListener('controllerchange', () => {
       if (!refreshing) {
@@ -81,7 +78,6 @@ if ('serviceWorker' in navigator) {
     });
   });
 }
-*/
 
 // Get root element safely
 const container = document.getElementById('root');
