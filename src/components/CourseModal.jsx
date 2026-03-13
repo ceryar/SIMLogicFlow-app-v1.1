@@ -209,14 +209,21 @@ export default function CourseModal({ isOpen, onClose, onSuccess, editCourse }) 
                                 maxHeight: '120px',
                                 overflowY: 'auto'
                             }}>
-                                {rooms.map(room => (
-                                    <label key={room.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '14px' }}>
+                                {rooms.filter(room => room.active || formData.roomIds.includes(room.id)).map(room => (
+                                    <label key={room.id} style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '8px',
+                                        cursor: 'pointer',
+                                        fontSize: '14px',
+                                        color: !room.active ? '#ff4d4f' : 'inherit'
+                                    }}>
                                         <input
                                             type="checkbox"
                                             checked={formData.roomIds.includes(room.id)}
                                             onChange={() => handleRoomToggle(room.id)}
                                         />
-                                        {room.name}
+                                        {room.name} {!room.active && '(Inactiva)'}
                                     </label>
                                 ))}
                             </div>
