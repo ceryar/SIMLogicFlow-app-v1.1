@@ -218,6 +218,13 @@ export default function AdminMenu() {
 
     useEffect(() => {
         const fetchMap = {
+            dashboard: () => {
+                fetchUsers();
+                fetchCourses();
+                fetchProCourses();
+                fetchMaintenances();
+                fetchSimulators();
+            },
             users: fetchUsers,
             rooms: fetchRooms,
             courses: fetchCourses,

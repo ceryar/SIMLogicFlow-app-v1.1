@@ -7,6 +7,8 @@ export default function StatisticsView({ users = [], courses = [], proCourses = 
     const [filterType, setFilterType] = useState('all'); // all, week, month, custom
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
+    const [selectedSimulatorId, setSelectedSimulatorId] = useState('');
+    const [selectedCourseId, setSelectedCourseId] = useState('');
 
     const filteredData = useMemo(() => {
         const now = new Date();
@@ -19,8 +21,15 @@ export default function StatisticsView({ users = [], courses = [], proCourses = 
             const diff = startOfWeek.getDate() - day + (day === 0 ? -6 : 1); // Adjust to Monday
             startLimit = new Date(startOfWeek.setDate(diff));
             startLimit.setHours(0, 0, 0, 0);
+
+            // Set end of week
+            endLimit = new Date(startLimit);
+            endLimit.setDate(startLimit.getDate() + 6);
+            endLimit.setHours(23, 59, 59, 999);
         } else if (filterType === 'month') {
             startLimit = new Date(now.getFullYear(), now.getMonth(), 1);
+            endLimit = new Date(now.getFullYear(), now.getMonth() + 1, 0); // Last day of month
+            endLimit.setHours(23, 59, 59, 999);
         } else if (filterType === 'custom' && startDate && endDate) {
             startLimit = new Date(startDate + 'T00:00:00');
             endLimit = new Date(endDate + 'T23:59:59');
@@ -35,20 +44,43 @@ export default function StatisticsView({ users = [], courses = [], proCourses = 
             return true;
         };
 
+        const simId = selectedSimulatorId ? parseInt(selectedSimulatorId) : null;
+        const courseId = selectedCourseId ? parseInt(selectedCourseId) : null;
+
         return {
-            proCourses: proCourses.filter(pc => isInRange(pc.fecha)),
-            maintenances: maintenances.filter(m => isInRange(m.fecIni))
+            proCourses: proCourses.filter(pc => {
+                const dateMatch = isInRange(pc.fecha);
+                const simMatch = !simId || pc.course?.simulator?.id === simId;
+                const courseMatch = !courseId || pc.course?.id === courseId;
+                return dateMatch && simMatch && courseMatch;
+            }),
+            maintenances: maintenances.filter(m => {
+                const dateMatch = isInRange(m.fecIni);
+                const simMatch = !simId || m.simulator?.id === simId;
+                return dateMatch && simMatch;
+            }),
+            courses: courses.filter(c => {
+                const simMatch = !simId || c.simulator?.id === simId;
+                const courseMatch = !courseId || c.id === courseId;
+                return simMatch && courseMatch;
+            }),
+            users: users.filter(u => {
+                if (!courseId) return true;
+                return u.courses?.some(c => c.id === courseId);
+            })
         };
-    }, [filterType, startDate, endDate, proCourses, maintenances]);
+    }, [filterType, startDate, endDate, selectedSimulatorId, selectedCourseId, proCourses, maintenances, courses, users]);
 
     const stats = useMemo(() => {
         // 1. Simulator Usage Statistics
-        const simulatorUsage = simulators.map(sim => {
-            const usageHours = filteredData.proCourses
-                .filter(pc => pc.course?.simulator?.id === sim.id)
-                .reduce((acc, pc) => acc + (pc.horas || 0), 0);
-            return { name: sim.name, hours: usageHours };
-        }).sort((a, b) => b.hours - a.hours);
+        const simulatorUsage = simulators
+            .filter(sim => !selectedSimulatorId || sim.id === parseInt(selectedSimulatorId))
+            .map(sim => {
+                const usageHours = filteredData.proCourses
+                    .filter(pc => pc.course?.simulator?.id === sim.id)
+                    .reduce((acc, pc) => acc + (pc.horas || 0), 0);
+                return { name: sim.name, hours: usageHours };
+            }).sort((a, b) => b.hours - a.hours);
 
         // 2. Maintenance Types Distribution
         const maintDistribution = filteredData.maintenances.reduce((acc, m) => {
@@ -58,32 +90,32 @@ export default function StatisticsView({ users = [], courses = [], proCourses = 
         }, {});
 
         // 3. User Role Distribution
-        const roleDistribution = users.reduce((acc, u) => {
+        const roleDistribution = filteredData.users.reduce((acc, u) => {
             const role = u.role?.name || 'Sin Rol';
             acc[role] = (acc[role] || 0) + 1;
             return acc;
         }, {});
 
         // 4. Course Intensity (Hours per Course)
-        const courseIntensity = courses.map(c => ({
+        const courseIntensity = filteredData.courses.map(c => ({
             name: c.name,
             totalHours: c.horas || 0,
             programmedHours: filteredData.proCourses
                 .filter(pc => pc.course?.id === c.id)
                 .reduce((acc, pc) => acc + (pc.horas || 0), 0)
-        })).filter(c => c.programmedHours > 0 || filterType === 'all').slice(0, 5);
+        })).filter(c => c.programmedHours > 0 || filterType === 'all').slice(0, 10);
 
         return {
             simulatorUsage,
             maintDistribution,
             roleDistribution,
             courseIntensity,
-            totalUsers: users.length,
-            totalCourses: courses.length,
+            totalUsers: filteredData.users.length,
+            totalCourses: filteredData.courses.length,
             totalMaintenances: filteredData.maintenances.length,
-            activeSimulators: simulators.filter(s => s.active).length
+            activeSimulators: simulators.filter(s => s.active && (!selectedSimulatorId || s.id === parseInt(selectedSimulatorId))).length
         };
-    }, [users, courses, filteredData, simulators, filterType]);
+    }, [simulators, selectedSimulatorId, filteredData, filterType]);
 
     const exportToPDF = async () => {
         try {
@@ -110,7 +142,19 @@ export default function StatisticsView({ users = [], courses = [], proCourses = 
             else if (filterType === 'month') periodText += 'Este Mes';
             else periodText += `${startDate} hasta ${endDate}`;
             doc.text(periodText, 14, 40);
-            doc.text(`Fecha de generación: ${new Date().toLocaleString()}`, 14, 45);
+
+            let filterText = '';
+            if (selectedSimulatorId) {
+                const sim = simulators.find(s => s.id === parseInt(selectedSimulatorId));
+                filterText += `Simulador: ${sim?.name || 'N/A'} `;
+            }
+            if (selectedCourseId) {
+                const course = courses.find(c => c.id === parseInt(selectedCourseId));
+                filterText += `Curso: ${course?.name || 'N/A'} `;
+            }
+            if (filterText) doc.text(filterText, 14, 45);
+
+            doc.text(`Fecha de generación: ${new Date().toLocaleString()}`, 14, filterText ? 50 : 45);
 
             // 1. Overview Table
             autoTable(doc, {
@@ -153,7 +197,7 @@ export default function StatisticsView({ users = [], courses = [], proCourses = 
 
             // 4. Course Intensity
             doc.setFontSize(14);
-            doc.text('Progreso de Cursos (Top 5)', 14, doc.lastAutoTable.finalY + 15);
+            doc.text('Estado de Cursos', 14, doc.lastAutoTable.finalY + 15);
 
             autoTable(doc, {
                 startY: doc.lastAutoTable.finalY + 20,
@@ -182,37 +226,39 @@ export default function StatisticsView({ users = [], courses = [], proCourses = 
 
             {/* Filters Row */}
             <div style={{ marginBottom: '30px', display: 'flex', gap: '15px', alignItems: 'center', flexWrap: 'wrap', background: '#f8fafc', padding: '15px', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
-                <span style={{ fontWeight: '700', fontSize: '14px' }}>Filtros de Tiempo:</span>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                    {[
-                        { id: 'all', label: 'Todo' },
-                        { id: 'week', label: 'Esta Semana' },
-                        { id: 'month', label: 'Este Mes' },
-                        { id: 'custom', label: 'Personalizado' }
-                    ].map(btn => (
-                        <button
-                            key={btn.id}
-                            onClick={() => setFilterType(btn.id)}
-                            style={{
-                                padding: '8px 16px',
-                                borderRadius: '8px',
-                                border: 'none',
-                                background: filterType === btn.id ? '#3b82f6' : '#fff',
-                                color: filterType === btn.id ? '#fff' : '#64748b',
-                                fontWeight: '600',
-                                fontSize: '13px',
-                                cursor: 'pointer',
-                                boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
-                                transition: 'all 0.2s'
-                            }}
-                        >
-                            {btn.label}
-                        </button>
-                    ))}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                    <span style={{ fontWeight: '700', fontSize: '12px', color: '#64748b' }}>Periodo:</span>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                        {[
+                            { id: 'all', label: 'Todo' },
+                            { id: 'week', label: 'Esta Semana' },
+                            { id: 'month', label: 'Este Mes' },
+                            { id: 'custom', label: 'Personalizado' }
+                        ].map(btn => (
+                            <button
+                                key={btn.id}
+                                onClick={() => setFilterType(btn.id)}
+                                style={{
+                                    padding: '8px 16px',
+                                    borderRadius: '8px',
+                                    border: 'none',
+                                    background: filterType === btn.id ? '#3b82f6' : '#fff',
+                                    color: filterType === btn.id ? '#fff' : '#64748b',
+                                    fontWeight: '600',
+                                    fontSize: '13px',
+                                    cursor: 'pointer',
+                                    boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+                                    transition: 'all 0.2s'
+                                }}
+                            >
+                                {btn.label}
+                            </button>
+                        ))}
+                    </div>
                 </div>
 
                 {filterType === 'custom' && (
-                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginLeft: '10px' }}>
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center', alignSelf: 'flex-end', marginBottom: '4px' }}>
                         <input
                             type="date"
                             value={startDate}
@@ -228,6 +274,37 @@ export default function StatisticsView({ users = [], courses = [], proCourses = 
                         />
                     </div>
                 )}
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                    <span style={{ fontWeight: '700', fontSize: '12px', color: '#64748b' }}>Simulador:</span>
+                    <select
+                        value={selectedSimulatorId}
+                        onChange={(e) => setSelectedSimulatorId(e.target.value)}
+                        style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: 'white', fontSize: '13px', fontWeight: '600', minWidth: '180px' }}
+                    >
+                        <option value="">Todos los Simuladores</option>
+                        {simulators.map(sim => (
+                            <option key={sim.id} value={sim.id}>{sim.name}</option>
+                        ))}
+                    </select>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                    <span style={{ fontWeight: '700', fontSize: '12px', color: '#64748b' }}>Curso:</span>
+                    <select
+                        value={selectedCourseId}
+                        onChange={(e) => setSelectedCourseId(e.target.value)}
+                        style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: 'white', fontSize: '13px', fontWeight: '600', minWidth: '180px' }}
+                    >
+                        <option value="">Todos los Cursos</option>
+                        {(selectedSimulatorId
+                            ? courses.filter(c => c.simulator?.id === parseInt(selectedSimulatorId))
+                            : courses
+                        ).map(course => (
+                            <option key={course.id} value={course.id}>{course.name}</option>
+                        ))}
+                    </select>
+                </div>
 
                 <button
                     onClick={exportToPDF}
@@ -245,12 +322,14 @@ export default function StatisticsView({ users = [], courses = [], proCourses = 
                         alignItems: 'center',
                         gap: '8px',
                         boxShadow: '0 2px 4px rgba(239, 68, 68, 0.2)',
-                        transition: 'transform 0.2s'
+                        transition: 'transform 0.2s',
+                        alignSelf: 'flex-end',
+                        marginBottom: '4px'
                     }}
                     onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
                     onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
                 >
-                    <span>📄</span> Descargar Reporte PDF
+                    <span>📄</span> PDF
                 </button>
             </div>
 
