@@ -350,20 +350,21 @@ export default function CoorAcadMenu() {
                         <th>Inicio / Fin</th>
                         <th>Horas</th>
                         <th>Recursos</th>
+                        <th>Personal</th>
                         <th className="text-right">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     {loading && courses.length === 0 ? (
                         <tr>
-                            <td colSpan="6" style={{ textAlign: 'center', padding: '2rem' }}>
+                            <td colSpan="7" style={{ textAlign: 'center', padding: '2rem' }}>
                                 <div className="loading-spinner-small" style={{ marginBottom: '10px' }}></div>
                                 Cargando cursos...
                             </td>
                         </tr>
                     ) : currentCourses.length === 0 ? (
                         <tr>
-                            <td colSpan="6" style={{ textAlign: 'center', padding: '2rem' }}>
+                            <td colSpan="7" style={{ textAlign: 'center', padding: '2rem' }}>
                                 No se encontraron cursos que coincidan con la búsqueda.
                             </td>
                         </tr>
@@ -390,6 +391,29 @@ export default function CoorAcadMenu() {
                                     </div>
                                     <div className="entity-indicator" title="Rooms">
                                         🏫 {course.rooms?.length || 0} aulas
+                                    </div>
+                                </td>
+                                <td data-label="Personal">
+                                    <div className="entity-indicator" title="Coordinador">
+                                        👤 Coord: {(() => {
+                                            const coords = (course.users || []).filter(u => {
+                                                const r = u.role?.name?.toUpperCase() || '';
+                                                return r.includes('COORDINADOR ACADÉMICO') || r === 'COORACAD' || r === 'ADMINISTRADOR';
+                                            });
+                                            return coords.length > 0 ? coords.map(u => `${u.firstName} ${u.lastname}`).join(', ') : 'Sin asignar';
+                                        })()}
+                                    </div>
+                                    <div className="entity-indicator" title="Pseudopiloto">
+                                        👤 Pseudo: {(() => {
+                                            const pseudos = (course.users || []).filter(u => (u.role?.name?.toUpperCase() || '').includes('PSEUDOPILOTO'));
+                                            return pseudos.length > 0 ? pseudos.map(u => `${u.firstName} ${u.lastname}`).join(', ') : 'Sin asignar';
+                                        })()}
+                                    </div>
+                                    <div className="entity-indicator" title="Instructor">
+                                        👤 Instr: {(() => {
+                                            const instrs = (course.users || []).filter(u => (u.role?.name?.toUpperCase() || '').includes('INSTRUCTOR'));
+                                            return instrs.length > 0 ? instrs.map(u => `${u.firstName} ${u.lastname}`).join(', ') : 'Sin asignar';
+                                        })()}
                                     </div>
                                 </td>
                                 <td data-label="Acciones" className="actions-cell">

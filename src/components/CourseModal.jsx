@@ -15,6 +15,7 @@ export default function CourseModal({ isOpen, onClose, onSuccess, editCourse }) 
     });
     const [rooms, setRooms] = useState([]);
     const [simulators, setSimulators] = useState([]);
+    const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(false);
     const [fetchingData, setFetchingData] = useState(false);
     const [error, setError] = useState(null);
@@ -25,12 +26,14 @@ export default function CourseModal({ isOpen, onClose, onSuccess, editCourse }) 
             setFetchingData(true);
             try {
                 const token = localStorage.getItem('token');
-                const [roomsRes, simsRes] = await Promise.all([
+                const [roomsRes, simsRes, usersRes] = await Promise.all([
                     axios.get('/api/v1/rooms', { headers: { Authorization: `Bearer ${token}` } }),
-                    axios.get('/api/v1/simulators', { headers: { Authorization: `Bearer ${token}` } })
+                    axios.get('/api/v1/simulators', { headers: { Authorization: `Bearer ${token}` } }),
+                    axios.get('/api/v1/users', { headers: { Authorization: `Bearer ${token}` } })
                 ]);
                 setRooms(roomsRes.data);
                 setSimulators(simsRes.data);
+                setUsers(usersRes.data);
             } catch (err) {
                 console.error('Error fetching course dependencies:', err);
                 setError('Error al cargar aulas o simuladores.');
@@ -169,8 +172,8 @@ export default function CourseModal({ isOpen, onClose, onSuccess, editCourse }) 
                             />
                         </div>
 
-                        <div className="form-group">
-                            <label>Simulador Requerido</label>
+                        <div className="form-group full-width">
+                            <label>Simulador Principal</label>
                             <select
                                 required
                                 value={formData.simulatorId}
