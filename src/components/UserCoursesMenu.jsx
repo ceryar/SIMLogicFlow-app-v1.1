@@ -84,6 +84,7 @@ export default function UserCoursesMenu() {
     const [error, setError] = useState(null);
     const [successMsg, setSuccessMsg] = useState(null);
     const [capacityWarning, setCapacityWarning] = useState(null);
+    const [courseSearchQuery, setCourseSearchQuery] = useState('');
 
     const token = localStorage.getItem('token');
     const authHeader = { headers: { Authorization: `Bearer ${token}` } };
@@ -127,6 +128,7 @@ export default function UserCoursesMenu() {
         setError(null);
         setSuccessMsg(null);
         setCapacityWarning(null);
+        setCourseSearchQuery('');
         fetchUserCourses(user.id);
     };
 
@@ -255,7 +257,17 @@ export default function UserCoursesMenu() {
         );
     });
 
-    const availableCourses = courses.filter(c => !userCourses.some(uc => uc.id === c.id));
+    const availableCourses = useMemo(() => {
+        return courses
+            .filter(c => !userCourses.some(uc => uc.id === c.id))
+            .filter(c => {
+                const q = courseSearchQuery.toLowerCase();
+                return (
+                    c.name.toLowerCase().includes(q) ||
+                    (c.simulator?.name || '').toLowerCase().includes(q)
+                );
+            });
+    }, [courses, userCourses, courseSearchQuery]);
 
     return (
         <div className="uc-layout">
@@ -341,6 +353,26 @@ export default function UserCoursesMenu() {
                         {/* Assign Course */}
                         <div className="uc-assign-form">
                             <h4>Asignar Nuevo Curso</h4>
+                            <div className="uc-search-box" style={{ marginBottom: '12px', maxWidth: '400px' }}>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <circle cx="11" cy="11" r="8"></circle>
+                                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                </svg>
+                                <input
+                                    type="text"
+                                    placeholder="Filtrar cursos disponibles..."
+                                    value={courseSearchQuery}
+                                    onChange={(e) => setCourseSearchQuery(e.target.value)}
+                                />
+                                {courseSearchQuery && (
+                                    <button
+                                        onClick={() => setCourseSearchQuery('')}
+                                        style={{ border: 'none', background: 'none', cursor: 'pointer', padding: '0', display: 'flex', color: 'var(--text-secondary)' }}
+                                    >
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                    </button>
+                                )}
+                            </div>
                             <form onSubmit={handleAssignCourse} className="uc-form-row">
                                 <select
                                     value={assignCourseId}
@@ -348,7 +380,11 @@ export default function UserCoursesMenu() {
                                     required
                                     disabled={assigning}
                                 >
-                                    <option value="">Seleccione un curso disponible...</option>
+                                    <option value="">
+                                        {availableCourses.length === 0 && courseSearchQuery
+                                            ? 'No se encontraron cursos'
+                                            : 'Seleccione un curso disponible...'}
+                                    </option>
                                     {availableCourses.map(c => (
                                         <option key={c.id} value={c.id}>
                                             {c.name} — {c.simulator?.name || '?'}
