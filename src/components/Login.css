@@ -50,6 +50,26 @@
   color: #fff;
 }
 
+.pwa-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.pwa-badge {
+  display: inline-block;
+  background: rgba(110, 142, 251, 0.2);
+  color: #6e8efb;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  letter-spacing: 1px;
+  margin-bottom: 0.8rem;
+  border: 1px solid rgba(110, 142, 251, 0.3);
+}
+
 .login-header h2 {
   font-size: 1.8rem;
   font-weight: 600;

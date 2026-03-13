@@ -46,13 +46,10 @@ export default function Login({ onLoginSuccess }) {
       <div className="login-card">
         <div className="login-header">
           <div className="login-icon">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
-              <polyline points="10 17 15 12 10 7" />
-              <line x1="15" y1="12" x2="3" y2="12" />
-            </svg>
+            <img src="/icons/pwa-192.png" alt="PWA Logo" className="pwa-logo-img" />
           </div>
-          <h2>Welcome Back</h2>
+          <div className="pwa-badge">PROGRESIVE WEB APP</div>
+          <h2>SimLogicFlow</h2>
           <p>Please enter your details to sign in.</p>
         </div>
 
