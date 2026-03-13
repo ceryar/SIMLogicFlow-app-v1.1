@@ -49,7 +49,7 @@ axios.interceptors.request.use((config) => {
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker
-      .register('/sw.js', { scope: '/' })
+      .register('/sw.js', { scope: '/', type: 'module' })
       .then(reg => {
         console.log('[SW] Registrado en scope:', reg.scope);
 

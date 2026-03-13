@@ -9,7 +9,9 @@ export default defineConfig({
     VitePWA({
       registerType: 'prompt',   // no auto-registra; lo hacemos en main.jsx
       injectRegister: false,    // no inyecta registro automático
-      strategies: 'generateSW', // no usamos el SW generado
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.js',
       // Solo el manifest es necesario:
       manifest: {
         name: 'SimLogicFlow',
@@ -26,13 +28,14 @@ export default defineConfig({
           { src: '/icons/pwa-512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' },
         ],
       },
-      workbox: {
-        // SW vacío — usamos /public/sw.js como SW real
-        globPatterns: [],
-        runtimeCaching: [],
+      injectManifest: {
+        // Al usar injectManifest, podemos decidir si queremos inyectar el manifest o no
+        // Por ahora lo dejaremos configurado para que funcione con el placeholder
+        injectionPoint: 'self.__WB_MANIFEST',
       },
       devOptions: {
-        enabled: false, // no interfiere en dev
+        enabled: true, // Permitir ver el SW en dev para depurar mejor
+        type: 'module',
       },
     }),
   ],
