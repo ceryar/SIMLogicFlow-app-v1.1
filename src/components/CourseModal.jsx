@@ -114,7 +114,7 @@ export default function CourseModal({ isOpen, onClose, onSuccess, editCourse }) 
 
     return (
         <div className="modal-overlay">
-            <div className="modal-content" style={{ maxWidth: '800px', maxHeight: '95vh', display: 'flex', flexDirection: 'column' }}>
+            <div className="modal-content" style={{ maxWidth: '1000px', maxHeight: '95vh', display: 'flex', flexDirection: 'column' }}>
                 <div className="modal-header">
                     <h3 style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>

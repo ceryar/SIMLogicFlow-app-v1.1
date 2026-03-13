@@ -11,6 +11,7 @@ import MaintenanceHistoryModal from './MaintenanceHistoryModal';
 import MaintenanceTypeModal from './MaintenanceTypeModal';
 import UserCoursesMenu from './UserCoursesMenu';
 import CalendarView from './CalendarView';
+import ReportView from './ReportView';
 import './AdminMenu.css';
 
 export default function AdminMenu() {
@@ -33,6 +34,7 @@ export default function AdminMenu() {
     const [editingMaintenance, setEditingMaintenance] = useState(null);
     const [editingHistory, setEditingHistory] = useState(null);
     const [editingMaintenanceType, setEditingMaintenanceType] = useState(null);
+    const [isReportsMenuOpen, setIsReportsMenuOpen] = useState(false);
     const [isCalendarMenuOpen, setIsCalendarMenuOpen] = useState(false);
     const [users, setUsers] = useState([]);
     const [rooms, setRooms] = useState([]);
@@ -1331,6 +1333,20 @@ export default function AdminMenu() {
                         )}
                     </li>
 
+                    <li className="admin-nav-group">
+                        <div className="admin-nav-group-header" onClick={() => setIsReportsMenuOpen(!isReportsMenuOpen)}>
+                            <span>Reportes</span>
+                            <svg className={`chevron-icon ${isReportsMenuOpen ? 'open' : ''}`} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </div>
+                        {isReportsMenuOpen && (
+                            <div className="admin-nav-group-content">
+                                <li className={`admin-nav-item ${activeTab === 'reports-courses' ? 'active' : ''}`} onClick={() => setActiveTab('reports-courses')}>Reporte Cursos</li>
+                                <li className={`admin-nav-item ${activeTab === 'reports-maintenances' ? 'active' : ''}`} onClick={() => setActiveTab('reports-maintenances')}>Reporte Mantenimientos</li>
+                                <li className={`admin-nav-item ${activeTab === 'reports-users' ? 'active' : ''}`} onClick={() => setActiveTab('reports-users')}>Reporte Usuarios</li>
+                            </div>
+                        )}
+                    </li>
+
                     <li className={`admin-nav-item ${activeTab === 'settings' ? 'active' : ''}`} onClick={() => setActiveTab('settings')}>
                         Configuración
                     </li>
@@ -1351,10 +1367,13 @@ export default function AdminMenu() {
                                                         activeTab === 'maintenance-types' ? 'Tipos de Mantenimiento' :
                                                             activeTab === 'maintenance-history' ? 'Historial Técnico' :
                                                                 activeTab === 'calendar-courses' ? 'Calendario de Cursos' :
-                                                                    activeTab === 'calendar-maint' ? 'Calendario de Mantenimientos' : 'Configuración'}
+                                                                    activeTab === 'calendar-maint' ? 'Calendario de Mantenimientos' :
+                                                                        activeTab === 'reports-courses' ? 'Generar Reporte de Cursos' :
+                                                                            activeTab === 'reports-maintenances' ? 'Generar Reporte de Mantenimientos' :
+                                                                                activeTab === 'reports-users' ? 'Generar Reporte de Usuarios' : 'Configuración'}
                     </h2>
                     <div className="admin-header-actions">
-                        {activeTab !== 'dashboard' && activeTab !== 'calendar-courses' && activeTab !== 'calendar-maint' && activeTab !== 'user-courses' && activeTab !== 'roles' && (
+                        {activeTab !== 'dashboard' && !activeTab.startsWith('calendar-') && !activeTab.startsWith('reports-') && activeTab !== 'user-courses' && activeTab !== 'roles' && (
                             <button className="btn-primary" onClick={() => {
                                 if (activeTab === 'users') { setEditingUser(null); setIsUserModalOpen(true); }
                                 else if (activeTab === 'rooms') { setEditingRoom(null); setIsRoomModalOpen(true); }
@@ -1400,7 +1419,10 @@ export default function AdminMenu() {
                                                         activeTab === 'maintenance-history' ? renderHistoryTable() :
                                                             activeTab === 'calendar-courses' ? <CalendarView events={proCourses} type="course" /> :
                                                                 activeTab === 'calendar-maint' ? <CalendarView events={maintenances} type="maint" /> :
-                                                                    <div className="settings-placeholder">Próximamente...</div>
+                                                                    activeTab === 'reports-courses' ? <ReportView type="courses" data={courses} simulators={simulators} courses={courses} roles={roles} maintenanceTypes={maintenanceTypes} /> :
+                                                                        activeTab === 'reports-maintenances' ? <ReportView type="maintenances" data={maintenances} simulators={simulators} courses={courses} roles={roles} maintenanceTypes={maintenanceTypes} /> :
+                                                                            activeTab === 'reports-users' ? <ReportView type="users" data={users} simulators={simulators} courses={courses} roles={roles} maintenanceTypes={maintenanceTypes} /> :
+                                                                                <div className="settings-placeholder">Próximamente...</div>
                 )}
             </div>
 

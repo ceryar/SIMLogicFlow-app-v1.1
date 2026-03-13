@@ -5,10 +5,12 @@ import CourseModal from './CourseModal';
 import ProCourseModal from './ProCourseModal';
 import UserCoursesMenu from './UserCoursesMenu';
 import CalendarView from './CalendarView';
+import ReportView from './ReportView';
 import './AdminMenu.css';
 
 export default function CoorAcadMenu() {
     const [activeTab, setActiveTab] = useState('users');
+    const [isReportsMenuOpen, setIsReportsMenuOpen] = useState(false);
     const [isUserModalOpen, setIsUserModalOpen] = useState(false);
     const [isCourseModalOpen, setIsCourseModalOpen] = useState(false);
     const [isProCourseModalOpen, setIsProCourseModalOpen] = useState(false);
@@ -20,6 +22,7 @@ export default function CoorAcadMenu() {
     const [users, setUsers] = useState([]);
     const [courses, setCourses] = useState([]);
     const [proCourses, setProCourses] = useState([]);
+    const [maintenances, setMaintenances] = useState([]);
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -41,6 +44,7 @@ export default function CoorAcadMenu() {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setUsers(response.data);
+            fetchCourses();
         } catch (err) {
             console.error('Error fetching users:', err);
             setError('No se pudieron cargar los usuarios.');
@@ -96,12 +100,33 @@ export default function CoorAcadMenu() {
         }
     }, []);
 
+    const fetchMaintenances = useCallback(async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const token = localStorage.getItem('token');
+            const response = await axios.get('/api/v1/maintenances', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setMaintenances(response.data);
+            fetchSimulators();
+        } catch (err) {
+            console.error('Error fetching maintenances:', err);
+            setError('No se pudieron cargar los mantenimientos.');
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
     useEffect(() => {
         const fetchMap = {
             users: fetchUsers,
             courses: fetchCourses,
             'pro-courses': fetchProCourses,
-            calendar: fetchProCourses
+            calendar: fetchProCourses,
+            'reports-users': fetchUsers,
+            'reports-courses': fetchCourses,
+            'reports-maintenances': fetchMaintenances
         };
 
         if (fetchMap[activeTab]) {
@@ -109,7 +134,7 @@ export default function CoorAcadMenu() {
         } else {
             setLoading(false);
         }
-    }, [activeTab, fetchUsers, fetchCourses, fetchProCourses]);
+    }, [activeTab, fetchUsers, fetchCourses, fetchProCourses, fetchMaintenances]);
 
     const handleUserSaved = (userData, isEdit) => {
         if (isEdit) {
@@ -612,6 +637,20 @@ export default function CoorAcadMenu() {
                     <li className={`admin-nav-item ${activeTab === 'courses' ? 'active' : ''}`} onClick={() => setActiveTab('courses')}>Cursos</li>
                     <li className={`admin-nav-item ${activeTab === 'pro-courses' ? 'active' : ''}`} onClick={() => setActiveTab('pro-courses')}>Programación</li>
                     <li className={`admin-nav-item ${activeTab === 'calendar' ? 'active' : ''}`} onClick={() => setActiveTab('calendar')}>Calendario</li>
+
+                    <li className="admin-nav-group">
+                        <div className="admin-nav-group-header" onClick={() => setIsReportsMenuOpen(!isReportsMenuOpen)}>
+                            <span>Reportes</span>
+                            <svg className={`chevron-icon ${isReportsMenuOpen ? 'open' : ''}`} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </div>
+                        {isReportsMenuOpen && (
+                            <div className="admin-nav-group-content">
+                                <li className={`admin-nav-item ${activeTab === 'reports-courses' ? 'active' : ''}`} onClick={() => setActiveTab('reports-courses')}>Reporte Cursos</li>
+                                <li className={`admin-nav-item ${activeTab === 'reports-maintenances' ? 'active' : ''}`} onClick={() => setActiveTab('reports-maintenances')}>Reporte Mantenimientos</li>
+                                <li className={`admin-nav-item ${activeTab === 'reports-users' ? 'active' : ''}`} onClick={() => setActiveTab('reports-users')}>Reporte Usuarios</li>
+                            </div>
+                        )}
+                    </li>
                 </ul>
             </div>
 
@@ -622,11 +661,15 @@ export default function CoorAcadMenu() {
                             {activeTab === 'users' ? 'Gestión de Estudiantes' :
                                 activeTab === 'courses' ? 'Gestión de Cursos' :
                                     activeTab === 'user-courses' ? 'Asignación de Estudiantes' :
-                                        activeTab === 'pro-courses' ? 'Programación de Cursos' : 'Calendario Académico'}
+                                        activeTab === 'pro-courses' ? 'Programación de Cursos' :
+                                            activeTab === 'calendar' ? 'Calendario Académico' :
+                                                activeTab === 'reports-courses' ? 'Reporte de Cursos' :
+                                                    activeTab === 'reports-maintenances' ? 'Reporte de Mantenimientos' :
+                                                        activeTab === 'reports-users' ? 'Reporte de Usuarios' : ''}
                         </h1>
                         <p className="admin-subtitle">Panel de control de recursos académicos</p>
                     </div>
-                    {activeTab !== 'calendar' && activeTab !== 'user-courses' && (
+                    {activeTab !== 'calendar' && activeTab !== 'user-courses' && !activeTab.startsWith('reports-') && (
                         <button className="btn-primary" onClick={() => {
                             if (activeTab === 'users') { setEditingUser(null); setIsUserModalOpen(true); }
                             else if (activeTab === 'courses') { setEditingCourse(null); setIsCourseModalOpen(true); }
@@ -647,11 +690,14 @@ export default function CoorAcadMenu() {
                     activeTab === 'user-courses' ? <UserCoursesMenu /> :
                         activeTab === 'courses' ? renderCourseTable() :
                             activeTab === 'pro-courses' ? renderProCourseTable() :
-                                loading && proCourses.length === 0 ? (
-                                    <div className="loading-state">Cargando calendario...</div>
-                                ) : (
-                                    <CalendarView events={proCourses} type="course" />
-                                )
+                                activeTab === 'reports-courses' ? <ReportView type="courses" data={courses} simulators={simulators} courses={courses} /> :
+                                    activeTab === 'reports-maintenances' ? <ReportView type="maintenances" data={maintenances} simulators={simulators} courses={courses} /> :
+                                        activeTab === 'reports-users' ? <ReportView type="users" data={users} simulators={simulators} courses={courses} /> :
+                                            loading && proCourses.length === 0 ? (
+                                                <div className="loading-state">Cargando calendario...</div>
+                                            ) : (
+                                                <CalendarView events={proCourses} type="course" />
+                                            )
                 }
             </main>
 

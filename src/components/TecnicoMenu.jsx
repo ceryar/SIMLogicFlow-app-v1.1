@@ -4,10 +4,12 @@ import MaintenanceModal from './MaintenanceModal';
 import MaintenanceHistoryModal from './MaintenanceHistoryModal';
 import MaintenanceTypeModal from './MaintenanceTypeModal';
 import CalendarView from './CalendarView';
+import ReportView from './ReportView';
 import './AdminMenu.css';
 
 export default function TecnicoMenu() {
     const [activeTab, setActiveTab] = useState('maintenances');
+    const [isReportsMenuOpen, setIsReportsMenuOpen] = useState(false);
     const [isMaintenanceModalOpen, setIsMaintenanceModalOpen] = useState(false);
     const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
 
@@ -17,6 +19,11 @@ export default function TecnicoMenu() {
     const [maintenances, setMaintenances] = useState([]);
     const [maintenanceHistory, setMaintenanceHistory] = useState([]);
     const [proCourses, setProCourses] = useState([]);
+    const [users, setUsers] = useState([]);
+    const [courses, setCourses] = useState([]);
+    const [simulators, setSimulators] = useState([]);
+    const [roles, setRoles] = useState([]);
+    const [maintenanceTypes, setMaintenanceTypes] = useState([]);
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -81,12 +88,88 @@ export default function TecnicoMenu() {
         }
     }, []);
 
+    const fetchUsers = useCallback(async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const token = localStorage.getItem('token');
+            const response = await axios.get('/api/v1/users', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setUsers(response.data);
+            fetchCourses();
+        } catch (err) {
+            console.error('Error fetching users:', err);
+            setError('Error al cargar usuarios.');
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    const fetchCourses = useCallback(async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const token = localStorage.getItem('token');
+            const response = await axios.get('/api/v1/courses', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setCourses(response.data);
+            fetchSimulators();
+        } catch (err) {
+            console.error('Error fetching courses:', err);
+            setError('Error al cargar cursos.');
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    const fetchSimulators = useCallback(async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await axios.get('/api/v1/simulators', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setSimulators(response.data);
+        } catch (err) {
+            console.error('Error fetching simulators:', err);
+        }
+    }, []);
+
+    const fetchRoles = useCallback(async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await axios.get('/api/v1/roles', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setRoles(response.data);
+        } catch (err) {
+            console.error('Error fetching roles:', err);
+        }
+    }, []);
+
+    const fetchMaintenanceTypes = useCallback(async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await axios.get('/api/v1/maintenance-types', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setMaintenanceTypes(response.data);
+        } catch (err) {
+            console.error('Error fetching maintenance types:', err);
+        }
+    }, []);
+
     useEffect(() => {
         const fetchMap = {
             maintenances: fetchMaintenances,
             'calendar-maint': fetchMaintenances,
             'maintenance-history': fetchMaintenanceHistory,
-            'calendar-courses': fetchProCourses
+            'calendar-courses': fetchProCourses,
+            'reports-courses': () => { fetchCourses(); fetchSimulators(); },
+            'reports-maintenances': () => { fetchMaintenances(); fetchSimulators(); fetchMaintenanceTypes(); },
+            'reports-users': () => { fetchUsers(); fetchRoles(); fetchCourses(); },
+            'reports-simulators': fetchSimulators
         };
 
         if (fetchMap[activeTab]) {
@@ -94,7 +177,7 @@ export default function TecnicoMenu() {
         } else {
             setLoading(false);
         }
-    }, [activeTab, fetchMaintenances, fetchMaintenanceHistory, fetchProCourses]);
+    }, [activeTab, fetchMaintenances, fetchMaintenanceHistory, fetchProCourses, fetchUsers, fetchCourses, fetchSimulators, fetchRoles, fetchMaintenanceTypes]);
 
     const handleMaintenanceSaved = (maintenance, isEdit) => {
         if (isEdit) setMaintenances(prev => prev.map(m => m.id === maintenance.id ? maintenance : m));
@@ -415,6 +498,20 @@ export default function TecnicoMenu() {
                     <li className={`admin-nav-item ${activeTab === 'maintenance-history' ? 'active' : ''}`} onClick={() => setActiveTab('maintenance-history')}>Historial</li>
                     <li className={`admin-nav-item ${activeTab === 'calendar-maint' ? 'active' : ''}`} onClick={() => setActiveTab('calendar-maint')}>Calendario Mantenimientos</li>
                     <li className={`admin-nav-item ${activeTab === 'calendar-courses' ? 'active' : ''}`} onClick={() => setActiveTab('calendar-courses')}>Calendario Cursos</li>
+
+                    <li className="admin-nav-group">
+                        <div className="admin-nav-group-header" onClick={() => setIsReportsMenuOpen(!isReportsMenuOpen)}>
+                            <span>Reportes</span>
+                            <svg className={`chevron-icon ${isReportsMenuOpen ? 'open' : ''}`} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </div>
+                        {isReportsMenuOpen && (
+                            <div className="admin-nav-group-content">
+                                <li className={`admin-nav-item ${activeTab === 'reports-courses' ? 'active' : ''}`} onClick={() => setActiveTab('reports-courses')}>Reporte Cursos</li>
+                                <li className={`admin-nav-item ${activeTab === 'reports-maintenances' ? 'active' : ''}`} onClick={() => setActiveTab('reports-maintenances')}>Reporte Mantenimientos</li>
+                                <li className={`admin-nav-item ${activeTab === 'reports-users' ? 'active' : ''}`} onClick={() => setActiveTab('reports-users')}>Reporte Usuarios</li>
+                            </div>
+                        )}
+                    </li>
                 </ul>
             </div>
 
@@ -423,10 +520,14 @@ export default function TecnicoMenu() {
                     <h2>
                         {activeTab === 'maintenances' ? 'Gestión de Mantenimientos' :
                             activeTab === 'maintenance-history' ? 'Historial Técnico' :
-                                activeTab === 'calendar-maint' ? 'Calendario de Mantenimientos' : 'Calendario de Cursos'}
+                                activeTab === 'calendar-maint' ? 'Calendario de Mantenimientos' :
+                                    activeTab === 'reports-courses' ? 'Reporte de Cursos' :
+                                        activeTab === 'reports-maintenances' ? 'Reporte de Mantenimientos' :
+                                            activeTab === 'reports-users' ? 'Reporte de Usuarios' :
+                                                'Calendario de Cursos'}
                     </h2>
                     <div className="admin-header-actions">
-                        {activeTab !== 'calendar-maint' && activeTab !== 'calendar-courses' && (
+                        {activeTab !== 'calendar-maint' && activeTab !== 'calendar-courses' && !activeTab.startsWith('reports-') && (
                             <button className="btn-primary" onClick={() => {
                                 if (activeTab === 'maintenances') { setEditingMaintenance(null); setIsMaintenanceModalOpen(true); }
                                 else if (activeTab === 'maintenance-history') { setEditingHistory(null); setIsHistoryModalOpen(true); }
@@ -449,6 +550,12 @@ export default function TecnicoMenu() {
                     renderHistoryTable()
                 ) : activeTab === 'calendar-maint' ? (
                     loading && maintenances.length === 0 ? <div className="loading-state">Cargando calendario...</div> : <CalendarView events={maintenances} type="maint" />
+                ) : activeTab === 'reports-courses' ? (
+                    <ReportView type="courses" data={courses} simulators={simulators} courses={courses} roles={roles} maintenanceTypes={maintenanceTypes} />
+                ) : activeTab === 'reports-maintenances' ? (
+                    <ReportView type="maintenances" data={maintenances} simulators={simulators} courses={courses} roles={roles} maintenanceTypes={maintenanceTypes} />
+                ) : activeTab === 'reports-users' ? (
+                    <ReportView type="users" data={users} simulators={simulators} courses={courses} roles={roles} maintenanceTypes={maintenanceTypes} />
                 ) : (
                     loading && proCourses.length === 0 ? <div className="loading-state">Cargando calendario...</div> : <CalendarView events={proCourses} type="course" />
                 )}
