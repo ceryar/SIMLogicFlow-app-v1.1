@@ -29,7 +29,7 @@ const ALL_CACHES = [CACHE_STATIC, CACHE_CATALOG, CACHE_DYNAMIC, CACHE_NAVIGATION
 
 const TTL_CATALOG = 24 * 60 * 60 * 1000;  // 24 h
 const TTL_DYNAMIC = 2 * 60 * 60 * 1000;  //  2 h
-const NETWORK_TIMEOUT_MS = 5000;                  //  5 s
+const NETWORK_TIMEOUT_MS = 15000;                 //  15 s (mayor margen para Railway)
 
 // ── Patrones de URL ────────────────────────────────────────────────────────────
 const RE_AUTH = /\/api\/v1\/auth\//;
@@ -73,15 +73,32 @@ function offlineFallback(pathname) {
 
 // ── Guardar respuesta en caché usando la URL como clave ───────────────────────
 async function saveToCache(cacheName, request, response) {
-    if (!response || (!response.ok && response.status !== 0)) return;
+    if (!response) return;
+
+    // Si la respuesta no es OK y no es opaca, no guardamos
+    if (!response.ok && response.status !== 0) return;
+
     try {
+        const cache = await caches.open(cacheName);
+        const key = cacheKey(request);
+
+        // Si es opaca (status 0), no podemos leer su cuerpo ni editar headers
+        if (response.status === 0) {
+            await cache.put(key, response.clone());
+            return;
+        }
+
+        // Si es normal, clonamos y añadimos metadata
         const body = await response.clone().arrayBuffer();
         const headers = new Headers(response.headers);
         headers.set('X-Cache-Time', String(Date.now()));
-        // ⚠️  La CLAVE es la URL string, NO la request original con sus headers
-        const key = cacheKey(request);
-        const cached = new Response(body, { status: response.status, statusText: response.statusText, headers });
-        const cache = await caches.open(cacheName);
+
+        const cached = new Response(body, {
+            status: response.status,
+            statusText: response.statusText,
+            headers
+        });
+
         await cache.put(key, cached);
     } catch (e) {
         console.warn('[SW] No se pudo guardar en caché:', e);
@@ -92,7 +109,8 @@ async function saveToCache(cacheName, request, response) {
 async function readFromCache(cacheName, request) {
     const cache = await caches.open(cacheName);
     // Buscar por URL string — ignora headers de la request original
-    return cache.match(cacheKey(request));
+    // Usamos ignoreVary para evitar fallos si el token de Auth cambia
+    return cache.match(cacheKey(request), { ignoreVary: true });
 }
 
 // ── Verificar TTL ─────────────────────────────────────────────────────────────
@@ -185,10 +203,16 @@ self.addEventListener('fetch', event => {
 async function staleWhileRevalidate(request, cacheName, ttlMs) {
     const cached = await readFromCache(cacheName, request);
 
-    // Lanzar actualización en background (siempre)
+    // Lanzar actualización en background
     const networkPromise = fetch(request.clone())
-        .then(res => { saveToCache(cacheName, request, res.clone()); return res; })
-        .catch(() => null);
+        .then(res => {
+            if (res.ok) saveToCache(cacheName, request, res.clone());
+            return res;
+        })
+        .catch(err => {
+            console.warn('[SW] Error en fetch de fondo:', err);
+            return null;
+        });
 
     // Hay caché fresco → responder inmediatamente
     if (cached && !isExpired(cached, ttlMs)) {
@@ -198,10 +222,11 @@ async function staleWhileRevalidate(request, cacheName, ttlMs) {
     // Sin caché o expirado → esperar la red
     try {
         const netRes = await networkPromise;
-        if (netRes && netRes.ok) return netRes;
+        // Si la red respondió (aunque sea error tipo 401), se devuelve eso
+        if (netRes) return netRes;
     } catch { /* continúa al fallback */ }
 
-    // Ultimo recurso: caché expirado
+    // Último recurso: caché aunque esté expirado
     if (cached) {
         console.warn('[SW] SWR — usando caché expirado offline:', request.url);
         return cached.clone();
@@ -289,6 +314,30 @@ async function navigationStrategy(request) {
 // ─────────────────────────────────────────────────────────────────────────────
 // MENSAJE → skipWaiting (actualización manual desde la UI)
 // ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// MENSAJES
+// ─────────────────────────────────────────────────────────────────────────────
 self.addEventListener('message', event => {
-    if (event.data?.type === 'SKIP_WAITING') self.skipWaiting();
+    const data = event.data;
+    if (!data) return;
+
+    switch (data.type) {
+        case 'SKIP_WAITING':
+            self.skipWaiting();
+            break;
+
+        case 'WARM_UP_CACHE':
+            // Pre-cargar endpoints críticos
+            if (data.endpoints && Array.isArray(data.endpoints)) {
+                console.log('[SW] Iniciando pre-carga de caché (Warm Up)...');
+                data.endpoints.forEach(url => {
+                    // Creamos una request sintética para que pase por el router (o fetch directo)
+                    // Usamos fetch(url) directamente para que se guarde vía networkFirst/staleWhileRevalidate
+                    // Pero ojo: el fetch desde aquí NO lleva el token a menos que lo pasemos o usemos el original.
+                    // usePWA.js ya hace axios.get() lo cual genera eventos fetch que el SW captura.
+                    // Si el SW captura esos fetch, se guardarán solos.
+                });
+            }
+            break;
+    }
 });

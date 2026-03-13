@@ -153,17 +153,19 @@ export function usePWA() {
 
     // ── Cache warm-up: call this after login ───────────────────────────────
     const triggerCacheWarmUp = useCallback(async () => {
-        if (!('serviceWorker' in navigator) || !navigator.serviceWorker.controller) {
-            console.warn("ServiceWorker not ready for warm up");
-            return;
-        }
-
+        // We do it from the UI thread so we can use axios with its interceptors (token)
         try {
-            navigator.serviceWorker.controller.postMessage({
-                type: 'WARM_UP_CACHE',
-                endpoints: WARM_UP_ENDPOINTS
-            });
-            setCacheReady(true); // Set cacheReady after triggering warm-up
+            console.log('[PWA] Warming up cache for critical endpoints...');
+            await warmUpCache();
+            setCacheReady(true);
+
+            // Also notify SW if it needs to know
+            if (navigator.serviceWorker?.controller) {
+                navigator.serviceWorker.controller.postMessage({
+                    type: 'WARM_UP_CACHE',
+                    status: 'completed'
+                });
+            }
         } catch (err) {
             console.error('Error triggering cache warm-up:', err);
         }
