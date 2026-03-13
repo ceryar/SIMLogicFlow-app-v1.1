@@ -48,6 +48,8 @@ export default function AdminMenu() {
     const [error, setError] = useState(null);
     const [userSearchTerm, setUserSearchTerm] = useState('');
     const [courseSearchTerm, setCourseSearchTerm] = useState('');
+    const [courseCurrentPage, setCourseCurrentPage] = useState(1);
+    const [courseItemsPerPage, setCourseItemsPerPage] = useState(10);
     const [proCourseSearchTerm, setProCourseSearchTerm] = useState('');
     const [proCourseCurrentPage, setProCourseCurrentPage] = useState(1);
     const [proCourseItemsPerPage, setProCourseItemsPerPage] = useState(10);
@@ -435,13 +437,13 @@ export default function AdminMenu() {
         const description = (course.description || '').toLowerCase();
         const simulatorName = (course.simulator?.name || '').toLowerCase();
         return name.includes(search) || description.includes(search) || simulatorName.includes(search);
-    });
+    }).sort((a, b) => a.name.localeCompare(b.name));
 
     const filteredProCourses = proCourses.filter(pro => {
         const search = proCourseSearchTerm.toLowerCase();
         const courseName = (pro.course?.name || '').toLowerCase();
         return courseName.includes(search);
-    });
+    }).sort((a, b) => (a.course?.name || '').localeCompare(b.course?.name || ''));
 
     const filteredMaintenances = maintenances.filter(m => {
         const search = maintenanceSearchTerm.toLowerCase();
@@ -457,6 +459,12 @@ export default function AdminMenu() {
         const observation = (h.observation || '').toLowerCase();
         return simulatorName.includes(search) || observation.includes(search);
     }).sort((a, b) => (a.maintenance?.simulator?.name || '').localeCompare(b.maintenance?.simulator?.name || ''));
+
+    // Pagination for Courses
+    const totalCoursePages = Math.ceil(filteredCourses.length / courseItemsPerPage);
+    const indexOfLastCourse = courseCurrentPage * courseItemsPerPage;
+    const indexOfFirstCourse = indexOfLastCourse - courseItemsPerPage;
+    const currentCourses = filteredCourses.slice(indexOfFirstCourse, indexOfLastCourse);
 
     // Pagination for ProCourses
     const totalProCoursePages = Math.ceil(filteredProCourses.length / proCourseItemsPerPage);
@@ -731,6 +739,7 @@ export default function AdminMenu() {
                         <th>Fecha Inicio</th>
                         <th>Fecha Fin</th>
                         <th>Horario</th>
+                        <th>Técnico</th>
                         <th>Descripción</th>
                         <th className="text-right">Acciones</th>
                     </tr>
@@ -738,14 +747,14 @@ export default function AdminMenu() {
                 <tbody>
                     {loading && maintenances.length === 0 ? (
                         <tr>
-                            <td colSpan="7" style={{ textAlign: 'center', padding: '2rem' }}>
+                            <td colSpan="8" style={{ textAlign: 'center', padding: '2rem' }}>
                                 <div className="loading-spinner-small" style={{ marginBottom: '10px' }}></div>
                                 Cargando mantenimientos...
                             </td>
                         </tr>
                     ) : currentMaintenances.length === 0 ? (
                         <tr>
-                            <td colSpan="7" style={{ textAlign: 'center', padding: '2rem' }}>
+                            <td colSpan="8" style={{ textAlign: 'center', padding: '2rem' }}>
                                 No se encontraron mantenimientos que coincidan con la búsqueda.
                             </td>
                         </tr>
@@ -768,6 +777,7 @@ export default function AdminMenu() {
                                 <td data-label="Horario">
                                     {m.horaIni && m.horaFin ? `${m.horaIni} - ${m.horaFin}` : '-'}
                                 </td>
+                                <td data-label="Técnico">{m.technician ? `${m.technician.firstName} ${m.technician.lastname}` : 'Sin asignar'}</td>
                                 <td data-label="Descripción">{m.description || '-'}</td>
                                 <td data-label="Acciones" className="actions-cell">
                                     <button className="btn-icon btn-edit" title="Editar" onClick={() => { setEditingMaintenance(m); setIsMaintenanceModalOpen(true); }}>
@@ -906,6 +916,7 @@ export default function AdminMenu() {
                         <th>Fecha</th>
                         <th>Simulador</th>
                         <th>Tipo</th>
+                        <th>Técnico</th>
                         <th>Observación</th>
                         <th className="text-right">Acciones</th>
                     </tr>
@@ -913,14 +924,14 @@ export default function AdminMenu() {
                 <tbody>
                     {loading && maintenanceHistory.length === 0 ? (
                         <tr>
-                            <td colSpan="5" style={{ textAlign: 'center', padding: '2rem' }}>
+                            <td colSpan="6" style={{ textAlign: 'center', padding: '2rem' }}>
                                 <div className="loading-spinner-small" style={{ marginBottom: '10px' }}></div>
                                 Cargando historial...
                             </td>
                         </tr>
                     ) : currentHistory.length === 0 ? (
                         <tr>
-                            <td colSpan="5" style={{ textAlign: 'center', padding: '2rem' }}>
+                            <td colSpan="6" style={{ textAlign: 'center', padding: '2rem' }}>
                                 No se encontraron registros en el historial que coincidan con la búsqueda.
                             </td>
                         </tr>
@@ -939,6 +950,7 @@ export default function AdminMenu() {
                                         {h.maintenance?.maintenanceType?.name || 'Mantenimiento'}
                                     </span>
                                 </td>
+                                <td data-label="Técnico">{h.maintenance?.technician ? `${h.maintenance.technician.firstName} ${h.maintenance.technician.lastname}` : 'Sin asignar'}</td>
                                 <td data-label="Observación">{h.observation}</td>
                                 <td data-label="Acciones" className="actions-cell">
                                     <button className="btn-icon btn-edit" title="Editar" onClick={() => { setEditingHistory(h); setIsHistoryModalOpen(true); }}>
@@ -1015,7 +1027,10 @@ export default function AdminMenu() {
                     type="text"
                     placeholder="Buscar curso por nombre, descripción o simulador..."
                     value={courseSearchTerm}
-                    onChange={(e) => setCourseSearchTerm(e.target.value)}
+                    onChange={(e) => {
+                        setCourseSearchTerm(e.target.value);
+                        setCourseCurrentPage(1);
+                    }}
                     style={{
                         flex: 1,
                         border: 'none',
@@ -1025,7 +1040,7 @@ export default function AdminMenu() {
                     }}
                 />
                 {courseSearchTerm && (
-                    <button onClick={() => setCourseSearchTerm('')} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#64748b' }}>
+                    <button onClick={() => { setCourseSearchTerm(''); setCourseCurrentPage(1); }} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#64748b' }}>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                     </button>
                 )}
@@ -1042,31 +1057,43 @@ export default function AdminMenu() {
                     </tr>
                 </thead>
                 <tbody>
-                    {filteredCourses.length === 0 ? (
+                    {loading && courses.length === 0 ? (
+                        <tr>
+                            <td colSpan="6" style={{ textAlign: 'center', padding: '2rem' }}>
+                                <div className="loading-spinner-small" style={{ marginBottom: '10px' }}></div>
+                                Cargando cursos...
+                            </td>
+                        </tr>
+                    ) : currentCourses.length === 0 ? (
                         <tr>
                             <td colSpan="6" style={{ textAlign: 'center', padding: '2rem' }}>
                                 No se encontraron cursos que coincidan con la búsqueda.
                             </td>
                         </tr>
                     ) : (
-                        filteredCourses.map(course => (
+                        currentCourses.map(course => (
                             <tr key={course.id}>
                                 <td data-label="ID">#{course.id}</td>
                                 <td data-label="Curso" className="font-medium">
-                                    <div>{course.name}</div>
-                                    <small style={{ color: '#64748b' }}>{course.description || '-'}</small>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <span className="course-color-dot" style={{ backgroundColor: getCourseColor(course.id) }}></span>
+                                        <div>
+                                            <div>{course.name}</div>
+                                            <small style={{ color: '#64748b' }}>{course.description || '-'}</small>
+                                        </div>
+                                    </div>
                                 </td>
                                 <td data-label="Inicio / Fin">
                                     {course.fecInicio} <br /> {course.fecFin}
                                 </td>
                                 <td data-label="Horas">{course.horas}h</td>
                                 <td data-label="Recursos">
-                                    <span className="entity-indicator" title="Simulator">
+                                    <div className="entity-indicator" title="Simulator">
                                         ✈️ {course.simulator?.name || 'N/A'}
-                                    </span> <br />
-                                    <span className="entity-indicator" title="Rooms">
+                                    </div>
+                                    <div className="entity-indicator" title="Rooms">
                                         🏫 {course.rooms?.length || 0} aulas
-                                    </span>
+                                    </div>
                                 </td>
                                 <td data-label="Acciones" className="actions-cell">
                                     <button className="btn-icon btn-edit" title="Editar" onClick={() => { setEditingCourse(course); setIsCourseModalOpen(true); }}>
@@ -1081,6 +1108,48 @@ export default function AdminMenu() {
                     )}
                 </tbody>
             </table>
+
+            {/* Pagination Controls */}
+            {filteredCourses.length > 0 && (
+                <div className="pagination-container">
+                    <div className="pagination-info">
+                        Mostrando {indexOfFirstCourse + 1} - {Math.min(indexOfLastCourse, filteredCourses.length)} de {filteredCourses.length}
+                    </div>
+                    <div className="pagination-actions">
+                        <div className="items-per-page">
+                            <label>Mostrar:</label>
+                            <select
+                                value={courseItemsPerPage}
+                                onChange={(e) => {
+                                    setCourseItemsPerPage(Number(e.target.value));
+                                    setCourseCurrentPage(1);
+                                }}
+                            >
+                                <option value={10}>10</option>
+                                <option value={20}>20</option>
+                                <option value={50}>50</option>
+                            </select>
+                        </div>
+                        <div className="pagination-buttons">
+                            <button
+                                className="btn-pagination"
+                                disabled={courseCurrentPage === 1}
+                                onClick={() => setCourseCurrentPage(prev => prev - 1)}
+                            >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                            </button>
+                            <span className="current-page">Página {courseCurrentPage} de {totalCoursePages || 1}</span>
+                            <button
+                                className="btn-pagination"
+                                disabled={courseCurrentPage >= totalCoursePages}
+                                onClick={() => setCourseCurrentPage(prev => prev + 1)}
+                            >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 
@@ -1108,7 +1177,7 @@ export default function AdminMenu() {
                     }}
                 />
                 {proCourseSearchTerm && (
-                    <button onClick={() => setProCourseSearchTerm('')} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#64748b' }}>
+                    <button onClick={() => { setProCourseSearchTerm(''); setProCourseCurrentPage(1); }} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#64748b' }}>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                     </button>
                 )}

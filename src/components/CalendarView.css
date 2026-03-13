@@ -281,6 +281,14 @@
     cursor: pointer;
 }
 
+.day-events {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    max-height: 110px;
+    overflow: hidden;
+}
+
 .day-number {
     font-size: 0.8rem;
     font-weight: 600;

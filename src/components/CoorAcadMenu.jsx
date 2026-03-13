@@ -26,6 +26,8 @@ export default function CoorAcadMenu() {
     const [userSearchTerm, setUserSearchTerm] = useState('');
     const [courseSearchTerm, setCourseSearchTerm] = useState('');
     const [proCourseSearchTerm, setProCourseSearchTerm] = useState('');
+    const [courseCurrentPage, setCourseCurrentPage] = useState(1);
+    const [courseItemsPerPage, setCourseItemsPerPage] = useState(10);
     const [proCourseCurrentPage, setProCourseCurrentPage] = useState(1);
     const [proCourseItemsPerPage, setProCourseItemsPerPage] = useState(10);
     const [simulators, setSimulators] = useState([]);
@@ -188,13 +190,19 @@ export default function CoorAcadMenu() {
         const description = (course.description || '').toLowerCase();
         const simulatorName = (course.simulator?.name || '').toLowerCase();
         return name.includes(search) || description.includes(search) || simulatorName.includes(search);
-    });
+    }).sort((a, b) => a.name.localeCompare(b.name));
 
     const filteredProCourses = proCourses.filter(pro => {
         const courseName = (pro.course?.name || '').toLowerCase();
         const search = proCourseSearchTerm.toLowerCase();
         return courseName.includes(search);
-    });
+    }).sort((a, b) => (a.course?.name || '').localeCompare(b.course?.name || ''));
+
+    // Pagination for Courses
+    const totalCoursePages = Math.ceil(filteredCourses.length / courseItemsPerPage);
+    const indexOfLastCourse = courseCurrentPage * courseItemsPerPage;
+    const indexOfFirstCourse = indexOfLastCourse - courseItemsPerPage;
+    const currentCourses = filteredCourses.slice(indexOfFirstCourse, indexOfLastCourse);
 
     // Pagination for ProCourses
     const totalProCoursePages = Math.ceil(filteredProCourses.length / proCourseItemsPerPage);
@@ -316,7 +324,10 @@ export default function CoorAcadMenu() {
                     type="text"
                     placeholder="Buscar curso por nombre, descripción o simulador..."
                     value={courseSearchTerm}
-                    onChange={(e) => setCourseSearchTerm(e.target.value)}
+                    onChange={(e) => {
+                        setCourseSearchTerm(e.target.value);
+                        setCourseCurrentPage(1);
+                    }}
                     style={{
                         flex: 1,
                         border: 'none',
@@ -326,7 +337,7 @@ export default function CoorAcadMenu() {
                     }}
                 />
                 {courseSearchTerm && (
-                    <button onClick={() => setCourseSearchTerm('')} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#64748b' }}>
+                    <button onClick={() => { setCourseSearchTerm(''); setCourseCurrentPage(1); }} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#64748b' }}>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                     </button>
                 )}
@@ -350,33 +361,42 @@ export default function CoorAcadMenu() {
                                 Cargando cursos...
                             </td>
                         </tr>
-                    ) : filteredCourses.length === 0 ? (
+                    ) : currentCourses.length === 0 ? (
                         <tr>
                             <td colSpan="6" style={{ textAlign: 'center', padding: '2rem' }}>
                                 No se encontraron cursos que coincidan con la búsqueda.
                             </td>
                         </tr>
                     ) : (
-                        filteredCourses.map(course => (
+                        currentCourses.map(course => (
                             <tr key={course.id}>
                                 <td data-label="ID">#{course.id}</td>
                                 <td data-label="Curso" className="font-medium">
-                                    <div>{course.name}</div>
-                                    <small style={{ color: '#64748b' }}>{course.description || '-'}</small>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <span className="course-color-dot" style={{ backgroundColor: getCourseColor(course.id) }}></span>
+                                        <div>
+                                            <div>{course.name}</div>
+                                            <small style={{ color: '#64748b' }}>{course.description || '-'}</small>
+                                        </div>
+                                    </div>
                                 </td>
                                 <td data-label="Inicio / Fin">
                                     {course.fecInicio} <br /> {course.fecFin}
                                 </td>
                                 <td data-label="Horas">{course.horas}h</td>
                                 <td data-label="Recursos">
-                                    <span className="entity-indicator">✈️ {course.simulator?.name || 'N/A'}</span> <br />
-                                    <span className="entity-indicator">🏫 {course.rooms?.length || 0} aulas</span>
+                                    <div className="entity-indicator" title="Simulator">
+                                        ✈️ {course.simulator?.name || 'N/A'}
+                                    </div>
+                                    <div className="entity-indicator" title="Rooms">
+                                        🏫 {course.rooms?.length || 0} aulas
+                                    </div>
                                 </td>
                                 <td data-label="Acciones" className="actions-cell">
-                                    <button className="btn-icon btn-edit" onClick={() => { setEditingCourse(course); setIsCourseModalOpen(true); }}>
+                                    <button className="btn-icon btn-edit" title="Editar" onClick={() => { setEditingCourse(course); setIsCourseModalOpen(true); }}>
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                                     </button>
-                                    <button className="btn-icon btn-delete" onClick={(e) => handleDeleteCourse(e, course.id, course.name)}>
+                                    <button className="btn-icon btn-delete" title="Eliminar" onClick={(e) => handleDeleteCourse(e, course.id, course.name)}>
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                                     </button>
                                 </td>
@@ -385,6 +405,48 @@ export default function CoorAcadMenu() {
                     )}
                 </tbody>
             </table>
+
+            {/* Pagination Controls */}
+            {filteredCourses.length > 0 && (
+                <div className="pagination-container">
+                    <div className="pagination-info">
+                        Mostrando {indexOfFirstCourse + 1} - {indexOfLastCourse} de {filteredCourses.length}
+                    </div>
+                    <div className="pagination-actions">
+                        <div className="items-per-page">
+                            <label>Mostrar:</label>
+                            <select
+                                value={courseItemsPerPage}
+                                onChange={(e) => {
+                                    setCourseItemsPerPage(Number(e.target.value));
+                                    setCourseCurrentPage(1);
+                                }}
+                            >
+                                <option value={10}>10</option>
+                                <option value={20}>20</option>
+                                <option value={50}>50</option>
+                            </select>
+                        </div>
+                        <div className="pagination-buttons">
+                            <button
+                                className="btn-pagination"
+                                disabled={courseCurrentPage === 1}
+                                onClick={() => setCourseCurrentPage(prev => prev - 1)}
+                            >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                            </button>
+                            <span className="current-page">Página {courseCurrentPage} de {totalCoursePages || 1}</span>
+                            <button
+                                className="btn-pagination"
+                                disabled={courseCurrentPage >= totalCoursePages}
+                                onClick={() => setCourseCurrentPage(prev => prev + 1)}
+                            >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 
@@ -412,7 +474,7 @@ export default function CoorAcadMenu() {
                     }}
                 />
                 {proCourseSearchTerm && (
-                    <button onClick={() => setProCourseSearchTerm('')} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', padding: '5px' }}>
+                    <button onClick={() => { setProCourseSearchTerm(''); setProCourseCurrentPage(1); }} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', padding: '5px' }}>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <line x1="18" y1="6" x2="6" y2="18"></line>
                             <line x1="6" y1="6" x2="18" y2="18"></line>

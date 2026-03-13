@@ -367,6 +367,9 @@ export default function CalendarView({ events, type }) {
                                                     {ev.description && (
                                                         <div className="detail-desc">{ev.description}</div>
                                                     )}
+                                                    {ev.technician && (
+                                                        <div className="detail-meta">👤 Técnico: {ev.technician.firstName} {ev.technician.lastname}</div>
+                                                    )}
                                                     {ev.fecFin && ev.fecFin !== ev.fecIni && (
                                                         <div className="detail-meta">📅 Hasta: {ev.fecFin}</div>
                                                     )}

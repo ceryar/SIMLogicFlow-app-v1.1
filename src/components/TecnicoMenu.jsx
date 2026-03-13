@@ -192,6 +192,7 @@ export default function TecnicoMenu() {
                         <th>Tipo</th>
                         <th>Fecha</th>
                         <th>Horario</th>
+                        <th>Técnico</th>
                         <th>Descripción</th>
                         <th className="text-right">Acciones</th>
                     </tr>
@@ -222,6 +223,7 @@ export default function TecnicoMenu() {
                                 <td data-label="Tipo"><span className="status-badge status-active">{m.maintenanceType?.name || 'N/A'}</span></td>
                                 <td data-label="Fecha">{m.fecIni}</td>
                                 <td data-label="Horario">{m.horaIni} - {m.horaFin}</td>
+                                <td data-label="Técnico">{m.technician ? `${m.technician.firstName} ${m.technician.lastname}` : 'Sin asignar'}</td>
                                 <td data-label="Descripción">{m.description}</td>
                                 <td data-label="Acciones" className="actions-cell">
                                     <button className="btn-icon btn-edit" title="Editar" onClick={() => { setEditingMaintenance(m); setIsMaintenanceModalOpen(true); }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
@@ -312,6 +314,7 @@ export default function TecnicoMenu() {
                         <th>Fecha Cambio</th>
                         <th>Simulador</th>
                         <th>Tipo</th>
+                        <th>Técnico</th>
                         <th>Observación</th>
                         <th className="text-right">Acciones</th>
                     </tr>
@@ -345,6 +348,7 @@ export default function TecnicoMenu() {
                                         {h.maintenance?.maintenanceType?.name || 'Mantenimiento'}
                                     </span>
                                 </td>
+                                <td data-label="Técnico">{h.maintenance?.technician ? `${h.maintenance.technician.firstName} ${h.maintenance.technician.lastname}` : 'Sin asignar'}</td>
                                 <td data-label="Observación">{h.observation}</td>
                                 <td data-label="Acciones" className="actions-cell">
                                     <button className="btn-icon btn-edit" title="Editar" onClick={() => { setEditingHistory(h); setIsHistoryModalOpen(true); }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>

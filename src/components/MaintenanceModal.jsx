@@ -11,10 +11,12 @@ export default function MaintenanceModal({ isOpen, onClose, onSuccess, editMaint
         horaIni: '',
         horaFin: '',
         simulatorId: '',
-        maintenanceTypeId: ''
+        maintenanceTypeId: '',
+        technicianId: ''
     });
     const [simulators, setSimulators] = useState([]);
     const [types, setTypes] = useState([]);
+    const [technicians, setTechnicians] = useState([]);
     const [loading, setLoading] = useState(false);
     const [fetchingData, setFetchingData] = useState(false);
     const [error, setError] = useState(null);
@@ -26,12 +28,14 @@ export default function MaintenanceModal({ isOpen, onClose, onSuccess, editMaint
             try {
                 const token = localStorage.getItem('token');
                 const config = { headers: { Authorization: `Bearer ${token}` } };
-                const [simsRes, typesRes] = await Promise.all([
+                const [simsRes, typesRes, techsRes] = await Promise.all([
                     axios.get('/api/v1/simulators', config),
-                    axios.get('/api/v1/maintenance-types', config)
+                    axios.get('/api/v1/maintenance-types', config),
+                    axios.get('/api/v1/users/role/TÉCNICO MANTENIMIENTO', config)
                 ]);
                 setSimulators(simsRes.data);
                 setTypes(typesRes.data);
+                setTechnicians(techsRes.data);
             } catch (err) {
                 console.error('Error fetching maintenance dependencies:', err);
                 setError('Error al cargar simuladores o tipos de mantenimiento.');
@@ -51,7 +55,8 @@ export default function MaintenanceModal({ isOpen, onClose, onSuccess, editMaint
                 horaIni: editMaintenance.horaIni || '',
                 horaFin: editMaintenance.horaFin || '',
                 simulatorId: editMaintenance.simulator ? editMaintenance.simulator.id : '',
-                maintenanceTypeId: editMaintenance.maintenanceType ? editMaintenance.maintenanceType.id : ''
+                maintenanceTypeId: editMaintenance.maintenanceType ? editMaintenance.maintenanceType.id : '',
+                technicianId: editMaintenance.technician ? editMaintenance.technician.id : ''
             });
         } else {
             setFormData({
@@ -61,7 +66,8 @@ export default function MaintenanceModal({ isOpen, onClose, onSuccess, editMaint
                 horaIni: '',
                 horaFin: '',
                 simulatorId: '',
-                maintenanceTypeId: ''
+                maintenanceTypeId: '',
+                technicianId: ''
             });
         }
         setError(null);
@@ -147,6 +153,24 @@ export default function MaintenanceModal({ isOpen, onClose, onSuccess, editMaint
                                 <option value="">Seleccione un tipo...</option>
                                 {types.map(type => (
                                     <option key={type.id} value={type.id}>{type.name}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Técnico */}
+                        <div className="form-group">
+                            <label>Técnico *</label>
+                            <select
+                                required
+                                value={formData.technicianId}
+                                onChange={(e) => setFormData({ ...formData, technicianId: e.target.value })}
+                                disabled={fetchingData}
+                            >
+                                <option value="">Seleccione un técnico...</option>
+                                {technicians.map(tech => (
+                                    <option key={tech.id} value={tech.id}>
+                                        {tech.firstName} {tech.lastname}
+                                    </option>
                                 ))}
                             </select>
                         </div>
