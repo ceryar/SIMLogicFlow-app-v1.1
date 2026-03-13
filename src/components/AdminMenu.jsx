@@ -49,6 +49,8 @@ export default function AdminMenu() {
     const [userSearchTerm, setUserSearchTerm] = useState('');
     const [courseSearchTerm, setCourseSearchTerm] = useState('');
     const [proCourseSearchTerm, setProCourseSearchTerm] = useState('');
+    const [proCourseCurrentPage, setProCourseCurrentPage] = useState(1);
+    const [proCourseItemsPerPage, setProCourseItemsPerPage] = useState(10);
 
     const fetchUsers = useCallback(async () => {
         setLoading(true);
@@ -434,6 +436,28 @@ export default function AdminMenu() {
         const courseName = (pro.course?.name || '').toLowerCase();
         return courseName.includes(search);
     });
+
+    // Pagination for ProCourses
+    const totalProCoursePages = Math.ceil(filteredProCourses.length / proCourseItemsPerPage);
+    const indexOfLastProCourse = proCourseCurrentPage * proCourseItemsPerPage;
+    const indexOfFirstProCourse = indexOfLastProCourse - proCourseItemsPerPage;
+    const currentProCourses = filteredProCourses.slice(indexOfFirstProCourse, indexOfLastProCourse);
+
+    const getCourseColor = (courseId) => {
+        const colors = [
+            '#3b82f6', // Blue
+            '#10b981', // Green
+            '#8b5cf6', // Purple
+            '#f59e0b', // Orange
+            '#ec4899', // Pink
+            '#6366f1', // Indigo
+            '#06b6d4', // Cyan
+            '#f43f5e', // Rose
+            '#14b8a6', // Teal
+            '#eab308'  // Yellow
+        ];
+        return colors[courseId % colors.length];
+    };
 
     const renderUserTable = () => (
         <div className="table-card">
@@ -854,7 +878,10 @@ export default function AdminMenu() {
                     type="text"
                     placeholder="Buscar programación por curso..."
                     value={proCourseSearchTerm}
-                    onChange={(e) => setProCourseSearchTerm(e.target.value)}
+                    onChange={(e) => {
+                        setProCourseSearchTerm(e.target.value);
+                        setProCourseCurrentPage(1);
+                    }}
                     style={{
                         flex: 1,
                         border: 'none',
@@ -888,17 +915,22 @@ export default function AdminMenu() {
                                 Cargando programación...
                             </td>
                         </tr>
-                    ) : filteredProCourses.length === 0 ? (
+                    ) : currentProCourses.length === 0 ? (
                         <tr>
                             <td colSpan="6" style={{ textAlign: 'center', padding: '2rem' }}>
-                                No se encontraron programaciones que coincidan con la búsqueda.
+                                No se encontraron programaciones que coincidan con la búsqueda o la selección actual.
                             </td>
                         </tr>
                     ) : (
-                        filteredProCourses.map(pro => (
+                        currentProCourses.map(pro => (
                             <tr key={pro.id}>
                                 <td data-label="ID">#{pro.id}</td>
-                                <td data-label="Curso" className="font-medium">{pro.course?.name || 'N/A'}</td>
+                                <td data-label="Curso" className="font-medium">
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <span className="course-color-dot" style={{ backgroundColor: getCourseColor(pro.course?.id || 0) }}></span>
+                                        {pro.course?.name || 'N/A'}
+                                    </div>
+                                </td>
                                 <td data-label="Fecha">{pro.fecha}</td>
                                 <td data-label="Horario">{pro.horaini} - {pro.horafin}</td>
                                 <td data-label="Horas">{pro.horas}h</td>
@@ -915,6 +947,48 @@ export default function AdminMenu() {
                     )}
                 </tbody>
             </table>
+
+            {/* Pagination Controls */}
+            {filteredProCourses.length > 0 && (
+                <div className="pagination-container">
+                    <div className="pagination-info">
+                        Mostrando {indexOfFirstProCourse + 1} - {Math.min(indexOfLastProCourse, filteredProCourses.length)} de {filteredProCourses.length}
+                    </div>
+                    <div className="pagination-actions">
+                        <div className="items-per-page">
+                            <label>Mostrar:</label>
+                            <select
+                                value={proCourseItemsPerPage}
+                                onChange={(e) => {
+                                    setProCourseItemsPerPage(Number(e.target.value));
+                                    setProCourseCurrentPage(1);
+                                }}
+                            >
+                                <option value={10}>10</option>
+                                <option value={20}>20</option>
+                                <option value={50}>50</option>
+                            </select>
+                        </div>
+                        <div className="pagination-buttons">
+                            <button
+                                className="btn-pagination"
+                                disabled={proCourseCurrentPage === 1}
+                                onClick={() => setProCourseCurrentPage(prev => prev - 1)}
+                            >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                            </button>
+                            <span className="current-page">Página {proCourseCurrentPage} de {totalProCoursePages || 1}</span>
+                            <button
+                                className="btn-pagination"
+                                disabled={proCourseCurrentPage >= totalProCoursePages}
+                                onClick={() => setProCourseCurrentPage(prev => prev + 1)}
+                            >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 
