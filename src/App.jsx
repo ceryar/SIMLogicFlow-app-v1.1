@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Login from './components/Login'
 import AdminMenu from './components/AdminMenu'
 import CoorAcadMenu from './components/CoorAcadMenu'
@@ -12,12 +12,21 @@ import ChangePasswordModal from './components/ChangePasswordModal'
 import './App.css'
 
 function App() {
+  console.log("App initialization started...");
   const [isAuthenticated, setIsAuthenticated] = useState(() => !!localStorage.getItem('token'));
   const [userRole, setUserRole] = useState(() => localStorage.getItem('role') || '');
   const [userEmail, setUserEmail] = useState(() => localStorage.getItem('email') || '');
   const [userId, setUserId] = useState(() => localStorage.getItem('userId') || '');
-
   const [mustChangePassword, setMustChangePassword] = useState(() => localStorage.getItem('mustChangePassword') === 'true');
+  const [user, setUser] = useState(() => {
+    try {
+      const savedUser = localStorage.getItem('user');
+      return savedUser ? JSON.parse(savedUser) : null;
+    } catch (e) {
+      console.warn("Error parsing user from localStorage:", e);
+      return null;
+    }
+  });
 
   const { triggerCacheWarmUp } = usePWA();
 

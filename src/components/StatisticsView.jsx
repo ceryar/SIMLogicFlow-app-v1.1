@@ -1,4 +1,6 @@
 import { useMemo, useState } from 'react';
+import axios from 'axios';
+// Dynamic imports moved inside function
 
 export default function StatisticsView({ users = [], courses = [], proCourses = [], maintenances = [], simulators = [] }) {
 
@@ -83,13 +85,103 @@ export default function StatisticsView({ users = [], courses = [], proCourses = 
         };
     }, [users, courses, filteredData, simulators, filterType]);
 
+    const exportToPDF = async () => {
+        try {
+            const { default: jsPDF } = await import('jspdf');
+            const { default: autoTable } = await import('jspdf-autotable');
+
+            const doc = new jsPDF();
+
+            // Header
+            doc.setFontSize(22);
+            doc.setTextColor(59, 130, 246); // #3b82f6
+            doc.text('SimLogicFlow', 14, 22);
+
+            doc.setFontSize(16);
+            doc.setTextColor(30, 41, 59); // #1e293b
+            doc.text('Reporte Estadístico de Operaciones', 14, 32);
+
+            // Filter Info
+            doc.setFontSize(10);
+            doc.setTextColor(100, 116, 139); // #64748b
+            let periodText = 'Periodo: ';
+            if (filterType === 'all') periodText += 'Todo el historial';
+            else if (filterType === 'week') periodText += 'Esta Semana';
+            else if (filterType === 'month') periodText += 'Este Mes';
+            else periodText += `${startDate} hasta ${endDate}`;
+            doc.text(periodText, 14, 40);
+            doc.text(`Fecha de generación: ${new Date().toLocaleString()}`, 14, 45);
+
+            // 1. Overview Table
+            autoTable(doc, {
+                startY: 55,
+                head: [['Indicador', 'Valor']],
+                body: [
+                    ['Total Usuarios', stats.totalUsers],
+                    ['Cursos Activos', stats.totalCourses],
+                    ['Simuladores Operativos', `${stats.activeSimulators}/${simulators.length}`],
+                    ['Mantenimientos en Periodo', stats.totalMaintenances]
+                ],
+                theme: 'striped',
+                headStyles: { fillColor: [59, 130, 246] }
+            });
+
+            // 2. Simulator Usage Table
+            doc.setFontSize(14);
+            doc.setTextColor(30, 41, 59);
+            doc.text('Uso de Simuladores (Horas)', 14, doc.lastAutoTable.finalY + 15);
+
+            autoTable(doc, {
+                startY: doc.lastAutoTable.finalY + 20,
+                head: [['Simulador', 'Horas de Uso']],
+                body: stats.simulatorUsage.map(sim => [sim.name, `${sim.hours}h`]),
+                theme: 'grid',
+                headStyles: { fillColor: [16, 185, 129] }
+            });
+
+            // 3. Maintenance Distribution
+            doc.setFontSize(14);
+            doc.text('Distribución de Mantenimiento', 14, doc.lastAutoTable.finalY + 15);
+
+            autoTable(doc, {
+                startY: doc.lastAutoTable.finalY + 20,
+                head: [['Tipo de Mantenimiento', 'Cantidad']],
+                body: Object.entries(stats.maintDistribution).map(([type, count]) => [type, count]),
+                theme: 'striped',
+                headStyles: { fillColor: [245, 158, 11] }
+            });
+
+            // 4. Course Intensity
+            doc.setFontSize(14);
+            doc.text('Progreso de Cursos (Top 5)', 14, doc.lastAutoTable.finalY + 15);
+
+            autoTable(doc, {
+                startY: doc.lastAutoTable.finalY + 20,
+                head: [['Curso', 'Progreso', 'Horas Programadas', 'Total']],
+                body: stats.courseIntensity.map(c => [
+                    c.name,
+                    `${Math.round((c.programmedHours / (c.totalHours || 1)) * 100)}%`,
+                    c.programmedHours,
+                    c.totalHours
+                ]),
+                theme: 'grid',
+                headStyles: { fillColor: [139, 92, 246] }
+            });
+
+            doc.save(`SimLogicFlow_Reporte_${filterType}_${new Date().getTime()}.pdf`);
+        } catch (error) {
+            console.error("Error generating PDF:", error);
+            alert("Error al generar el PDF. Por favor, intente de nuevo.");
+        }
+    };
+
     const maxUsageHours = Math.max(...stats.simulatorUsage.map(s => s.hours), 1);
 
     return (
         <div className="statistics-container" style={{ padding: '20px', color: '#1e293b' }}>
 
             {/* Filters Row */}
-            <div style={{ marginBottom: '30px', display: 'flex', gap: '15px', alignItems: 'center', flexWrap: 'wrap', background: '#f8fafc', padding: '15px', borderRadius: '12px' }}>
+            <div style={{ marginBottom: '30px', display: 'flex', gap: '15px', alignItems: 'center', flexWrap: 'wrap', background: '#f8fafc', padding: '15px', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
                 <span style={{ fontWeight: '700', fontSize: '14px' }}>Filtros de Tiempo:</span>
                 <div style={{ display: 'flex', gap: '8px' }}>
                     {[
@@ -136,7 +228,32 @@ export default function StatisticsView({ users = [], courses = [], proCourses = 
                         />
                     </div>
                 )}
+
+                <button
+                    onClick={exportToPDF}
+                    style={{
+                        marginLeft: 'auto',
+                        padding: '10px 20px',
+                        background: '#ef4444',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '8px',
+                        fontWeight: '700',
+                        fontSize: '13px',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        boxShadow: '0 2px 4px rgba(239, 68, 68, 0.2)',
+                        transition: 'transform 0.2s'
+                    }}
+                    onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
+                    onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                >
+                    <span>📄</span> Descargar Reporte PDF
+                </button>
             </div>
+
             {/* Overview Cards */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px', marginBottom: '30px' }}>
                 <StatCard title="Total Usuarios" value={stats.totalUsers} icon="👥" color="#3b82f6" />

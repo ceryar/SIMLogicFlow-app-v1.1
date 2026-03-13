@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 
 // Endpoints to warm up when user authenticates (GET only, safe to cache)
@@ -39,9 +39,12 @@ async function warmUpCache() {
  */
 export function usePWA() {
     const [isOnline, setIsOnline] = useState(navigator.onLine);
-    const [updateAvailable, setUpdateAvailable] = useState(false);
-    const [registration, setRegistration] = useState(null);
-    const [installPrompt, setInstallPrompt] = useState(null);
+    const [offlineAt, setOfflineAt] = useState(null);
+    const [showUpdate, setShowUpdate] = useState(false);
+    const [registration, setRegistration] = useState(null); // Kept for applyUpdate
+    const [showInstallPrompt, setShowInstallPrompt] = useState(false);
+    const [isInstalling, setIsInstalling] = useState(false);
+    const [deferredPrompt, setDeferredPrompt] = useState(null);
     const [isInstalled, setIsInstalled] = useState(
         window.matchMedia('(display-mode: standalone)').matches
     );
@@ -49,45 +52,63 @@ export function usePWA() {
 
     // ── Online / Offline events ─────────────────────────────────────────────
     useEffect(() => {
-        const goOnline = () => setIsOnline(true);
-        const goOffline = () => setIsOnline(false);
-        window.addEventListener('online', goOnline);
-        window.addEventListener('offline', goOffline);
+        const handleOnline = () => {
+            setIsOnline(true);
+            setOfflineAt(null);
+        };
+        const handleOffline = () => {
+            setIsOnline(false);
+            setOfflineAt(new Date());
+        };
+
+        window.addEventListener('online', handleOnline);
+        window.addEventListener('offline', handleOffline);
+
         return () => {
-            window.removeEventListener('online', goOnline);
-            window.removeEventListener('offline', goOffline);
+            window.removeEventListener('online', handleOnline);
+            window.removeEventListener('offline', handleOffline);
         };
     }, []);
 
     // ── Service Worker registration & update detection ──────────────────────
     useEffect(() => {
-        if (!('serviceWorker' in navigator)) return;
+        const handleControllerChange = () => {
+            if (document.visibilityState === 'visible') {
+                window.location.reload();
+            }
+        };
 
-        navigator.serviceWorker.ready.then(reg => {
-            setRegistration(reg);
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.addEventListener('controllerchange', handleControllerChange);
 
-            // Detect a waiting SW (update available)
-            if (reg.waiting) setUpdateAvailable(true);
+            navigator.serviceWorker.getRegistration().then(reg => {
+                if (reg) {
+                    setRegistration(reg); // Set registration state
+                    // Detect a waiting SW (update available)
+                    if (reg.waiting) setShowUpdate(true);
 
-            reg.addEventListener('updatefound', () => {
-                const newWorker = reg.installing;
-                if (!newWorker) return;
-                newWorker.addEventListener('statechange', () => {
-                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                        setUpdateAvailable(true);
-                    }
-                });
+                    reg.addEventListener('updatefound', () => {
+                        const newWorker = reg.installing;
+                        if (newWorker) {
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    setShowUpdate(true);
+                                }
+                            });
+                        }
+                    });
+                }
             });
-        });
+        }
 
-        // Reload page when a new SW takes control
-        let refreshing = false;
-        navigator.serviceWorker.addEventListener('controllerchange', () => {
-            if (!refreshing) { refreshing = true; window.location.reload(); }
-        });
+        return () => {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.removeEventListener('controllerchange', handleControllerChange);
+            }
+        };
     }, []);
 
-    // ── Apply SW update (send skipWaiting) ─────────────────────────────────
+    // ── Actions ────────────────────────────────────────────────────────────
     const applyUpdate = useCallback(() => {
         if (registration?.waiting) {
             registration.waiting.postMessage({ type: 'SKIP_WAITING' });
@@ -95,35 +116,65 @@ export function usePWA() {
     }, [registration]);
 
     // ── Install prompt (Add to Home Screen) ────────────────────────────────
-    useEffect(() => {
-        const handler = (e) => { e.preventDefault(); setInstallPrompt(e); };
-        window.addEventListener('beforeinstallprompt', handler);
-        window.addEventListener('appinstalled', () => {
+    React.useEffect(() => {
+        const handleBeforeInstallPrompt = (e) => {
+            e.preventDefault();
+            setDeferredPrompt(e);
+            setShowInstallPrompt(true);
+        };
+
+        const handleAppInstalled = () => {
             setIsInstalled(true);
-            setInstallPrompt(null);
-        });
-        return () => window.removeEventListener('beforeinstallprompt', handler);
+            setShowInstallPrompt(false);
+            setDeferredPrompt(null);
+        };
+
+        window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+        window.addEventListener('appinstalled', handleAppInstalled);
+
+        return () => {
+            window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+            window.removeEventListener('appinstalled', handleAppInstalled);
+        };
     }, []);
 
     const installApp = useCallback(async () => {
-        if (!installPrompt) return;
-        installPrompt.prompt();
-        const { outcome } = await installPrompt.userChoice;
-        if (outcome === 'accepted') setIsInstalled(true);
-        setInstallPrompt(null);
-    }, [installPrompt]);
+        if (!deferredPrompt) return;
+        setIsInstalling(true);
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+            setIsInstalled(true);
+        }
+        setShowInstallPrompt(false);
+        setDeferredPrompt(null);
+        setIsInstalling(false);
+    }, [deferredPrompt]);
 
     // ── Cache warm-up: call this after login ───────────────────────────────
     const triggerCacheWarmUp = useCallback(async () => {
-        await warmUpCache();
-        setCacheReady(true);
+        if (!('serviceWorker' in navigator) || !navigator.serviceWorker.controller) {
+            console.warn("ServiceWorker not ready for warm up");
+            return;
+        }
+
+        try {
+            navigator.serviceWorker.controller.postMessage({
+                type: 'WARM_UP_CACHE',
+                endpoints: WARM_UP_ENDPOINTS
+            });
+            setCacheReady(true); // Set cacheReady after triggering warm-up
+        } catch (err) {
+            console.error('Error triggering cache warm-up:', err);
+        }
     }, []);
 
     return {
         isOnline,
-        updateAvailable,
+        offlineAt,
+        updateAvailable: showUpdate,
         applyUpdate,
-        canInstall: !!installPrompt && !isInstalled,
+        canInstall: showInstallPrompt && !isInstalled && !isInstalling,
         installApp,
         isInstalled,
         cacheReady,
