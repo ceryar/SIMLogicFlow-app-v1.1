@@ -247,166 +247,200 @@ export default function ProCourseModal({ isOpen, onClose, onSuccess, editProCour
 
     return (
         <div className="modal-overlay">
-            <div className="modal-content" style={{ maxWidth: '650px' }}>
+            <div className="modal-content" style={{ maxWidth: '900px', maxHeight: '95vh', display: 'flex', flexDirection: 'column' }}>
                 <div className="modal-header">
-                    <h3>{editProCourse ? 'Editar Sesión' : 'Programar Multi-sesiones'}</h3>
+                    <h3 style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                        {editProCourse ? 'Editar Sesión' : 'Programar Multi-sesiones'}
+                    </h3>
                     <button className="btn-close" onClick={onClose}>
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                     </button>
                 </div>
 
-                {error && <div className="modal-error">{error}</div>}
+                {error && <div className="modal-error" style={{ margin: '1rem 2rem 0' }}>{error}</div>}
 
-                <form className="modal-form" onSubmit={handleSubmit}>
-                    <div className="form-grid">
-                        <div className="form-group full-width">
-                            <label>Curso *</label>
-                            <select
-                                required
-                                value={courseId}
-                                onChange={(e) => {
-                                    setCourseId(e.target.value);
-                                    setSessions([]);
-                                    setError(null);
-                                }}
-                                disabled={fetchingCourses || editProCourse}
-                            >
-                                <option value="">Seleccione un curso...</option>
-                                {courses.map(course => (
-                                    <option key={course.id} value={course.id}>
-                                        {course.name} ({course.horas}h — hasta {course.fecFin})
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
-                        {selectedCourse && (
+                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
+                    <div className="modal-body" style={{ padding: '1.5rem 2rem', overflowY: 'auto', flex: 1 }}>
+                        <div className="form-grid">
                             <div className="form-group full-width">
-                                <div className="hours-progress-bar">
-                                    <div className="hours-progress-labels">
-                                        <span>Horas Totales (DB + Nuevas)</span>
-                                        <span className={totalAfter > courseLimit ? 'over-limit' : ''}>
-                                            {totalAfter}h / {courseLimit}h
-                                        </span>
-                                    </div>
-                                    <div className="hours-track">
-                                        <div
-                                            className={`hours-fill ${totalAfter >= courseLimit ? 'complete' : ''}`}
-                                            style={{ width: `${Math.min((totalAfter / courseLimit) * 100, 100)}%` }}
-                                        />
-                                    </div>
-                                    <div className="hours-meta">
-                                        En DB: <strong>{scheduledHours}h</strong> |
-                                        En Lista: <strong>{totalNewSessionsHours}h</strong> |
-                                        Disponible: <strong>{Math.max(courseLimit - totalAfter, 0)}h</strong>
-                                    </div>
-                                </div>
+                                <label>Curso *</label>
+                                <select
+                                    required
+                                    value={courseId}
+                                    onChange={(e) => {
+                                        setCourseId(e.target.value);
+                                        setSessions([]);
+                                        setError(null);
+                                    }}
+                                    disabled={fetchingCourses || editProCourse}
+                                    style={{ width: '100%' }}
+                                >
+                                    <option value="">Seleccione un curso...</option>
+                                    {courses.map(course => (
+                                        <option key={course.id} value={course.id}>
+                                            {course.name} ({course.horas}h — hasta {course.fecFin})
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
-                        )}
 
-                        {!editProCourse && selectedCourse && (
-                            <div className="session-builder full-width" style={{ background: 'rgba(255,255,255,0.03)', padding: '15px', borderRadius: '12px', border: '1px dashed rgba(255,255,255,0.1)', marginBottom: '15px' }}>
-                                <h4 style={{ margin: '0 0 10px 0', fontSize: '0.9rem', color: '#94a3b8' }}>Añadir sesión a la lista</h4>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: '10px', alignItems: 'end' }}>
-                                    <div className="form-group" style={{ marginBottom: 0 }}>
-                                        <label style={{ fontSize: '12px' }}>Fecha</label>
-                                        <DatePicker
-                                            value={currentSession.fecha}
-                                            onChange={(e) => setCurrentSession({ ...currentSession, fecha: e.target.value })}
-                                            minDate={selectedCourse.fecInicio < today ? today : selectedCourse.fecInicio}
-                                            maxDate={selectedCourse.fecFin}
-                                        />
-                                    </div>
-                                    <div className="form-group" style={{ marginBottom: 0 }}>
-                                        <label style={{ fontSize: '12px' }}>Inicio</label>
-                                        <TimePicker
-                                            value={currentSession.horaini}
-                                            onChange={(e) => handleCurrentTimeChange('horaini', e.target.value)}
-                                        />
-                                    </div>
-                                    <div className="form-group" style={{ marginBottom: 0 }}>
-                                        <label style={{ fontSize: '12px' }}>Fin</label>
-                                        <TimePicker
-                                            value={currentSession.horafin}
-                                            onChange={(e) => handleCurrentTimeChange('horafin', e.target.value)}
-                                        />
-                                    </div>
-                                    <button type="button" className="btn-primary" onClick={addSessionToList} style={{ padding: '10px', height: '42px' }}>
-                                        +
-                                    </button>
-                                </div>
-                                {currentSession.horas && (
-                                    <div style={{ marginTop: '8px', fontSize: '12px', color: '#6366f1' }}>
-                                        Duración: {currentSession.horas} h
-                                    </div>
-                                )}
-                            </div>
-                        )}
-
-                        {sessions.length > 0 && (
-                            <div className="sessions-list full-width" style={{ maxHeight: '200px', overflowY: 'auto' }}>
-                                <label style={{ marginBottom: '8px', display: 'block' }}>Sesiones para guardar ({sessions.length}):</label>
-                                {sessions.map((s, idx) => (
-                                    <div key={s.id} className="session-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', marginBottom: '6px' }}>
-                                        <div style={{ fontSize: '14px' }}>
-                                            <strong>{s.fecha}</strong> | {s.horaini} - {s.horafin} ({s.horas}h)
+                            {selectedCourse && (
+                                <div className="form-group full-width">
+                                    <div className="hours-progress-bar" style={{ padding: '12px', background: 'rgba(99, 102, 241, 0.05)', borderRadius: '12px' }}>
+                                        <div className="hours-progress-labels" style={{ marginBottom: '8px', fontSize: '13px', display: 'flex', justifyContent: 'space-between' }}>
+                                            <span>Progreso de Horas</span>
+                                            <span className={totalAfter > courseLimit ? 'over-limit' : ''}>
+                                                <strong>{totalAfter}</strong> / {courseLimit}h
+                                            </span>
                                         </div>
-                                        {!editProCourse && (
-                                            <button type="button" className="btn-icon btn-delete" onClick={() => removeSession(s.id)} style={{ color: '#ef4444' }}>
-                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                                            </button>
-                                        )}
+                                        <div className="hours-track" style={{ height: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '10px', overflow: 'hidden' }}>
+                                            <div
+                                                className={`hours-fill ${totalAfter >= courseLimit ? 'complete' : ''}`}
+                                                style={{ width: `${Math.min((totalAfter / courseLimit) * 100, 100)}%`, height: '100%', transition: 'width 0.4s ease' }}
+                                            />
+                                        </div>
+                                        <div className="hours-meta" style={{ marginTop: '8px', fontSize: '11px', color: '#94a3b8', display: 'flex', gap: '15px' }}>
+                                            <span>DB: <strong>{scheduledHours}h</strong></span>
+                                            <span>En Lista: <strong>{totalNewSessionsHours}h</strong></span>
+                                            <span>Disponible: <strong style={{ color: totalAfter >= courseLimit ? '#ef4444' : '#10b981' }}>{Math.max(courseLimit - totalAfter, 0)}h</strong></span>
+                                        </div>
                                     </div>
-                                ))}
-                            </div>
-                        )}
+                                </div>
+                            )}
 
-                        {editProCourse && sessions[0] && (
-                            <>
-                                <div className="form-group">
-                                    <label>Fecha de Sesión *</label>
-                                    <DatePicker
-                                        required
-                                        value={sessions[0].fecha}
-                                        onChange={(e) => setSessions([{ ...sessions[0], fecha: e.target.value }])}
-                                        minDate={selectedCourse?.fecInicio < today ? today : selectedCourse?.fecInicio}
-                                        maxDate={selectedCourse?.fecFin}
-                                    />
+                            {!editProCourse && selectedCourse && (
+                                <div className="session-builder full-width" style={{ position: 'relative', background: 'rgba(255,255,255,0.02)', padding: '15px 15px 30px 15px', borderRadius: '12px', border: '1px dashed rgba(255,255,255,0.12)', marginBottom: '5px' }}>
+                                    <h4 style={{ margin: '0 0 12px 0', fontSize: '0.85rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Configurar nueva sesión</h4>
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(200px, 1.5fr) 1fr 1fr auto', gap: '15px', alignItems: 'end' }}>
+                                        <div className="form-group" style={{ marginBottom: 0 }}>
+                                            <label style={{ fontSize: '11px', color: '#64748b' }}>Fecha</label>
+                                            <DatePicker
+                                                value={currentSession.fecha}
+                                                onChange={(e) => setCurrentSession({ ...currentSession, fecha: e.target.value })}
+                                                minDate={selectedCourse.fecInicio < today ? today : selectedCourse.fecInicio}
+                                                maxDate={selectedCourse.fecFin}
+                                            />
+                                        </div>
+                                        <div className="form-group" style={{ marginBottom: 0 }}>
+                                            <label style={{ fontSize: '11px', color: '#64748b' }}>Inicio</label>
+                                            <TimePicker
+                                                value={currentSession.horaini}
+                                                onChange={(e) => handleCurrentTimeChange('horaini', e.target.value)}
+                                            />
+                                        </div>
+                                        <div className="form-group" style={{ marginBottom: 0 }}>
+                                            <label style={{ fontSize: '11px', color: '#64748b' }}>Fin</label>
+                                            <TimePicker
+                                                value={currentSession.horafin}
+                                                onChange={(e) => handleCurrentTimeChange('horafin', e.target.value)}
+                                            />
+                                        </div>
+                                        <button
+                                            type="button"
+                                            className="btn-primary"
+                                            onClick={addSessionToList}
+                                            style={{
+                                                width: '42px',
+                                                height: '42px',
+                                                padding: 0,
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                borderRadius: '10px'
+                                            }}
+                                            title="Añadir sesión"
+                                        >
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                        </button>
+                                    </div>
+                                    {currentSession.horas && (
+                                        <div style={{ position: 'absolute', top: '15px', right: '15px', fontSize: '12px', color: '#6366f1', fontWeight: '600' }}>
+                                            {currentSession.horas} h
+                                        </div>
+                                    )}
                                 </div>
-                                <div className="form-group">
-                                    <label>Hora Inicio *</label>
-                                    <TimePicker
-                                        value={sessions[0].horaini}
-                                        onChange={(e) => {
-                                            const h = calcSessionHours(e.target.value, sessions[0].horafin);
-                                            setSessions([{ ...sessions[0], horaini: e.target.value, horas: h || '' }]);
-                                        }}
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>Hora Fin *</label>
-                                    <TimePicker
-                                        value={sessions[0].horafin}
-                                        onChange={(e) => {
-                                            const h = calcSessionHours(sessions[0].horaini, e.target.value);
-                                            setSessions([{ ...sessions[0], horafin: e.target.value, horas: h || '' }]);
-                                        }}
-                                    />
-                                </div>
-                                <div className="form-group" style={{ display: 'flex', alignItems: 'flex-end' }}>
-                                    <div className="hours-chip" style={{ height: '42px', display: 'flex', alignItems: 'center', width: '100%' }}>
-                                        {sessions[0].horas}h
+                            )}
+
+                            {sessions.length > 0 && (
+                                <div className="sessions-list full-width" style={{ marginTop: '10px' }}>
+                                    <label style={{ marginBottom: '10px', fontSize: '13px', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v20M2 12h20"></path></svg>
+                                        Sesiones en cola ({sessions.length}):
+                                    </label>
+                                    <div style={{ maxHeight: '140px', overflowY: 'auto', paddingRight: '5px' }}>
+                                        {sessions.map((s) => (
+                                            <div key={s.id} className="session-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', background: 'rgba(255,255,255,0.03)', borderRadius: '10px', marginBottom: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                                        <span style={{ fontSize: '14px', fontWeight: '600', color: '#f8fafc' }}>{s.fecha}</span>
+                                                        <span style={{ fontSize: '12px', color: '#94a3b8' }}>{s.horaini} — {s.horafin}</span>
+                                                    </div>
+                                                    <div style={{ background: 'rgba(99, 102, 241, 0.1)', color: '#818cf8', padding: '2px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: '700' }}>
+                                                        {s.horas}h
+                                                    </div>
+                                                </div>
+                                                {!editProCourse && (
+                                                    <button type="button" className="btn-icon" onClick={() => removeSession(s.id)} style={{ color: '#ef4444', background: 'rgba(239, 68, 68, 0.1)', padding: '6px', borderRadius: '6px' }}>
+                                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                                    </button>
+                                                )}
+                                            </div>
+                                        ))}
                                     </div>
                                 </div>
-                            </>
-                        )}
+                            )}
+
+                            {editProCourse && sessions[0] && (
+                                <>
+                                    <div className="form-group">
+                                        <label>Fecha de Sesión *</label>
+                                        <DatePicker
+                                            required
+                                            value={sessions[0].fecha}
+                                            onChange={(e) => setSessions([{ ...sessions[0], fecha: e.target.value }])}
+                                            minDate={selectedCourse?.fecInicio < today ? today : selectedCourse?.fecInicio}
+                                            maxDate={selectedCourse?.fecFin}
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Horario *</label>
+                                        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                                            <TimePicker
+                                                value={sessions[0].horaini}
+                                                onChange={(e) => {
+                                                    const h = calcSessionHours(e.target.value, sessions[0].horafin);
+                                                    setSessions([{ ...sessions[0], horaini: e.target.value, horas: h || '' }]);
+                                                }}
+                                            />
+                                            <span style={{ color: '#64748b' }}>—</span>
+                                            <TimePicker
+                                                value={sessions[0].horafin}
+                                                onChange={(e) => {
+                                                    const h = calcSessionHours(sessions[0].horaini, e.target.value);
+                                                    setSessions([{ ...sessions[0], horafin: e.target.value, horas: h || '' }]);
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="form-group" style={{ display: 'flex', justifyContent: 'center' }}>
+                                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px' }}>
+                                            <label style={{ fontSize: '11px', color: '#64748b' }}>Duración Calculada</label>
+                                            <div className="hours-chip" style={{ background: 'rgba(99, 102, 241, 0.15)', color: '#818cf8', padding: '10px 20px', borderRadius: '12px', fontWeight: '700', fontSize: '1.2rem' }}>
+                                                {sessions[0].horas}h
+                                            </div>
+                                        </div>
+                                    </div>
+                                </>
+                            )}
+                        </div>
                     </div>
 
-                    <div className="modal-actions" style={{ marginTop: '20px' }}>
-                        <button type="button" className="btn-secondary" onClick={onClose} disabled={loading}>
+                    <div className="modal-actions" style={{ padding: '1.25rem 2rem', borderTop: '1px solid rgba(255,255,255,0.08)', display: 'flex', justifyContent: 'flex-end', gap: '1rem', background: 'rgba(15, 23, 42, 0.4)' }}>
+                        <button type="button" className="btn-secondary" onClick={onClose} disabled={loading} style={{ padding: '10px 20px' }}>
                             Cancelar
                         </button>
-                        <button type="submit" className="btn-primary" disabled={loading || sessions.length === 0}>
+                        <button type="submit" className="btn-primary" disabled={loading || sessions.length === 0} style={{ padding: '10px 24px', minWidth: '160px' }}>
                             {loading ? 'Guardando...' : (editProCourse ? 'Actualizar Sesión' : `Guardar ${sessions.length} Sesiones`)}
                         </button>
                     </div>
