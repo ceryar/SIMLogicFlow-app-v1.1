@@ -136,11 +136,27 @@ export default function StatisticsView({ users = [], courses = [], proCourses = 
             // Filter Info
             doc.setFontSize(10);
             doc.setTextColor(100, 116, 139); // #64748b
+
             let periodText = 'Periodo: ';
-            if (filterType === 'all') periodText += 'Todo el historial';
-            else if (filterType === 'week') periodText += 'Esta Semana';
-            else if (filterType === 'month') periodText += 'Este Mes';
-            else periodText += `${startDate} hasta ${endDate}`;
+            const now = new Date();
+
+            if (filterType === 'all') {
+                periodText += 'Todo el historial';
+            } else if (filterType === 'week') {
+                const startOfWeek = new Date(now);
+                const day = startOfWeek.getDay();
+                const diff = startOfWeek.getDate() - day + (day === 0 ? -6 : 1);
+                const s = new Date(startOfWeek.setDate(diff));
+                const e = new Date(s);
+                e.setDate(s.getDate() + 6);
+                periodText += `${s.toLocaleDateString()} al ${e.toLocaleDateString()} (Esta Semana)`;
+            } else if (filterType === 'month') {
+                const s = new Date(now.getFullYear(), now.getMonth(), 1);
+                const e = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+                periodText += `${s.toLocaleDateString()} al ${e.toLocaleDateString()} (Este Mes)`;
+            } else {
+                periodText += `${startDate || '...'} al ${endDate || '...'}`;
+            }
             doc.text(periodText, 14, 40);
 
             let filterText = '';
