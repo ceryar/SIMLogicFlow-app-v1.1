@@ -92,6 +92,7 @@ export default function ProCourseModal({ isOpen, onClose, onSuccess, editProCour
     const [fetchingCourses, setFetchingCourses] = useState(false);
     const [error, setError] = useState(null);
     const [warnings, setWarnings] = useState([]);
+    const [courseSearchQuery, setCourseSearchQuery] = useState('');
 
     const today = new Date().toISOString().split('T')[0];
 
@@ -134,6 +135,7 @@ export default function ProCourseModal({ isOpen, onClose, onSuccess, editProCour
         }
         setError(null);
         setWarnings([]);
+        setCourseSearchQuery('');
     }, [editProCourse, isOpen]);
 
     // ---- Derived values ----
@@ -265,6 +267,30 @@ export default function ProCourseModal({ isOpen, onClose, onSuccess, editProCour
                         <div className="form-grid">
                             <div className="form-group full-width">
                                 <label>Curso *</label>
+                                {!editProCourse && (
+                                    <div className="uc-search-box" style={{ marginBottom: '10px', maxWidth: '100%', background: 'rgba(0,0,0,0.15)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ opacity: 0.6 }}>
+                                            <circle cx="11" cy="11" r="8"></circle>
+                                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                        </svg>
+                                        <input
+                                            type="text"
+                                            placeholder="Filtrar cursos por nombre..."
+                                            value={courseSearchQuery}
+                                            onChange={(e) => setCourseSearchQuery(e.target.value)}
+                                            style={{ fontSize: '12px', padding: '6px 0' }}
+                                        />
+                                        {courseSearchQuery && (
+                                            <button
+                                                type="button"
+                                                onClick={() => setCourseSearchQuery('')}
+                                                style={{ border: 'none', background: 'none', cursor: 'pointer', padding: '0', color: '#64748b', display: 'flex' }}
+                                            >
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                                            </button>
+                                        )}
+                                    </div>
+                                )}
                                 <select
                                     required
                                     value={courseId}
@@ -276,12 +302,18 @@ export default function ProCourseModal({ isOpen, onClose, onSuccess, editProCour
                                     disabled={fetchingCourses || editProCourse}
                                     style={{ width: '100%' }}
                                 >
-                                    <option value="">Seleccione un curso...</option>
-                                    {courses.map(course => (
-                                        <option key={course.id} value={course.id}>
-                                            {course.name} ({course.horas}h — hasta {course.fecFin})
-                                        </option>
-                                    ))}
+                                    <option value="">
+                                        {courses.filter(c => c.name.toLowerCase().includes(courseSearchQuery.toLowerCase())).length === 0 && courseSearchQuery
+                                            ? 'No se encontraron cursos'
+                                            : 'Seleccione un curso...'}
+                                    </option>
+                                    {courses
+                                        .filter(course => course.name.toLowerCase().includes(courseSearchQuery.toLowerCase()))
+                                        .map(course => (
+                                            <option key={course.id} value={course.id}>
+                                                {course.name} ({course.horas}h — hasta {course.fecFin})
+                                            </option>
+                                        ))}
                                 </select>
                             </div>
 
