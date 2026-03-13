@@ -17,6 +17,13 @@ export default function DatePicker({ value, onChange, placeholder, required, min
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
+    // Sync viewDate when value changes from outside
+    useEffect(() => {
+        if (value) {
+            setViewDate(new Date(value + 'T00:00:00'));
+        }
+    }, [value]);
+
     const { days, monthName, year } = useMemo(() => {
         const y = viewDate.getFullYear();
         const m = viewDate.getMonth();

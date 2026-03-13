@@ -905,6 +905,7 @@ export default function AdminMenu() {
                     <tr>
                         <th>Fecha</th>
                         <th>Simulador</th>
+                        <th>Tipo</th>
                         <th>Observación</th>
                         <th className="text-right">Acciones</th>
                     </tr>
@@ -912,14 +913,14 @@ export default function AdminMenu() {
                 <tbody>
                     {loading && maintenanceHistory.length === 0 ? (
                         <tr>
-                            <td colSpan="4" style={{ textAlign: 'center', padding: '2rem' }}>
+                            <td colSpan="5" style={{ textAlign: 'center', padding: '2rem' }}>
                                 <div className="loading-spinner-small" style={{ marginBottom: '10px' }}></div>
                                 Cargando historial...
                             </td>
                         </tr>
                     ) : currentHistory.length === 0 ? (
                         <tr>
-                            <td colSpan="4" style={{ textAlign: 'center', padding: '2rem' }}>
+                            <td colSpan="5" style={{ textAlign: 'center', padding: '2rem' }}>
                                 No se encontraron registros en el historial que coincidan con la búsqueda.
                             </td>
                         </tr>
@@ -932,6 +933,11 @@ export default function AdminMenu() {
                                         <span className="course-color-dot" style={{ backgroundColor: getCourseColor(h.maintenance?.simulator?.id || 0) }}></span>
                                         {h.maintenance?.simulator?.name || '-'}
                                     </div>
+                                </td>
+                                <td data-label="Tipo">
+                                    <span className="status-badge status-active">
+                                        {h.maintenance?.maintenanceType?.name || 'Mantenimiento'}
+                                    </span>
                                 </td>
                                 <td data-label="Observación">{h.observation}</td>
                                 <td data-label="Acciones" className="actions-cell">

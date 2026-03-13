@@ -1,40 +1,85 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import DatePicker from './DatePicker';
 import './AdminMenu.css';
 import './CalendarView.css';
+
+const monthNames = [
+    "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+    "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+];
 
 export default function CalendarView({ events, type }) {
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDayEvents, setSelectedDayEvents] = useState(null);
     const [selectedDate, setSelectedDate] = useState(null);
 
-    const { days, monthName, year } = useMemo(() => {
+    const [viewMode, setViewMode] = useState('month');
+
+    const { days, viewTitle, year } = useMemo(() => {
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
-        const firstDayOfMonth = new Date(year, month, 1).getDay();
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const date = currentDate.getDate();
+        if (viewMode === 'month') {
+            const firstDayOfMonth = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const days = [];
+            for (let i = 0; i < firstDayOfMonth; i++) {
+                days.push({ day: null, key: `empty-${i}` });
+            }
+            for (let i = 1; i <= daysInMonth; i++) {
+                days.push({
+                    day: i,
+                    dateString: `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`,
+                    key: `day-${i}`
+                });
+            }
+            return { days, viewTitle: monthNames[month], year };
+        } else if (viewMode === 'week') {
+            const startOfWeek = new Date(currentDate);
+            startOfWeek.setDate(date - currentDate.getDay());
+            const days = [];
+            for (let i = 0; i < 7; i++) {
+                const d = new Date(startOfWeek);
+                d.setDate(startOfWeek.getDate() + i);
+                days.push({
+                    day: d.getDate(),
+                    dateString: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`,
+                    key: `week-${i}`,
+                    weekday: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'][i]
+                });
+            }
+            const endOfWeek = new Date(startOfWeek);
+            endOfWeek.setDate(startOfWeek.getDate() + 6);
 
-        const days = [];
-        for (let i = 0; i < firstDayOfMonth; i++) {
-            days.push({ day: null, key: `empty-${i}` });
+            let title = `${monthNames[startOfWeek.getMonth()]}`;
+            if (startOfWeek.getMonth() !== endOfWeek.getMonth()) {
+                title += ` - ${monthNames[endOfWeek.getMonth()]}`;
+            }
+            return { days, viewTitle: title, year };
+        } else {
+            // Day view
+            return {
+                days: [{
+                    day: date,
+                    dateString: `${year}-${String(month + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`,
+                    key: 'single-day'
+                }],
+                viewTitle: `${monthNames[month]} ${date}`,
+                year
+            };
         }
-        for (let i = 1; i <= daysInMonth; i++) {
-            days.push({
-                day: i,
-                dateString: `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`,
-                key: `day-${i}`
-            });
+    }, [currentDate, viewMode]);
+
+    const navigate = (offset) => {
+        const newDate = new Date(currentDate);
+        if (viewMode === 'month') {
+            newDate.setMonth(currentDate.getMonth() + offset);
+            newDate.setDate(1);
+        } else if (viewMode === 'week') {
+            newDate.setDate(currentDate.getDate() + (offset * 7));
+        } else {
+            newDate.setDate(currentDate.getDate() + offset);
         }
-
-        const monthNames = [
-            "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-            "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
-        ];
-
-        return { days, monthName: monthNames[month], year };
-    }, [currentDate]);
-
-    const changeMonth = (offset) => {
-        const newDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + offset, 1);
         setCurrentDate(newDate);
         setSelectedDayEvents(null);
         setSelectedDate(null);
@@ -42,9 +87,32 @@ export default function CalendarView({ events, type }) {
 
     const formatTime = (timeStr) => {
         if (!timeStr) return '';
-        // Handle HH:MM:SS or HH:MM
         const parts = timeStr.split(':');
         return `${parts[0]}:${parts[1]}`;
+    };
+
+    const getEventColor = (event) => {
+        const colors = [
+            '#6366f1', // Indigo
+            '#10b981', // Green
+            '#f59e0b', // Orange
+            '#3b82f6', // Blue
+            '#ec4899', // Pink
+            '#8b5cf6', // Purple
+            '#06b6d4', // Cyan
+            '#f43f5e', // Rose
+            '#84cc16', // Lime
+            '#ef4444', // Red
+        ];
+
+        let id = 0;
+        if (type === 'course') {
+            id = event.course?.id || 0;
+        } else {
+            id = event.simulator?.id || 0;
+        }
+
+        return colors[id % colors.length];
     };
 
     const getEventLabel = (event) => {
@@ -79,6 +147,15 @@ export default function CalendarView({ events, type }) {
         setSelectedDayEvents(dayEvents);
     };
 
+    // Auto-select day in day view
+    useEffect(() => {
+        if (viewMode === 'day') {
+            const dateString = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`;
+            setSelectedDate(dateString);
+            setSelectedDayEvents(getEventsForDay(dateString));
+        }
+    }, [viewMode, currentDate, events]);
+
     const today = new Date();
     const todayString = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
@@ -87,26 +164,95 @@ export default function CalendarView({ events, type }) {
             <div className="calendar-container">
                 {/* Header */}
                 <div className="calendar-header">
-                    <button className="btn-calendar-nav" onClick={() => changeMonth(-1)}>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <polyline points="15 18 9 12 15 6"></polyline>
-                        </svg>
-                    </button>
-                    <h3>{monthName} {year}</h3>
-                    <button className="btn-calendar-nav" onClick={() => changeMonth(1)}>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <polyline points="9 18 15 12 9 6"></polyline>
-                        </svg>
-                    </button>
+                    <div className="calendar-nav-group">
+                        <button className="btn-calendar-nav" onClick={() => navigate(-1)}>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <polyline points="15 18 9 12 15 6"></polyline>
+                            </svg>
+                        </button>
+                        <button className="btn-calendar-today" onClick={() => setCurrentDate(new Date())}>Hoy</button>
+                        <button className="btn-calendar-nav" onClick={() => navigate(1)}>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div className="calendar-title-wrapper">
+                        <div className="calendar-selectors-menu">
+                            <select
+                                className="calendar-select-menu"
+                                value={currentDate.getMonth()}
+                                onChange={(e) => {
+                                    const d = new Date(currentDate);
+                                    d.setMonth(parseInt(e.target.value));
+                                    d.setDate(1);
+                                    setCurrentDate(d);
+                                }}
+                            >
+                                {monthNames.map((name, i) => (
+                                    <option key={i} value={i}>{name}</option>
+                                ))}
+                            </select>
+
+                            <select
+                                className="calendar-select-menu year"
+                                value={currentDate.getFullYear()}
+                                onChange={(e) => {
+                                    const d = new Date(currentDate);
+                                    d.setFullYear(parseInt(e.target.value));
+                                    setCurrentDate(d);
+                                }}
+                            >
+                                {Array.from({ length: 11 }, (_, i) => currentDate.getFullYear() - 5 + i).map(y => (
+                                    <option key={y} value={y}>{y}</option>
+                                ))}
+                            </select>
+
+                            <div className="calendar-date-selector" title="Escoger día específico">
+                                <DatePicker
+                                    value={`${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`}
+                                    onChange={(e) => {
+                                        const dateStr = e.target.value;
+                                        const [y, m, d] = dateStr.split('-').map(Number);
+                                        if (y && m && d) {
+                                            setCurrentDate(new Date(y, m - 1, d));
+                                            setSelectedDate(dateStr);
+                                            setSelectedDayEvents(getEventsForDay(dateStr));
+                                        }
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="calendar-view-switcher">
+                        <button
+                            className={`btn-view-mode ${viewMode === 'month' ? 'active' : ''}`}
+                            onClick={() => setViewMode('month')}
+                        >Mes</button>
+                        <button
+                            className={`btn-view-mode ${viewMode === 'week' ? 'active' : ''}`}
+                            onClick={() => setViewMode('week')}
+                        >Semana</button>
+                        <button
+                            className={`btn-view-mode ${viewMode === 'day' ? 'active' : ''}`}
+                            onClick={() => setViewMode('day')}
+                        >Día</button>
+                    </div>
                 </div>
 
-                {/* Weekday Labels */}
-                <div className="calendar-grid">
-                    {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map(d => (
-                        <div key={d} className="calendar-weekday">{d}</div>
-                    ))}
+                {/* Weekday Labels (Only for Month and Week) */}
+                {viewMode !== 'day' && (
+                    <div className={`calendar-grid-header ${viewMode}-view`}>
+                        {['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'].map(d => (
+                            <div key={d} className="calendar-weekday">{d}</div>
+                        ))}
+                    </div>
+                )}
 
-                    {/* Day Cells */}
+                {/* Day Cells */}
+                <div className={`calendar-grid ${viewMode}-view`}>
                     {days.map(dayObj => {
                         const dayEvents = dayObj.day ? getEventsForDay(dayObj.dateString) : [];
                         const isToday = dayObj.dateString === todayString;
@@ -115,18 +261,32 @@ export default function CalendarView({ events, type }) {
                         return (
                             <div
                                 key={dayObj.key}
-                                className={`calendar-day ${dayObj.day === null ? 'empty' : ''} ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''} ${dayEvents.length > 0 ? 'has-events' : ''}`}
-                                onClick={() => dayObj.day && handleDayClick(dayObj)}
+                                className={`calendar-day ${dayObj.day === null ? 'empty' : ''} ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''} ${dayEvents.length > 0 ? 'has-events' : ''} ${viewMode}-day`}
+                                onClick={() => dayObj.day && (viewMode === 'day' ? null : handleDayClick(dayObj))}
                             >
                                 {dayObj.day && (
                                     <>
-                                        <span className="day-number">{dayObj.day}</span>
+                                        <div className="day-header">
+                                            <span className="day-number">{dayObj.day}</span>
+                                            {viewMode === 'week' && <span className="day-weekday-label">{dayObj.weekday}</span>}
+                                        </div>
                                         <div className="day-events">
-                                            {dayEvents.slice(0, 2).map((ev, idx) => (
+                                            {(viewMode === 'month' ? dayEvents.slice(0, 3) : dayEvents).map((ev, idx) => (
                                                 <div
                                                     key={idx}
-                                                    className={`calendar-event event-${type}`}
+                                                    className={`calendar-event event-${type} ${viewMode}-event`}
+                                                    style={{
+                                                        borderLeftColor: getEventColor(ev),
+                                                        backgroundColor: `${getEventColor(ev)}15`,
+                                                        color: getEventColor(ev)
+                                                    }}
                                                     title={`${getEventLabel(ev)}${getEventTime(ev) ? ' · ' + getEventTime(ev) : ''}`}
+                                                    onClick={(e) => {
+                                                        if (viewMode === 'day' || viewMode === 'week') {
+                                                            e.stopPropagation();
+                                                            handleDayClick(dayObj);
+                                                        }
+                                                    }}
                                                 >
                                                     <span className="event-label">{getEventLabel(ev)}</span>
                                                     {getEventTime(ev) && (
@@ -134,8 +294,8 @@ export default function CalendarView({ events, type }) {
                                                     )}
                                                 </div>
                                             ))}
-                                            {dayEvents.length > 2 && (
-                                                <div className="event-more">+{dayEvents.length - 2} más</div>
+                                            {viewMode === 'month' && dayEvents.length > 3 && (
+                                                <div className="event-more">+{dayEvents.length - 3} más</div>
                                             )}
                                         </div>
                                     </>
@@ -173,7 +333,7 @@ export default function CalendarView({ events, type }) {
                                 const timeStr = getEventTime(ev);
                                 return (
                                     <li key={idx} className={`calendar-detail-item event-${type}-item`}>
-                                        <div className={`detail-color-bar bg-${type}`}></div>
+                                        <div className="detail-color-bar" style={{ backgroundColor: getEventColor(ev) }}></div>
                                         <div className="detail-content">
                                             <span className="detail-title">{getEventLabel(ev)}</span>
                                             {timeStr && (
