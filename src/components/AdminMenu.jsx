@@ -445,8 +445,11 @@ export default function AdminMenu() {
     const filteredProCourses = proCourses.filter(pro => {
         const search = proCourseSearchTerm.toLowerCase();
         const courseName = (pro.course?.name || '').toLowerCase();
-        return courseName.includes(search);
-    }).sort((a, b) => (a.course?.name || '').localeCompare(b.course?.name || ''));
+        const date = (pro.fecha || '').toLowerCase();
+        const startTime = (pro.horaini || '').toLowerCase();
+        const endTime = (pro.horafin || '').toLowerCase();
+        return courseName.includes(search) || date.includes(search) || startTime.includes(search) || endTime.includes(search);
+    }).sort((a, b) => (b.fecha || '').localeCompare(a.fecha || '') || (a.course?.name || '').localeCompare(b.course?.name || ''));
 
     const filteredMaintenances = maintenances.filter(m => {
         const search = maintenanceSearchTerm.toLowerCase();
@@ -1189,7 +1192,7 @@ export default function AdminMenu() {
                 </svg>
                 <input
                     type="text"
-                    placeholder="Buscar programación por curso..."
+                    placeholder="Buscar programación por curso, fecha o horario..."
                     value={proCourseSearchTerm}
                     onChange={(e) => {
                         setProCourseSearchTerm(e.target.value);
