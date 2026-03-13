@@ -34,7 +34,7 @@ export default function Login({ onLoginSuccess }) {
       if (err.response && err.response.data && err.response.data.message) {
         setError(err.response.data.message);
       } else {
-        setError('Login failed. Please check your credentials and try again.');
+        setError('Error al iniciar sesión. Por favor, verifique sus credenciales e intente de nuevo.');
       }
     } finally {
       setLoading(false);
@@ -48,34 +48,34 @@ export default function Login({ onLoginSuccess }) {
           <div className="login-icon">
             <img src="/icons/pwa-192.png" alt="PWA Logo" className="pwa-logo-img" />
           </div>
-          <div className="pwa-badge">PROGRESIVE WEB APP</div>
+          <div className="pwa-badge">PROGRESSIVE WEB APP</div>
           <h2>SimLogicFlow</h2>
-          <p>Please enter your details to sign in.</p>
+          <p>Por favor, ingrese sus datos para iniciar sesión.</p>
         </div>
 
         {error && <div className="login-error">{error}</div>}
 
         <form onSubmit={handleSubmit} className="login-form">
           <div className="form-group">
-            <label htmlFor="email">Email</label>
+            <label htmlFor="email">Correo Electrónico</label>
             <input
               type="email"
               id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
+              placeholder="Ingrese su correo"
               required
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">Contraseña</label>
             <input
               type="password"
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
+              placeholder="Ingrese su contraseña"
               required
             />
           </div>
@@ -85,7 +85,7 @@ export default function Login({ onLoginSuccess }) {
             className={`login-btn ${loading ? 'loading' : ''}`}
             disabled={loading}
           >
-            {loading ? 'Signing in...' : 'Sign In'}
+            {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
           </button>
         </form>
       </div>
