@@ -12,6 +12,7 @@ import MaintenanceTypeModal from './MaintenanceTypeModal';
 import UserCoursesMenu from './UserCoursesMenu';
 import CalendarView from './CalendarView';
 import ReportView from './ReportView';
+import StatisticsView from './StatisticsView';
 import './AdminMenu.css';
 
 export default function AdminMenu() {
@@ -1309,6 +1310,7 @@ export default function AdminMenu() {
             <div className="admin-sidebar">
                 <h2 className="admin-title">Panel Admin</h2>
                 <ul className="admin-nav">
+                    <li className={`admin-nav-item ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => setActiveTab('dashboard')}>📈 Estadísticas</li>
                     <li className={`admin-nav-item ${activeTab === 'users' ? 'active' : ''}`} onClick={() => setActiveTab('users')}>Usuarios</li>
                     <li className={`admin-nav-item ${activeTab === 'user-courses' ? 'active' : ''}`} onClick={() => setActiveTab('user-courses')}>Usuarios Cursos</li>
                     <li className={`admin-nav-item ${activeTab === 'rooms' ? 'active' : ''}`} onClick={() => setActiveTab('rooms')}>Aulas</li>
@@ -1356,21 +1358,22 @@ export default function AdminMenu() {
             <div className="admin-content">
                 <div className="admin-header">
                     <h2>
-                        {activeTab === 'users' ? 'Gestionar Usuarios' :
-                            activeTab === 'user-courses' ? 'Usuarios — Asignación de Cursos' :
-                                activeTab === 'rooms' ? 'Gestionar Aulas' :
-                                    activeTab === 'roles' ? 'Gestionar Roles' :
-                                        activeTab === 'simulators' ? 'Gestionar Simuladores' :
-                                            activeTab === 'courses' ? 'Gestionar Cursos' :
-                                                activeTab === 'pro-courses' ? 'Programación de Cursos' :
-                                                    activeTab === 'maintenances' ? 'Gestionar Mantenimientos' :
-                                                        activeTab === 'maintenance-types' ? 'Tipos de Mantenimiento' :
-                                                            activeTab === 'maintenance-history' ? 'Historial Técnico' :
-                                                                activeTab === 'calendar-courses' ? 'Calendario de Cursos' :
-                                                                    activeTab === 'calendar-maint' ? 'Calendario de Mantenimientos' :
-                                                                        activeTab === 'reports-courses' ? 'Generar Reporte de Cursos' :
-                                                                            activeTab === 'reports-maintenances' ? 'Generar Reporte de Mantenimientos' :
-                                                                                activeTab === 'reports-users' ? 'Generar Reporte de Usuarios' : 'Configuración'}
+                        {activeTab === 'dashboard' ? 'Panel de Estadísticas y Toma de Decisiones' :
+                            activeTab === 'users' ? 'Gestionar Usuarios' :
+                                activeTab === 'user-courses' ? 'Usuarios — Asignación de Cursos' :
+                                    activeTab === 'rooms' ? 'Gestionar Aulas' :
+                                        activeTab === 'roles' ? 'Gestionar Roles' :
+                                            activeTab === 'simulators' ? 'Gestionar Simuladores' :
+                                                activeTab === 'courses' ? 'Gestionar Cursos' :
+                                                    activeTab === 'pro-courses' ? 'Programación de Cursos' :
+                                                        activeTab === 'maintenances' ? 'Gestionar Mantenimientos' :
+                                                            activeTab === 'maintenance-types' ? 'Tipos de Mantenimiento' :
+                                                                activeTab === 'maintenance-history' ? 'Historial Técnico' :
+                                                                    activeTab === 'calendar-courses' ? 'Calendario de Cursos' :
+                                                                        activeTab === 'calendar-maint' ? 'Calendario de Mantenimientos' :
+                                                                            activeTab === 'reports-courses' ? 'Generar Reporte de Cursos' :
+                                                                                activeTab === 'reports-maintenances' ? 'Generar Reporte de Mantenimientos' :
+                                                                                    activeTab === 'reports-users' ? 'Generar Reporte de Usuarios' : 'Configuración'}
                     </h2>
                     <div className="admin-header-actions">
                         {activeTab !== 'dashboard' && !activeTab.startsWith('calendar-') && !activeTab.startsWith('reports-') && activeTab !== 'user-courses' && activeTab !== 'roles' && (
@@ -1407,22 +1410,23 @@ export default function AdminMenu() {
                 ) : error ? (
                     <div className="error-state">{error}</div>
                 ) : (
-                    activeTab === 'users' ? renderUserTable() :
-                        activeTab === 'user-courses' ? <UserCoursesMenu /> :
-                            activeTab === 'rooms' ? renderRoomTable() :
-                                activeTab === 'roles' ? renderRoleTable() :
-                                    activeTab === 'simulators' ? renderSimulatorTable() :
-                                        activeTab === 'courses' ? renderCourseTable() :
-                                            activeTab === 'pro-courses' ? renderProCourseTable() :
-                                                activeTab === 'maintenances' ? renderMaintenanceTable() :
-                                                    activeTab === 'maintenance-types' ? renderMaintenanceTypeTable() :
-                                                        activeTab === 'maintenance-history' ? renderHistoryTable() :
-                                                            activeTab === 'calendar-courses' ? <CalendarView events={proCourses} type="course" /> :
-                                                                activeTab === 'calendar-maint' ? <CalendarView events={maintenances} type="maint" /> :
-                                                                    activeTab === 'reports-courses' ? <ReportView type="courses" data={courses} simulators={simulators} courses={courses} roles={roles} maintenanceTypes={maintenanceTypes} /> :
-                                                                        activeTab === 'reports-maintenances' ? <ReportView type="maintenances" data={maintenances} simulators={simulators} courses={courses} roles={roles} maintenanceTypes={maintenanceTypes} /> :
-                                                                            activeTab === 'reports-users' ? <ReportView type="users" data={users} simulators={simulators} courses={courses} roles={roles} maintenanceTypes={maintenanceTypes} /> :
-                                                                                <div className="settings-placeholder">Próximamente...</div>
+                    activeTab === 'dashboard' ? <StatisticsView users={users} courses={courses} proCourses={proCourses} maintenances={maintenances} simulators={simulators} /> :
+                        activeTab === 'users' ? renderUserTable() :
+                            activeTab === 'user-courses' ? <UserCoursesMenu /> :
+                                activeTab === 'rooms' ? renderRoomTable() :
+                                    activeTab === 'roles' ? renderRoleTable() :
+                                        activeTab === 'simulators' ? renderSimulatorTable() :
+                                            activeTab === 'courses' ? renderCourseTable() :
+                                                activeTab === 'pro-courses' ? renderProCourseTable() :
+                                                    activeTab === 'maintenances' ? renderMaintenanceTable() :
+                                                        activeTab === 'maintenance-types' ? renderMaintenanceTypeTable() :
+                                                            activeTab === 'maintenance-history' ? renderHistoryTable() :
+                                                                activeTab === 'calendar-courses' ? <CalendarView events={proCourses} type="course" /> :
+                                                                    activeTab === 'calendar-maint' ? <CalendarView events={maintenances} type="maint" /> :
+                                                                        activeTab === 'reports-courses' ? <ReportView type="courses" data={courses} simulators={simulators} courses={courses} roles={roles} maintenanceTypes={maintenanceTypes} /> :
+                                                                            activeTab === 'reports-maintenances' ? <ReportView type="maintenances" data={maintenances} simulators={simulators} courses={courses} roles={roles} maintenanceTypes={maintenanceTypes} /> :
+                                                                                activeTab === 'reports-users' ? <ReportView type="users" data={users} simulators={simulators} courses={courses} roles={roles} maintenanceTypes={maintenanceTypes} /> :
+                                                                                    <div className="settings-placeholder">Próximamente...</div>
                 )}
             </div>
 

@@ -5,6 +5,7 @@ import MaintenanceHistoryModal from './MaintenanceHistoryModal';
 import MaintenanceTypeModal from './MaintenanceTypeModal';
 import CalendarView from './CalendarView';
 import ReportView from './ReportView';
+import StatisticsView from './StatisticsView';
 import './AdminMenu.css';
 
 export default function TecnicoMenu() {
@@ -162,6 +163,7 @@ export default function TecnicoMenu() {
 
     useEffect(() => {
         const fetchMap = {
+            dashboard: () => { fetchMaintenances(); fetchSimulators(); fetchMaintenanceTypes(); fetchProCourses(); fetchUsers(); },
             maintenances: fetchMaintenances,
             'calendar-maint': fetchMaintenances,
             'maintenance-history': fetchMaintenanceHistory,
@@ -494,6 +496,7 @@ export default function TecnicoMenu() {
             <div className="admin-sidebar">
                 <h2 className="admin-title">Panel Coordinador Técnico</h2>
                 <ul className="admin-nav">
+                    <li className={`admin-nav-item ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => setActiveTab('dashboard')}>📈 Estadísticas</li>
                     <li className={`admin-nav-item ${activeTab === 'maintenances' ? 'active' : ''}`} onClick={() => setActiveTab('maintenances')}>Mantenimientos</li>
                     <li className={`admin-nav-item ${activeTab === 'maintenance-history' ? 'active' : ''}`} onClick={() => setActiveTab('maintenance-history')}>Historial</li>
                     <li className={`admin-nav-item ${activeTab === 'calendar-maint' ? 'active' : ''}`} onClick={() => setActiveTab('calendar-maint')}>Calendario Mantenimientos</li>
@@ -518,13 +521,14 @@ export default function TecnicoMenu() {
             <div className="admin-content">
                 <div className="admin-header">
                     <h2>
-                        {activeTab === 'maintenances' ? 'Gestión de Mantenimientos' :
-                            activeTab === 'maintenance-history' ? 'Historial Técnico' :
-                                activeTab === 'calendar-maint' ? 'Calendario de Mantenimientos' :
-                                    activeTab === 'reports-courses' ? 'Reporte de Cursos' :
-                                        activeTab === 'reports-maintenances' ? 'Reporte de Mantenimientos' :
-                                            activeTab === 'reports-users' ? 'Reporte de Usuarios' :
-                                                'Calendario de Cursos'}
+                        {activeTab === 'dashboard' ? 'Panel de Estadísticas y Control Técnico' :
+                            activeTab === 'maintenances' ? 'Gestión de Mantenimientos' :
+                                activeTab === 'maintenance-history' ? 'Historial Técnico' :
+                                    activeTab === 'calendar-maint' ? 'Calendario de Mantenimientos' :
+                                        activeTab === 'reports-courses' ? 'Reporte de Cursos' :
+                                            activeTab === 'reports-maintenances' ? 'Reporte de Mantenimientos' :
+                                                activeTab === 'reports-users' ? 'Reporte de Usuarios' :
+                                                    'Calendario de Cursos'}
                     </h2>
                     <div className="admin-header-actions">
                         {activeTab !== 'calendar-maint' && activeTab !== 'calendar-courses' && !activeTab.startsWith('reports-') && (
@@ -544,7 +548,9 @@ export default function TecnicoMenu() {
 
                 {error && <div className="error-state" style={{ marginBottom: '20px' }}>{error}</div>}
 
-                {activeTab === 'maintenances' ? (
+                {activeTab === 'dashboard' ? (
+                    <StatisticsView users={users} courses={courses} proCourses={proCourses} maintenances={maintenances} simulators={simulators} />
+                ) : activeTab === 'maintenances' ? (
                     renderMaintenanceTable()
                 ) : activeTab === 'maintenance-history' ? (
                     renderHistoryTable()

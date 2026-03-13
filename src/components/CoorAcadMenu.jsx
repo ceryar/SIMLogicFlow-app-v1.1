@@ -6,6 +6,7 @@ import ProCourseModal from './ProCourseModal';
 import UserCoursesMenu from './UserCoursesMenu';
 import CalendarView from './CalendarView';
 import ReportView from './ReportView';
+import StatisticsView from './StatisticsView';
 import './AdminMenu.css';
 
 export default function CoorAcadMenu() {
@@ -120,6 +121,7 @@ export default function CoorAcadMenu() {
 
     useEffect(() => {
         const fetchMap = {
+            dashboard: () => { fetchUsers(); fetchCourses(); fetchProCourses(); fetchMaintenances(); },
             users: fetchUsers,
             courses: fetchCourses,
             'pro-courses': fetchProCourses,
@@ -632,6 +634,7 @@ export default function CoorAcadMenu() {
             <div className="admin-sidebar">
                 <h2 className="admin-title">Panel Coordinador Académico</h2>
                 <ul className="admin-nav">
+                    <li className={`admin-nav-item ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => setActiveTab('dashboard')}>📈 Estadísticas</li>
                     <li className={`admin-nav-item ${activeTab === 'users' ? 'active' : ''}`} onClick={() => setActiveTab('users')}>Usuarios</li>
                     <li className={`admin-nav-item ${activeTab === 'user-courses' ? 'active' : ''}`} onClick={() => setActiveTab('user-courses')}>Asignar Cursos</li>
                     <li className={`admin-nav-item ${activeTab === 'courses' ? 'active' : ''}`} onClick={() => setActiveTab('courses')}>Cursos</li>
@@ -658,14 +661,15 @@ export default function CoorAcadMenu() {
                 <header className="admin-header">
                     <div>
                         <h1 className="admin-main-title">
-                            {activeTab === 'users' ? 'Gestión de Estudiantes' :
-                                activeTab === 'courses' ? 'Gestión de Cursos' :
-                                    activeTab === 'user-courses' ? 'Asignación de Estudiantes' :
-                                        activeTab === 'pro-courses' ? 'Programación de Cursos' :
-                                            activeTab === 'calendar' ? 'Calendario Académico' :
-                                                activeTab === 'reports-courses' ? 'Reporte de Cursos' :
-                                                    activeTab === 'reports-maintenances' ? 'Reporte de Mantenimientos' :
-                                                        activeTab === 'reports-users' ? 'Reporte de Usuarios' : ''}
+                            {activeTab === 'dashboard' ? 'Panel de Estadísticas Académicas' :
+                                activeTab === 'users' ? 'Gestión de Estudiantes' :
+                                    activeTab === 'courses' ? 'Gestión de Cursos' :
+                                        activeTab === 'user-courses' ? 'Asignación de Estudiantes' :
+                                            activeTab === 'pro-courses' ? 'Programación de Cursos' :
+                                                activeTab === 'calendar' ? 'Calendario Académico' :
+                                                    activeTab === 'reports-courses' ? 'Reporte de Cursos' :
+                                                        activeTab === 'reports-maintenances' ? 'Reporte de Mantenimientos' :
+                                                            activeTab === 'reports-users' ? 'Reporte de Usuarios' : ''}
                         </h1>
                         <p className="admin-subtitle">Panel de control de recursos académicos</p>
                     </div>
@@ -686,18 +690,19 @@ export default function CoorAcadMenu() {
 
                 {error && <div className="error-alert">{error}</div>}
 
-                {activeTab === 'users' ? renderUserTable() :
-                    activeTab === 'user-courses' ? <UserCoursesMenu /> :
-                        activeTab === 'courses' ? renderCourseTable() :
-                            activeTab === 'pro-courses' ? renderProCourseTable() :
-                                activeTab === 'reports-courses' ? <ReportView type="courses" data={courses} simulators={simulators} courses={courses} /> :
-                                    activeTab === 'reports-maintenances' ? <ReportView type="maintenances" data={maintenances} simulators={simulators} courses={courses} /> :
-                                        activeTab === 'reports-users' ? <ReportView type="users" data={users} simulators={simulators} courses={courses} /> :
-                                            loading && proCourses.length === 0 ? (
-                                                <div className="loading-state">Cargando calendario...</div>
-                                            ) : (
-                                                <CalendarView events={proCourses} type="course" />
-                                            )
+                {activeTab === 'dashboard' ? <StatisticsView users={users} courses={courses} proCourses={proCourses} maintenances={maintenances} simulators={simulators} /> :
+                    activeTab === 'users' ? renderUserTable() :
+                        activeTab === 'user-courses' ? <UserCoursesMenu /> :
+                            activeTab === 'courses' ? renderCourseTable() :
+                                activeTab === 'pro-courses' ? renderProCourseTable() :
+                                    activeTab === 'reports-courses' ? <ReportView type="courses" data={courses} simulators={simulators} courses={courses} /> :
+                                        activeTab === 'reports-maintenances' ? <ReportView type="maintenances" data={maintenances} simulators={simulators} courses={courses} /> :
+                                            activeTab === 'reports-users' ? <ReportView type="users" data={users} simulators={simulators} courses={courses} /> :
+                                                loading && proCourses.length === 0 ? (
+                                                    <div className="loading-state">Cargando calendario...</div>
+                                                ) : (
+                                                    <CalendarView events={proCourses} type="course" />
+                                                )
                 }
             </main>
 
