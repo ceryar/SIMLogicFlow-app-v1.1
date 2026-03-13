@@ -293,6 +293,56 @@
     white-space: nowrap;
 }
 
+/* ---- User List Pagination ---- */
+.uc-pagination-simple {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 8px;
+    margin-top: 8px;
+    border-top: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+    background: rgba(0, 0, 0, 0.1);
+    position: sticky;
+    bottom: -8px;
+    /* Offset the padding of the list */
+    margin-left: -8px;
+    margin-right: -8px;
+}
+
+.uc-page-info {
+    font-size: 0.75rem;
+    color: var(--text-secondary, #94a3b8);
+}
+
+.uc-page-info strong {
+    color: var(--text-primary, #f1f5f9);
+}
+
+.uc-page-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+    color: var(--text-primary, #f1f5f9);
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.uc-page-btn:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(99, 102, 241, 0.5);
+    color: #818cf8;
+}
+
+.uc-page-btn:disabled {
+    opacity: 0.3;
+    cursor: default;
+}
+
 .uc-hint {
     display: block;
     margin-top: 8px;

@@ -85,6 +85,8 @@ export default function UserCoursesMenu() {
     const [successMsg, setSuccessMsg] = useState(null);
     const [capacityWarning, setCapacityWarning] = useState(null);
     const [courseSearchQuery, setCourseSearchQuery] = useState('');
+    const [userCurrentPage, setUserCurrentPage] = useState(1);
+    const [userItemsPerPage, setUserItemsPerPage] = useState(10);
 
     const token = localStorage.getItem('token');
     const authHeader = { headers: { Authorization: `Bearer ${token}` } };
@@ -257,6 +259,11 @@ export default function UserCoursesMenu() {
         );
     });
 
+    const totalUserPages = Math.ceil(filteredUsers.length / userItemsPerPage);
+    const indexOfLastUser = userCurrentPage * userItemsPerPage;
+    const indexOfFirstUser = indexOfLastUser - userItemsPerPage;
+    const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
+
     const availableCourses = useMemo(() => {
         return courses
             .filter(c => !userCourses.some(uc => uc.id === c.id))
@@ -284,7 +291,10 @@ export default function UserCoursesMenu() {
                             type="text"
                             placeholder="Buscar por nombre, email o rol..."
                             value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
+                            onChange={(e) => {
+                                setSearchQuery(e.target.value);
+                                setUserCurrentPage(1);
+                            }}
                         />
                     </div>
                 </div>
@@ -292,7 +302,7 @@ export default function UserCoursesMenu() {
                     <div className="uc-loading">Cargando usuarios...</div>
                 ) : (
                     <ul className="uc-user-list">
-                        {filteredUsers.map(user => (
+                        {currentUsers.map(user => (
                             <li key={user.id}
                                 className={`uc-user-item ${selectedUser?.id === user.id ? 'active' : ''}`}
                                 onClick={() => handleSelectUser(user)}
@@ -309,8 +319,32 @@ export default function UserCoursesMenu() {
                                 </span>
                             </li>
                         ))}
-                        {filteredUsers.length === 0 && (
+                        {currentUsers.length === 0 && (
                             <li className="uc-empty-list">No se encontraron usuarios</li>
+                        )}
+
+                        {filteredUsers.length > userItemsPerPage && (
+                            <div className="uc-pagination-simple">
+                                <button
+                                    className="uc-page-btn"
+                                    disabled={userCurrentPage === 1}
+                                    onClick={(e) => { e.stopPropagation(); setUserCurrentPage(prev => prev - 1); }}
+                                    title="Anterior"
+                                >
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                                </button>
+                                <span className="uc-page-info">
+                                    Página <strong>{userCurrentPage}</strong> de {totalUserPages}
+                                </span>
+                                <button
+                                    className="uc-page-btn"
+                                    disabled={userCurrentPage >= totalUserPages}
+                                    onClick={(e) => { e.stopPropagation(); setUserCurrentPage(prev => prev + 1); }}
+                                    title="Siguiente"
+                                >
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                </button>
+                            </div>
                         )}
                     </ul>
                 )}
