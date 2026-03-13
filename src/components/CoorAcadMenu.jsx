@@ -23,7 +23,10 @@ export default function CoorAcadMenu() {
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [searchTerm, setSearchTerm] = useState('');
+    const [userSearchTerm, setUserSearchTerm] = useState('');
+    const [courseSearchTerm, setCourseSearchTerm] = useState('');
+    const [proCourseSearchTerm, setProCourseSearchTerm] = useState('');
+    const [simulators, setSimulators] = useState([]);
 
     const fetchUsers = useCallback(async () => {
         setLoading(true);
@@ -42,6 +45,18 @@ export default function CoorAcadMenu() {
         }
     }, []);
 
+    const fetchSimulators = useCallback(async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await axios.get('/api/v1/simulators', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setSimulators(response.data);
+        } catch (err) {
+            console.error('Error fetching simulators:', err);
+        }
+    }, []);
+
     const fetchCourses = useCallback(async () => {
         setLoading(true);
         setError(null);
@@ -51,13 +66,14 @@ export default function CoorAcadMenu() {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setCourses(response.data);
+            fetchSimulators();
         } catch (err) {
             console.error('Error fetching courses:', err);
             setError('No se pudieron cargar los cursos.');
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [fetchSimulators]);
 
     const fetchProCourses = useCallback(async () => {
         setLoading(true);
@@ -160,8 +176,22 @@ export default function CoorAcadMenu() {
     const filteredUsers = users.filter(user => {
         const fullName = `${user.firstName} ${user.middleName || ''} ${user.lastname} ${user.secondlasname || ''}`.toLowerCase();
         const email = user.email.toLowerCase();
-        const search = searchTerm.toLowerCase();
+        const search = userSearchTerm.toLowerCase();
         return fullName.includes(search) || email.includes(search);
+    });
+
+    const filteredCourses = courses.filter(course => {
+        const search = courseSearchTerm.toLowerCase();
+        const name = course.name.toLowerCase();
+        const description = (course.description || '').toLowerCase();
+        const simulatorName = (course.simulator?.name || '').toLowerCase();
+        return name.includes(search) || description.includes(search) || simulatorName.includes(search);
+    });
+
+    const filteredProCourses = proCourses.filter(pro => {
+        const courseName = (pro.course?.name || '').toLowerCase();
+        const search = proCourseSearchTerm.toLowerCase();
+        return courseName.includes(search);
     });
 
     const renderUserTable = () => (
@@ -174,8 +204,8 @@ export default function CoorAcadMenu() {
                 <input
                     type="text"
                     placeholder="Buscar estudiante por nombre o email..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    value={userSearchTerm}
+                    onChange={(e) => setUserSearchTerm(e.target.value)}
                     style={{
                         flex: 1,
                         border: 'none',
@@ -184,8 +214,8 @@ export default function CoorAcadMenu() {
                         color: '#1e293b'
                     }}
                 />
-                {searchTerm && (
-                    <button onClick={() => setSearchTerm('')} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#64748b' }}>
+                {userSearchTerm && (
+                    <button onClick={() => setUserSearchTerm('')} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#64748b' }}>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                     </button>
                 )}
@@ -253,6 +283,30 @@ export default function CoorAcadMenu() {
 
     const renderCourseTable = () => (
         <div className="table-card">
+            <div className="search-container" style={{ padding: '15px', borderBottom: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input
+                    type="text"
+                    placeholder="Buscar curso por nombre, descripción o simulador..."
+                    value={courseSearchTerm}
+                    onChange={(e) => setCourseSearchTerm(e.target.value)}
+                    style={{
+                        flex: 1,
+                        border: 'none',
+                        outline: 'none',
+                        fontSize: '14px',
+                        color: '#1e293b'
+                    }}
+                />
+                {courseSearchTerm && (
+                    <button onClick={() => setCourseSearchTerm('')} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#64748b' }}>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                )}
+            </div>
             <table className="admin-table">
                 <thead>
                     <tr>
@@ -272,14 +326,14 @@ export default function CoorAcadMenu() {
                                 Cargando cursos...
                             </td>
                         </tr>
-                    ) : courses.length === 0 ? (
+                    ) : filteredCourses.length === 0 ? (
                         <tr>
                             <td colSpan="6" style={{ textAlign: 'center', padding: '2rem' }}>
-                                No hay cursos registrados.
+                                No se encontraron cursos que coincidan con la búsqueda.
                             </td>
                         </tr>
                     ) : (
-                        courses.map(course => (
+                        filteredCourses.map(course => (
                             <tr key={course.id}>
                                 <td data-label="ID">#{course.id}</td>
                                 <td data-label="Curso" className="font-medium">
@@ -312,6 +366,33 @@ export default function CoorAcadMenu() {
 
     const renderProCourseTable = () => (
         <div className="table-card">
+            <div className="search-container" style={{ padding: '15px', borderBottom: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input
+                    type="text"
+                    placeholder="Buscar programación por curso..."
+                    value={proCourseSearchTerm}
+                    onChange={(e) => setProCourseSearchTerm(e.target.value)}
+                    style={{
+                        flex: 1,
+                        border: 'none',
+                        outline: 'none',
+                        fontSize: '0.95rem',
+                        color: '#1e293b'
+                    }}
+                />
+                {proCourseSearchTerm && (
+                    <button onClick={() => setProCourseSearchTerm('')} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', padding: '5px' }}>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                )}
+            </div>
             <table className="admin-table">
                 <thead>
                     <tr>
@@ -331,14 +412,14 @@ export default function CoorAcadMenu() {
                                 Cargando programación...
                             </td>
                         </tr>
-                    ) : proCourses.length === 0 ? (
+                    ) : filteredProCourses.length === 0 ? (
                         <tr>
                             <td colSpan="6" style={{ textAlign: 'center', padding: '2rem' }}>
-                                No hay programaciones registradas.
+                                No se encontraron programaciones que coincidan con la búsqueda.
                             </td>
                         </tr>
                     ) : (
-                        proCourses.map(pro => (
+                        filteredProCourses.map(pro => (
                             <tr key={pro.id}>
                                 <td data-label="ID">#{pro.id}</td>
                                 <td data-label="Curso" className="font-medium">{pro.course?.name || 'N/A'}</td>

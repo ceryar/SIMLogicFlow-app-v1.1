@@ -47,6 +47,8 @@ export default function AdminMenu() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [userSearchTerm, setUserSearchTerm] = useState('');
+    const [courseSearchTerm, setCourseSearchTerm] = useState('');
+    const [proCourseSearchTerm, setProCourseSearchTerm] = useState('');
 
     const fetchUsers = useCallback(async () => {
         setLoading(true);
@@ -419,6 +421,20 @@ export default function AdminMenu() {
         return fullName.includes(search) || email.includes(search);
     });
 
+    const filteredCourses = courses.filter(course => {
+        const search = courseSearchTerm.toLowerCase();
+        const name = course.name.toLowerCase();
+        const description = (course.description || '').toLowerCase();
+        const simulatorName = (course.simulator?.name || '').toLowerCase();
+        return name.includes(search) || description.includes(search) || simulatorName.includes(search);
+    });
+
+    const filteredProCourses = proCourses.filter(pro => {
+        const search = proCourseSearchTerm.toLowerCase();
+        const courseName = (pro.course?.name || '').toLowerCase();
+        return courseName.includes(search);
+    });
+
     const renderUserTable = () => (
         <div className="table-card">
             <div className="search-container" style={{ padding: '15px', borderBottom: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -749,6 +765,30 @@ export default function AdminMenu() {
 
     const renderCourseTable = () => (
         <div className="table-card">
+            <div className="search-container" style={{ padding: '15px', borderBottom: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input
+                    type="text"
+                    placeholder="Buscar curso por nombre, descripción o simulador..."
+                    value={courseSearchTerm}
+                    onChange={(e) => setCourseSearchTerm(e.target.value)}
+                    style={{
+                        flex: 1,
+                        border: 'none',
+                        outline: 'none',
+                        fontSize: '14px',
+                        color: '#1e293b'
+                    }}
+                />
+                {courseSearchTerm && (
+                    <button onClick={() => setCourseSearchTerm('')} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#64748b' }}>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                )}
+            </div>
             <table className="admin-table">
                 <thead>
                     <tr>
@@ -761,35 +801,43 @@ export default function AdminMenu() {
                     </tr>
                 </thead>
                 <tbody>
-                    {courses.map(course => (
-                        <tr key={course.id}>
-                            <td data-label="ID">#{course.id}</td>
-                            <td data-label="Curso" className="font-medium">
-                                <div>{course.name}</div>
-                                <small style={{ color: '#64748b' }}>{course.description || '-'}</small>
-                            </td>
-                            <td data-label="Inicio / Fin">
-                                {course.fecInicio} <br /> {course.fecFin}
-                            </td>
-                            <td data-label="Horas">{course.horas}h</td>
-                            <td data-label="Recursos">
-                                <span className="entity-indicator" title="Simulator">
-                                    ✈️ {course.simulator?.name || 'N/A'}
-                                </span> <br />
-                                <span className="entity-indicator" title="Rooms">
-                                    🏫 {course.rooms?.length || 0} aulas
-                                </span>
-                            </td>
-                            <td data-label="Acciones" className="actions-cell">
-                                <button className="btn-icon btn-edit" title="Editar" onClick={() => { setEditingCourse(course); setIsCourseModalOpen(true); }}>
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                                </button>
-                                <button className="btn-icon btn-delete" title="Eliminar" onClick={(e) => handleDeleteCourse(e, course.id, course.name)}>
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                                </button>
+                    {filteredCourses.length === 0 ? (
+                        <tr>
+                            <td colSpan="6" style={{ textAlign: 'center', padding: '2rem' }}>
+                                No se encontraron cursos que coincidan con la búsqueda.
                             </td>
                         </tr>
-                    ))}
+                    ) : (
+                        filteredCourses.map(course => (
+                            <tr key={course.id}>
+                                <td data-label="ID">#{course.id}</td>
+                                <td data-label="Curso" className="font-medium">
+                                    <div>{course.name}</div>
+                                    <small style={{ color: '#64748b' }}>{course.description || '-'}</small>
+                                </td>
+                                <td data-label="Inicio / Fin">
+                                    {course.fecInicio} <br /> {course.fecFin}
+                                </td>
+                                <td data-label="Horas">{course.horas}h</td>
+                                <td data-label="Recursos">
+                                    <span className="entity-indicator" title="Simulator">
+                                        ✈️ {course.simulator?.name || 'N/A'}
+                                    </span> <br />
+                                    <span className="entity-indicator" title="Rooms">
+                                        🏫 {course.rooms?.length || 0} aulas
+                                    </span>
+                                </td>
+                                <td data-label="Acciones" className="actions-cell">
+                                    <button className="btn-icon btn-edit" title="Editar" onClick={() => { setEditingCourse(course); setIsCourseModalOpen(true); }}>
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                    </button>
+                                    <button className="btn-icon btn-delete" title="Eliminar" onClick={(e) => handleDeleteCourse(e, course.id, course.name)}>
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                    </button>
+                                </td>
+                            </tr>
+                        ))
+                    )}
                 </tbody>
             </table>
         </div>
@@ -797,14 +845,38 @@ export default function AdminMenu() {
 
     const renderProCourseTable = () => (
         <div className="table-card">
+            <div className="search-container" style={{ padding: '15px', borderBottom: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input
+                    type="text"
+                    placeholder="Buscar programación por curso..."
+                    value={proCourseSearchTerm}
+                    onChange={(e) => setProCourseSearchTerm(e.target.value)}
+                    style={{
+                        flex: 1,
+                        border: 'none',
+                        outline: 'none',
+                        fontSize: '14px',
+                        color: '#1e293b'
+                    }}
+                />
+                {proCourseSearchTerm && (
+                    <button onClick={() => setProCourseSearchTerm('')} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#64748b' }}>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                )}
+            </div>
             <table className="admin-table">
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Curso Relacionado</th>
+                        <th>Curso</th>
                         <th>Fecha</th>
                         <th>Horario</th>
-                        <th>Total</th>
+                        <th>Horas</th>
                         <th className="text-right">Acciones</th>
                     </tr>
                 </thead>
@@ -813,25 +885,23 @@ export default function AdminMenu() {
                         <tr>
                             <td colSpan="6" style={{ textAlign: 'center', padding: '2rem' }}>
                                 <div className="loading-spinner-small" style={{ marginBottom: '10px' }}></div>
-                                Cargando programación académica...
+                                Cargando programación...
                             </td>
                         </tr>
-                    ) : proCourses.length === 0 ? (
+                    ) : filteredProCourses.length === 0 ? (
                         <tr>
                             <td colSpan="6" style={{ textAlign: 'center', padding: '2rem' }}>
-                                No hay cursos programados registrados.
+                                No se encontraron programaciones que coincidan con la búsqueda.
                             </td>
                         </tr>
                     ) : (
-                        proCourses.map(pro => (
+                        filteredProCourses.map(pro => (
                             <tr key={pro.id}>
                                 <td data-label="ID">#{pro.id}</td>
-                                <td data-label="Curso Relacionado" className="font-medium">{pro.course?.name || 'DESCONOCIDO'}</td>
+                                <td data-label="Curso" className="font-medium">{pro.course?.name || 'N/A'}</td>
                                 <td data-label="Fecha">{pro.fecha}</td>
-                                <td data-label="Horario">
-                                    {pro.horaini} - {pro.horafin}
-                                </td>
-                                <td data-label="Total">{pro.horas}h</td>
+                                <td data-label="Horario">{pro.horaini} - {pro.horafin}</td>
+                                <td data-label="Horas">{pro.horas}h</td>
                                 <td data-label="Acciones" className="actions-cell">
                                     <button className="btn-icon btn-edit" title="Editar" onClick={() => { setEditingProCourse(pro); setIsProCourseModalOpen(true); }}>
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
