@@ -1,18 +1,25 @@
 /* ==========================================================
-   MOBILE EXPERIENCE ENHANCEMENT PROFILE
-   Optimized for SimLogicFlow
+   MOBILE EXPERIENCE ENHANCEMENT PROFILE (V2)
+   Universal adaptation for all SimLogicFlow menus.
+   Targeting: 320px, 375px, 414px, 768px, 1024px.
    ========================================================== */
 
-@media (max-width: 768px) {
+/* 1. Global Reset & Performance */
+@media (max-width: 1024px) {
     :root {
         --safe-area-bottom: env(safe-area-inset-bottom, 0px);
         --mobile-nav-height: 65px;
+        --primary-gradient: linear-gradient(135deg, #6e8efb, #a777e3);
+        --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
     }
 
     body {
         -webkit-tap-highlight-color: transparent;
         font-size: 15px;
+        overscroll-behavior-y: contain;
+        /* Prevents "bounce" on pull-to-refresh */
         background-color: #f8fafc !important;
+        transition: background-color 0.3s ease;
     }
 
     @media (prefers-color-scheme: dark) {
@@ -21,42 +28,82 @@
         }
     }
 
-    /* 1. Universal Touch Optimization */
+    /* Premium Micro-animations */
+    @keyframes slideInUp {
+        from {
+            transform: translateY(15px);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes scaleIn {
+        from {
+            transform: scale(0.95);
+            opacity: 0;
+        }
+
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    .admin-content,
+    .card,
+    .stat-card,
+    .table-card {
+        animation: slideInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Better touch targets for everything */
     button,
     .admin-nav-item,
     .uc-user-item,
-    .admin-table tr {
-        cursor: pointer;
-        transition: transform 0.1s active;
-    }
-
-    button:active {
-        transform: scale(0.97);
-    }
-
-    /* Forms */
-    input,
     select,
-    textarea {
-        font-size: 16px !important;
-        /* Prevents iOS zoom */
-        padding: 12px 16px !important;
-        border-radius: 12px !important;
+    input {
+        min-height: 48px;
+    }
+}
+
+/* 2. Standard Mobile Adaptation (< 768px) */
+@media (max-width: 768px) {
+
+    /* Main Layout */
+    .admin-container {
+        flex-direction: column !important;
+        min-height: 100vh !important;
+        padding-bottom: calc(var(--mobile-nav-height) + 20px + var(--safe-area-bottom)) !important;
     }
 
-    /* 2. Premium Fixed Navbar */
+    /* Fixed Navbar Header */
     .navbar {
+        position: sticky;
+        top: 0;
+        z-index: 1001;
         height: 60px;
         padding: 0 16px !important;
+        display: flex !important;
         flex-direction: row !important;
         align-items: center !important;
         justify-content: space-between !important;
-        position: sticky;
-        top: 0;
-        z-index: 1000;
         background: rgba(255, 255, 255, 0.8) !important;
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
         border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     }
 
@@ -76,53 +123,58 @@
         display: none !important;
     }
 
-    /* Simplify header */
     .nav-user {
         width: auto !important;
     }
 
-    /* 3. Dynamic Bottom Navigation (Replaces Sidebar) */
-    .admin-container {
-        flex-direction: column !important;
-        padding-bottom: calc(var(--mobile-nav-height) + 20px + var(--safe-area-bottom)) !important;
+    .logout-btn {
+        padding: 8px 14px !important;
+        font-size: 12px !important;
+        border-radius: 10px !important;
+        background: #ef4444 !important;
     }
 
+    /* Bottom Navigation Bar (replaces Sidebar) */
     .admin-sidebar {
         position: fixed !important;
         bottom: 0 !important;
         left: 0 !important;
         width: 100% !important;
         height: var(--mobile-nav-height) !important;
-        background: rgba(255, 255, 255, 0.9) !important;
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
+        background: rgba(255, 255, 255, 0.98) !important;
+        backdrop-filter: blur(25px);
+        -webkit-backdrop-filter: blur(25px);
         border-top: 1px solid rgba(0, 0, 0, 0.08);
-        z-index: 1000;
+        z-index: 2000;
         padding: 0 !important;
         display: block !important;
+        padding-bottom: var(--safe-area-bottom) !important;
+        box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.05);
     }
 
     @media (prefers-color-scheme: dark) {
         .admin-sidebar {
-            background: rgba(30, 41, 59, 0.9) !important;
+            background: rgba(30, 41, 59, 0.98) !important;
             border-top-color: rgba(255, 255, 255, 0.1);
         }
     }
 
-    .admin-title {
-        display: none;
+    .admin-title,
+    .admin-subtitle {
+        display: none !important;
     }
 
     .admin-nav {
         display: flex !important;
         flex-direction: row !important;
         height: 100%;
+        width: 100%;
         overflow-x: auto !important;
         overflow-y: hidden !important;
-        scroll-snap-type: x mandatory;
+        padding: 0 5px !important;
+        gap: 2px !important;
+        scrollbar-width: none;
         -webkit-overflow-scrolling: touch;
-        padding: 0 10px !important;
-        gap: 0 !important;
     }
 
     .admin-nav::-webkit-scrollbar {
@@ -130,39 +182,46 @@
     }
 
     .admin-nav-item {
-        flex: 0 0 80px;
-        scroll-snap-align: center;
+        flex: 0 0 85px;
+        /* Fixed width for horizontal scrolling menu */
         height: 100%;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         font-size: 10px !important;
-        color: #64748b !important;
-        padding: 5px 2px !important;
-        margin: 0 !important;
+        padding: 4px !important;
+        color: #94a3b8 !important;
         border-radius: 0 !important;
+        background: transparent !important;
+        white-space: nowrap;
+        text-align: center;
         position: relative;
+        transition: color 0.3s ease;
     }
 
     .admin-nav-item.active {
         color: #3b82f6 !important;
-        background: transparent !important;
+        font-weight: 700 !important;
     }
 
+    /* Visual active indicator dot */
     .admin-nav-item.active::after {
         content: "";
         position: absolute;
-        bottom: 12px;
+        bottom: 10px;
         width: 4px;
         height: 4px;
         background: #3b82f6;
         border-radius: 50%;
+        animation: fadeIn 0.3s ease;
     }
 
-    /* Handle groups on mobile by flattening them or hiding them */
+    /* Flatten Nav Groups for Mobile */
     .admin-nav-group {
         margin: 0 !important;
+        width: auto !important;
+        display: flex !important;
     }
 
     .admin-nav-group-header {
@@ -172,81 +231,234 @@
     .admin-nav-group-content {
         display: flex !important;
         flex-direction: row !important;
-        padding: 0 !important;
-        margin: 0 !important;
     }
 
-    /* 4. Content Area & Buttons */
-    .admin-content {
+    /* Content Area */
+    .admin-content,
+    .admin-main {
         padding: 16px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
     }
 
     .admin-header {
-        flex-direction: column;
-        align-items: flex-start !important;
-        gap: 12px !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 16px !important;
+        margin-bottom: 24px !important;
+    }
+
+    .admin-main-title,
+    .admin-header h2 {
+        font-size: 1.4rem !important;
+        margin: 0 !important;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 800 !important;
     }
 
     .btn-primary {
         width: 100% !important;
-        height: 50px;
+        height: 52px;
         border-radius: 14px !important;
-        justify-content: center !important;
         font-size: 1rem !important;
-        box-shadow: 0 10px 20px rgba(59, 130, 246, 0.2) !important;
-    }
-
-    /* 5. Statistics Panel Mobile Layout */
-    .statistics-container>div {
-        grid-template-columns: 1fr !important;
-    }
-
-    /* 6. Improved Table Cards */
-    .admin-table tr {
-        margin-bottom: 16px !important;
+        font-weight: 600 !important;
+        justify-content: center !important;
+        box-shadow: 0 10px 25px rgba(59, 130, 246, 0.25) !important;
         border: none !important;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
+    }
+
+    /* Table Cards Optimization */
+    .table-card {
+        border-radius: 20px !important;
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        margin-top: 10px !important;
+    }
+
+    .admin-table thead {
+        display: none !important;
+    }
+
+    /* Hide headers */
+
+    .admin-table tr {
+        display: block !important;
         background: white !important;
-        padding: 8px !important;
+        border-radius: 20px !important;
+        padding: 16px !important;
+        margin-bottom: 16px !important;
+        box-shadow: var(--card-shadow) !important;
+        border: 1px solid rgba(0, 0, 0, 0.03) !important;
+        animation: scaleIn 0.4s ease-out;
     }
 
     @media (prefers-color-scheme: dark) {
         .admin-table tr {
             background: #1e293b !important;
+            border-color: rgba(255, 255, 255, 0.05) !important;
         }
     }
 
     .admin-table td {
-        padding: 10px 12px !important;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.03) !important;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        padding: 10px 0 !important;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.04) !important;
+        text-align: right !important;
+        font-size: 0.9rem !important;
+        min-height: 44px !important;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        .admin-table td {
+            border-bottom-color: rgba(255, 255, 255, 0.04) !important;
+        }
+    }
+
+    .admin-table td::before {
+        content: attr(data-label);
+        font-weight: 700;
+        color: #94a3b8;
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-right: 15px;
+        text-align: left;
     }
 
     .admin-table td:last-child {
-        background: transparent !important;
         border-bottom: none !important;
+        justify-content: center !important;
+        padding-top: 16px !important;
+        gap: 12px;
     }
 
-    /* 7. Modals for Mobile */
+    /* Actions in Table */
+    .actions-cell {
+        width: 100% !important;
+        justify-content: center !important;
+    }
+
+    .btn-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px !important;
+        background: #f1f5f9 !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s ease;
+    }
+
+    .btn-icon:active {
+        transform: scale(0.9);
+    }
+
+    /* 3. Specific Component Fixes (Split Views) */
+    .uc-layout {
+        flex-direction: column !important;
+        height: auto !important;
+        overflow: visible !important;
+        gap: 20px !important;
+    }
+
+    .uc-user-panel {
+        width: 100% !important;
+        height: 400px !important;
+        min-height: 400px !important;
+        flex-shrink: 0 !important;
+        border-radius: 20px !important;
+    }
+
+    .uc-course-panel {
+        width: 100% !important;
+        height: auto !important;
+        min-height: 400px;
+        border-radius: 20px !important;
+    }
+
+    .uc-form-row {
+        flex-direction: column !important;
+        gap: 15px !important;
+    }
+
+    /* 4. Common Modals for Standards */
     .modal-content {
         width: 100% !important;
+        max-width: 100% !important;
         margin: 0 !important;
-        max-height: 90vh !important;
-        padding: 20px !important;
-        border-radius: 24px 24px 0 0 !important;
+        border-radius: 28px 28px 0 0 !important;
         position: fixed !important;
         bottom: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        animation: slideUp 0.3s ease-out;
+        max-height: 94vh !important;
+        padding: 24px !important;
+        padding-bottom: calc(30px + var(--safe-area-bottom)) !important;
+        overflow-y: auto;
+        box-shadow: 0 -10px 50px rgba(0, 0, 0, 0.15) !important;
+        transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
-    @keyframes slideUp {
-        from {
-            transform: translateY(100%);
-        }
+    /* 5. Filter Rows Adjustment */
+    div[style*="flex-wrap: wrap"] {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 15px !important;
+    }
 
-        to {
-            transform: translateY(0);
-        }
+    div[style*="flex-direction: column"] {
+        width: 100% !important;
+    }
+}
+
+/* 6. Standard Breakpoints Adjustments */
+
+/* iPhone SE / Small Screens */
+@media (max-width: 375px) {
+    .nav-brand {
+        font-size: 1rem !important;
+    }
+
+    .admin-nav-item {
+        flex: 0 0 75px;
+        font-size: 9px !important;
+    }
+
+    .admin-main-title {
+        font-size: 1.2rem !important;
+    }
+}
+
+/* Tablets & Large Phones */
+@media (min-width: 480px) and (max-width: 768px) {
+    .admin-table tr {
+        padding: 20px !important;
+    }
+}
+
+/* Landscape Mobile & Small Tablets */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .admin-sidebar {
+        width: 90px !important;
+        min-width: 90px !important;
+    }
+
+    .admin-title,
+    .admin-subtitle {
+        display: none;
+    }
+
+    .admin-nav-item {
+        font-size: 10px !important;
+        padding: 10px 5px !important;
+    }
+
+    .admin-table th,
+    .admin-table td {
+        padding: 10px 8px !important;
+        font-size: 0.85rem !important;
     }
 }
