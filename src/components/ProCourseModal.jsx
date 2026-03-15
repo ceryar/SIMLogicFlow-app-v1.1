@@ -164,6 +164,69 @@ export default function ProCourseModal({ isOpen, onClose, onSuccess, editProCour
         return sessions.reduce((sum, s) => sum + (Number(s.horas) || 0), 0);
     }, [sessions]);
 
+    const checkConflicts = (testSession) => {
+        const overlaps = (s1, s2) => {
+            if (!s1.fecha || !s1.horaini || !s1.horafin || !s2.fecha || !s2.horaini || !s2.horafin) return false;
+            if (s1.fecha !== s2.fecha) return false;
+            return (s1.horaini < s2.horafin && s1.horafin > s2.horaini);
+        };
+
+        if (!selectedCourse) return null;
+
+        const selSimId = selectedCourse.simulator?.id;
+        const selInstrId = selectedCourse.instructor?.id;
+        const selPseudoId = selectedCourse.pseudoPilot?.id;
+        const selUserIds = (selectedCourse.users || []).map(u => u.id);
+
+        for (const pc of allProCourses) {
+            if (editProCourse && pc.id === editProCourse.id) continue;
+
+            if (overlaps(testSession, pc)) {
+                // Simulator Check
+                const otherSimId = pc.course?.simulator?.id || pc.simulator?.id;
+                if (selSimId && otherSimId === selSimId) {
+                    return `Conflicto de SIMULADOR: El simulador ${selectedCourse.simulator.name} ya está ocupado por el curso "${pc.course?.name || 'Otro'}" en este horario.`;
+                }
+
+                // Personnel (Instructor)
+                const otherInstrId = pc.instructor?.id || pc.course?.instructor?.id;
+                if (selInstrId && otherInstrId === selInstrId) {
+                    return `Conflicto de INSTRUCTOR: ${selectedCourse.instructor.firstName} ya tiene una sesión asignada en el curso "${pc.course?.name}" en este horario.`;
+                }
+
+                // Personnel (Pseudo)
+                const otherPseudoId = pc.pseudoPilot?.id || pc.course?.pseudoPilot?.id;
+                if (selPseudoId && otherPseudoId === selPseudoId) {
+                    return `Conflicto de PSEUDOPILOTO: ${selectedCourse.pseudoPilot.firstName} ya tiene una sesión asignada en el curso "${pc.course?.name}" en este horario.`;
+                }
+
+                // Personnel (Coordinator)
+                const selCoordId = selectedCourse.coordinator?.id;
+                const otherCoordId = pc.course?.coordinator?.id;
+                if (selCoordId && otherCoordId === selCoordId) {
+                    return `Conflicto de COORDINADOR: ${selectedCourse.coordinator.firstName} ya tiene una sesión asignada en el curso "${pc.course?.name}" en este horario.`;
+                }
+
+                // Students
+                const otherUserIds = (pc.course?.users || []).map(u => u.id);
+                const conflictingUsers = selUserIds.filter(id => otherUserIds.includes(id));
+                if (conflictingUsers.length > 0) {
+                    const firstConflicting = selectedCourse.users.find(u => u.id === conflictingUsers[0]);
+                    return `Conflicto de ESTUDIANTE: ${firstConflicting.firstName} ${firstConflicting.lastname} ya tiene clase en el curso "${pc.course?.name || 'Otro'}" en este horario.`;
+                }
+            }
+        }
+
+        // Check against sessions in current queue
+        for (const s of sessions) {
+            if (overlaps(testSession, s) && testSession.id !== s.id) {
+                return 'Conflicto interno: Esta sesión se solapa con otra sesión que ya está en la lista.';
+            }
+        }
+
+        return null;
+    };
+
     const handleCurrentTimeChange = (field, val) => {
         const next = { ...currentSession, [field]: val };
         const calc = calcSessionHours(
@@ -198,6 +261,13 @@ export default function ProCourseModal({ isOpen, onClose, onSuccess, editProCour
             return;
         }
 
+        // Conflict check
+        const conflictError = checkConflicts(currentSession);
+        if (conflictError) {
+            setError(conflictError);
+            return;
+        }
+
         setSessions([...sessions, { ...currentSession, id: Date.now() }]);
         setCurrentSession({ fecha: '', horaini: '', horafin: '', horas: '' });
         setError(null);
@@ -212,6 +282,15 @@ export default function ProCourseModal({ isOpen, onClose, onSuccess, editProCour
         if (sessions.length === 0) {
             setError('Debe añadir al menos una sesión a la lista.');
             return;
+        }
+
+        // Final conflict check before submit (important for edits)
+        for (const s of sessions) {
+            const err = checkConflicts(s);
+            if (err) {
+                setError(err);
+                return;
+            }
         }
 
         setLoading(true);
