@@ -208,16 +208,8 @@ export default function ProCourseModal({ isOpen, onClose, onSuccess, editProCour
                     return `Conflicto de INSTRUCTOR: ${selectedCourse.instructor.firstName} ya tiene una sesión asignada en el curso "${pcCourseFull?.name}" en este horario (${pc.horaini} - ${pc.horafin}).`;
                 }
 
-                // 3. Personnel Conflict (Pseudo)
-                const otherPseudoId = pc.pseudoPilot?.id || pcCourseFull?.pseudoPilot?.id;
-                if (selPseudoId && otherPseudoId === selPseudoId) {
-                    const otherSimId = pcCourseFull?.simulator?.id;
-                    // Allow overlap ONLY if it is the same simulator (different rooms)
-                    if (selSimId !== otherSimId) {
-                        return `Conflicto de PSEUDOPILOTO: ${selectedCourse.pseudoPilot.firstName} ya tiene una sesión asignada en UN SIMULADOR DIFERENTE ("${pcCourseFull?.name}") en este horario (${pc.horaini} - ${pc.horafin}).`;
-                    }
-                }
-
+                // 3. Personnel Conflict (Pseudo) - No check, they can monitor everything concurrently
+                Joe
                 // 4. Personnel Conflict (Coordinator)
                 const otherCoordId = pc.coordinator?.id || pcCourseFull?.coordinator?.id;
                 if (selCoordId && otherCoordId === selCoordId) {
