@@ -1,5 +1,14 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --primary-color: #002D72;
+  /* Dark Blue CEA */
+  --secondary-color: #EAAA00;
+  /* Gold CEA */
+  --accent-color: #00A3E0;
+  /* Sky Blue (Aeronautical) */
+  --background-light: #f5f7fb;
+  --background-dark: #0f172a;
+
+  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
