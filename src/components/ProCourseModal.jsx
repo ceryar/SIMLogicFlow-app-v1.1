@@ -187,11 +187,18 @@ export default function ProCourseModal({ isOpen, onClose, onSuccess, editProCour
                 // Course from sessions may not have full data, lookup from courses list
                 const pcCourseFull = courses.find(c => c.id === (pc.course?.id || pc.courseId)) || pc.course;
 
-                // Room Conflict (One course per room rule)
-                const otherRoomIds = (pcCourseFull?.rooms || []).map(r => r.id);
-                const conflictingRooms = selRoomIds.filter(id => otherRoomIds.includes(id));
+                // 1. Room Conflict (Strictly by physical room/aula)
+                const otherRooms = (pcCourseFull?.rooms || []);
+                const conflictingRooms = selectedCourse.rooms.filter(room => {
+                    const isOccupied = otherRooms.some(r => r.id === room.id);
+                    if (!isOccupied) return false;
+                    const roomName = (room.name || '').toUpperCase();
+                    if (roomName.includes('PSEUDO')) return false;
+                    return true;
+                });
+
                 if (conflictingRooms.length > 0) {
-                    const firstConflicting = selectedCourse.rooms.find(r => r.id === conflictingRooms[0]);
+                    const firstConflicting = conflictingRooms[0];
                     return `Conflicto de AULA: La ${firstConflicting.name} ya está ocupada por el curso "${pcCourseFull?.name || 'Otro'}" en este horario.`;
                 }
 
