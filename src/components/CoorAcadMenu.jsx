@@ -296,45 +296,45 @@ export default function CoorAcadMenu() {
                         <tr>
                             <td colSpan="6" style={{ textAlign: 'center', padding: '2rem' }}>
                                 <div className="loading-spinner-small" style={{ marginBottom: '10px' }}></div>
-                                Cargando estudiantes...
+                                Cargando usuarios...
                             </td>
                         </tr>
                     ) : filteredUsers.length === 0 ? (
-                        <tr>
-                            <td colSpan="6" style={{ textAlign: 'center', padding: '2rem' }}>
-                                No se encontraron estudiantes.
-                            </td>
-                        </tr>
+                    <tr>
+                        <td colSpan="6" style={{ textAlign: 'center', padding: '2rem' }}>
+                            No se encontraron estudiantes.
+                        </td>
+                    </tr>
                     ) : (
                         filteredUsers.map(user => (
-                            <tr key={user.id}>
-                                <td data-label="ID">#{user.id}</td>
-                                <td data-label="Nombre Completo" className="font-medium">{`${user.firstName} ${user.lastname}`}</td>
-                                <td data-label="Email">{user.email}</td>
-                                <td data-label="Rol">
-                                    <span className={`role-badge role-${user.role?.name?.toLowerCase() || 'unknown'}`}>
-                                        {user.role?.name || 'UNKNOWN'}
-                                    </span>
-                                </td>
-                                <td data-label="Estado">
-                                    <span className={`status-badge ${user.active ? 'status-active' : 'status-inactive'}`}>
-                                        {user.active ? 'Activo' : 'Inactivo'}
-                                    </span>
-                                </td>
-                                <td data-label="Acciones" className="actions-cell">
-                                    {user.role?.name === 'ESTUDIANTE' && (
-                                        <>
-                                            <button className="btn-icon btn-edit" title="Editar" onClick={() => { setEditingUser(user); setIsUserModalOpen(true); }}>
-                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                                            </button>
-                                            <button className="btn-icon btn-delete" title="Eliminar" onClick={(e) => handleDeleteUser(e, user.id, user.email)}>
-                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                                            </button>
-                                        </>
-                                    )}
-                                </td>
-                            </tr>
-                        ))
+                    <tr key={user.id}>
+                        <td data-label="ID">#{user.id}</td>
+                        <td data-label="Nombre Completo" className="font-medium">{`${user.firstName} ${user.lastname}`}</td>
+                        <td data-label="Email">{user.email}</td>
+                        <td data-label="Rol">
+                            <span className={`role-badge role-${user.role?.name?.toLowerCase() || 'unknown'}`}>
+                                {user.role?.name || 'UNKNOWN'}
+                            </span>
+                        </td>
+                        <td data-label="Estado">
+                            <span className={`status-badge ${user.active ? 'status-active' : 'status-inactive'}`}>
+                                {user.active ? 'Activo' : 'Inactivo'}
+                            </span>
+                        </td>
+                        <td data-label="Acciones" className="actions-cell">
+                            {user.role?.name === 'ESTUDIANTE' && (
+                                <>
+                                    <button className="btn-icon btn-edit" title="Editar" onClick={() => { setEditingUser(user); setIsUserModalOpen(true); }}>
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                    </button>
+                                    <button className="btn-icon btn-delete" title="Eliminar" onClick={(e) => handleDeleteUser(e, user.id, user.email)}>
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                    </button>
+                                </>
+                            )}
+                        </td>
+                    </tr>
+                    ))
                     )}
                 </tbody>
             </table>
@@ -436,34 +436,46 @@ export default function CoorAcadMenu() {
                                             return allCoords.length > 0 ? allCoords.map(u => `${u.firstName} ${u.lastname}`).join(', ') : 'Sin asignar';
                                         })()}
                                     </div>
-                                                                        <div className="entity-indicator" title="Pseudopiloto">
+                                    <div className="entity-indicator" title="Pseudopiloto">
                                         👤 Pseudo: {(() => {
                                             const directPseudo = course.pseudoPilot;
-                                            // Search in global users list as backup
-                                            const pseudosFromUsers = users.filter(u => {
-                                                const r = (u.role?.name || '').toUpperCase();
-                                                const isPseudo = r.includes('PSEUDO');
-                                                const isInCourse = (u.courses || []).some(uc => uc.id === course.id);
-                                                return isPseudo && isInCourse;
-                                            });
-                                            const allPseudos = directPseudo ? [directPseudo, ...pseudosFromUsers.filter(u => u.id !== directPseudo.id)] : pseudosFromUsers;
-                                            return allPseudos.length > 0 ? allPseudos.map(u => `${u.firstName} ${u.lastname}`).join(', ') : 'Sin asignar';
+                                            // 1. Search in participants list
+                                            const pseudosFromUsers = (course.users || []).filter(u => (u.role?.name || '').toUpperCase().includes('PSEUDO'));
+                                            // 2. Search in sessions (proCourses) as backup
+                                            const pseudosFromSessions = proCourses
+                                                .filter(pc => pc.course?.id === course.id && pc.pseudoPilot)
+                                                .map(pc => pc.pseudoPilot);
+
+                                            // Combine all unique pseudos
+                                            const all = [...(directPseudo ? [directPseudo] : []), ...pseudosFromUsers, ...pseudosFromSessions];
+                                            const unique = all.reduce((acc, curr) => {
+                                                if (!acc.find(u => u.id === curr.id)) acc.push(curr);
+                                                return acc;
+                                            }, []);
+
+                                            return unique.length > 0 ? unique.map(u => `${u.firstName} ${u.lastname}`).join(', ') : 'Sin asignar';
                                         })()}
-                                                                            </div>
+                                    </div>
                                     <div className="entity-indicator" title="Instructor">
                                         👤 Instr: {(() => {
                                             const directInstr = course.instructor;
-                                            // Search in global users list as backup
-                                            const instrsFromUsers = users.filter(u => {
-                                                const r = (u.role?.name || '').toUpperCase();
-                                                const isInstr = r.includes('INSTRUCTOR');
-                                                const isInCourse = (u.courses || []).some(uc => uc.id === course.id);
-                                                return isInstr && isInCourse;
-                                            });
-                                            const allInstrs = directInstr ? [directInstr, ...instrsFromUsers.filter(u => u.id !== directInstr.id)] : instrsFromUsers;
-                                            return allInstrs.length > 0 ? allInstrs.map(u => `${u.firstName} ${u.lastname}`).join(', ') : 'Sin asignar';
+                                            // 1. Search in participants list
+                                            const instrsFromUsers = (course.users || []).filter(u => (u.role?.name || '').toUpperCase().includes('INSTRUCTOR'));
+                                            // 2. Search in sessions (proCourses) as backup
+                                            const instrsFromSessions = proCourses
+                                                .filter(pc => pc.course?.id === course.id && pc.instructor)
+                                                .map(pc => pc.instructor);
+
+                                            // Combine all unique instrs
+                                            const all = [...(directInstr ? [directInstr] : []), ...instrsFromUsers, ...instrsFromSessions];
+                                            const unique = all.reduce((acc, curr) => {
+                                                if (!acc.find(u => u.id === curr.id)) acc.push(curr);
+                                                return acc;
+                                            }, []);
+
+                                            return unique.length > 0 ? unique.map(u => `${u.firstName} ${u.lastname}`).join(', ') : 'Sin asignar';
                                         })()}
-                                                                            </div>
+                                    </div>
                                 </td>
                                 <td data-label="Acciones" className="actions-cell">
                                     <button className="btn-icon btn-edit" title="Editar" onClick={() => { setEditingCourse(course); setIsCourseModalOpen(true); }}>
@@ -562,6 +574,8 @@ export default function CoorAcadMenu() {
                         <th>Curso</th>
                         <th>Fecha</th>
                         <th>Horario</th>
+                        <th>Instructor</th>
+                        <th>Pseudo</th>
                         <th>Horas</th>
                         <th className="text-right">Acciones</th>
                     </tr>
@@ -569,14 +583,14 @@ export default function CoorAcadMenu() {
                 <tbody>
                     {loading && proCourses.length === 0 ? (
                         <tr>
-                            <td colSpan="6" style={{ textAlign: 'center', padding: '2rem' }}>
+                            <td colSpan="8" style={{ textAlign: 'center', padding: '2rem' }}>
                                 <div className="loading-spinner-small" style={{ marginBottom: '10px' }}></div>
                                 Cargando programación...
                             </td>
                         </tr>
                     ) : currentProCourses.length === 0 ? (
                         <tr>
-                            <td colSpan="6" style={{ textAlign: 'center', padding: '2rem' }}>
+                            <td colSpan="8" style={{ textAlign: 'center', padding: '2rem' }}>
                                 No se encontraron programaciones que coincidan con la búsqueda o la selección actual.
                             </td>
                         </tr>
@@ -592,6 +606,8 @@ export default function CoorAcadMenu() {
                                 </td>
                                 <td data-label="Fecha">{pro.fecha}</td>
                                 <td data-label="Horario">{pro.horaini} - {pro.horafin}</td>
+                                <td data-label="Instructor">{pro.instructor ? `${pro.instructor.firstName} ${pro.instructor.lastname}` : '—'}</td>
+                                <td data-label="Pseudo">{pro.pseudoPilot ? `${pro.pseudoPilot.firstName} ${pro.pseudoPilot.lastname}` : '—'}</td>
                                 <td data-label="Horas">{pro.horas}h</td>
                                 <td data-label="Acciones" className="actions-cell">
                                     <button className="btn-icon btn-edit" title="Editar" onClick={() => { setEditingProCourse(pro); setIsProCourseModalOpen(true); }}>
