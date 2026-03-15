@@ -75,8 +75,15 @@ export default function ReportView({ type, data, courses = [], simulators = [], 
             const term = searchTerm.toLowerCase();
             result = result.filter(item => {
                 if (type === 'courses') {
+                    const instr = item.instructor || (item.users || []).find(u => (u.role?.name || '').toUpperCase().includes('INSTRUCTOR'));
+                    const pseudo = item.pseudoPilot || (item.users || []).find(u => (u.role?.name || '').toUpperCase().includes('PSEUDO'));
+                    const instrName = instr ? `${instr.firstName} ${instr.lastname}`.toLowerCase() : '';
+                    const pseudoName = pseudo ? `${pseudo.firstName} ${pseudo.lastname}`.toLowerCase() : '';
+
                     return (item.name?.toLowerCase().includes(term)) ||
-                        (item.description?.toLowerCase().includes(term));
+                        (item.description?.toLowerCase().includes(term)) ||
+                        instrName.includes(term) ||
+                        pseudoName.includes(term);
                 } else if (type === 'users') {
                     return (item.firstName?.toLowerCase().includes(term)) ||
                         (item.lastname?.toLowerCase().includes(term)) ||
@@ -206,15 +213,20 @@ export default function ReportView({ type, data, courses = [], simulators = [], 
                     u.active ? 'Activo' : 'Inactivo'
                 ]);
             } else if (type === 'courses') {
-                tableHead = [['Nombre del Curso', 'Fecha Inicio', 'Fecha Fin', 'Simulador', 'Horas', 'Estado']];
-                tableBody = filteredData.map(c => [
-                    c.name,
-                    c.fecInicio || '—',
-                    c.fecFin || '—',
-                    c.simulator?.name || 'N/A',
-                    c.horas || 0,
-                    c.active ? 'Activo' : 'Inactivo'
-                ]);
+                tableHead = [['Nombre del Curso', 'Fecha Inicio', 'Fecha Fin', 'Simulador', 'Horas', 'Instructor', 'Pseudopiloto']];
+                tableBody = filteredData.map(c => {
+                    const instr = c.instructor || (c.users || []).find(u => (u.role?.name || '').toUpperCase().includes('INSTRUCTOR'));
+                    const pseudo = c.pseudoPilot || (c.users || []).find(u => (u.role?.name || '').toUpperCase().includes('PSEUDO'));
+                    return [
+                        c.name,
+                        c.fecInicio || '—',
+                        c.fecFin || '—',
+                        c.simulator?.name || 'N/A',
+                        c.horas || 0,
+                        instr ? `${instr.firstName} ${instr.lastname}` : '—',
+                        pseudo ? `${pseudo.firstName} ${pseudo.lastname}` : '—'
+                    ];
+                });
             } else if (type === 'maintenances') {
                 tableHead = [['Simulador', 'Tipo', 'Fecha', 'Horario', 'Técnico', 'Descripción']];
                 tableBody = filteredData.map(m => [

@@ -428,9 +428,21 @@ export default function ConsultationMenu() {
                                             {c.name}
                                             <div style={{ fontSize: '11px', color: '#64748b' }}>✈️ {c.simulator?.name || 'N/A'}</div>
                                         </td>
-                                        <td>{c.coordinator ? `${c.coordinator.firstName} ${c.coordinator.lastname}` : '—'}</td>
-                                        <td>{c.instructor ? `${c.instructor.firstName} ${c.instructor.lastname}` : '—'}</td>
-                                        <td>{c.pseudoPilot ? `${c.pseudoPilot.firstName} ${c.pseudoPilot.lastname}` : '—'}</td>
+                                        <td>{(() => {
+                                            const coord = c.coordinator || (c.users || []).find(u => {
+                                                const r = (u.role?.name || '').toUpperCase();
+                                                return r.includes('COORDINADOR') || r === 'COORACAD' || r === 'ADMINISTRADOR';
+                                            });
+                                            return coord ? `${coord.firstName} ${coord.lastname}` : '—';
+                                        })()}</td>
+                                        <td>{(() => {
+                                            const instr = c.instructor || (c.users || []).find(u => (u.role?.name || '').toUpperCase().includes('INSTRUCTOR'));
+                                            return instr ? `${instr.firstName} ${instr.lastname}` : '—';
+                                        })()}</td>
+                                        <td>{(() => {
+                                            const pseudo = c.pseudoPilot || (c.users || []).find(u => (u.role?.name || '').toUpperCase().includes('PSEUDO'));
+                                            return pseudo ? `${pseudo.firstName} ${pseudo.lastname}` : '—';
+                                        })()}</td>
                                         <td><span className="status-badge" style={{ background: '#eff6ff', color: '#1e40af' }}>{students.length}</span></td>
                                     </tr>
                                 );

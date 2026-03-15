@@ -424,25 +424,46 @@ export default function CoorAcadMenu() {
                                 <td data-label="Personal">
                                     <div className="entity-indicator" title="Coordinador">
                                         👤 Coord: {(() => {
-                                            const coords = (course.users || []).filter(u => {
-                                                const r = u.role?.name?.toUpperCase() || '';
-                                                return r.includes('COORDINADOR ACADÉMICO') || r === 'COORACAD' || r === 'ADMINISTRADOR';
+                                            const directCoord = course.coordinator;
+                                            // Search in global users list as backup
+                                            const coordsFromUsers = users.filter(u => {
+                                                const r = (u.role?.name || '').toUpperCase();
+                                                const isCoord = r.includes('COORDINADOR') || r === 'COORACAD' || r === 'ADMINISTRADOR';
+                                                const isInCourse = (u.courses || []).some(uc => uc.id === course.id);
+                                                return isCoord && isInCourse;
                                             });
-                                            return coords.length > 0 ? coords.map(u => `${u.firstName} ${u.lastname}`).join(', ') : 'Sin asignar';
+                                            const allCoords = directCoord ? [directCoord, ...coordsFromUsers.filter(u => u.id !== directCoord.id)] : coordsFromUsers;
+                                            return allCoords.length > 0 ? allCoords.map(u => `${u.firstName} ${u.lastname}`).join(', ') : 'Sin asignar';
                                         })()}
                                     </div>
-                                    <div className="entity-indicator" title="Pseudopiloto">
+                                                                        <div className="entity-indicator" title="Pseudopiloto">
                                         👤 Pseudo: {(() => {
-                                            const pseudos = (course.users || []).filter(u => (u.role?.name?.toUpperCase() || '').includes('PSEUDOPILOTO'));
-                                            return pseudos.length > 0 ? pseudos.map(u => `${u.firstName} ${u.lastname}`).join(', ') : 'Sin asignar';
+                                            const directPseudo = course.pseudoPilot;
+                                            // Search in global users list as backup
+                                            const pseudosFromUsers = users.filter(u => {
+                                                const r = (u.role?.name || '').toUpperCase();
+                                                const isPseudo = r.includes('PSEUDO');
+                                                const isInCourse = (u.courses || []).some(uc => uc.id === course.id);
+                                                return isPseudo && isInCourse;
+                                            });
+                                            const allPseudos = directPseudo ? [directPseudo, ...pseudosFromUsers.filter(u => u.id !== directPseudo.id)] : pseudosFromUsers;
+                                            return allPseudos.length > 0 ? allPseudos.map(u => `${u.firstName} ${u.lastname}`).join(', ') : 'Sin asignar';
                                         })()}
-                                    </div>
+                                                                            </div>
                                     <div className="entity-indicator" title="Instructor">
                                         👤 Instr: {(() => {
-                                            const instrs = (course.users || []).filter(u => (u.role?.name?.toUpperCase() || '').includes('INSTRUCTOR'));
-                                            return instrs.length > 0 ? instrs.map(u => `${u.firstName} ${u.lastname}`).join(', ') : 'Sin asignar';
+                                            const directInstr = course.instructor;
+                                            // Search in global users list as backup
+                                            const instrsFromUsers = users.filter(u => {
+                                                const r = (u.role?.name || '').toUpperCase();
+                                                const isInstr = r.includes('INSTRUCTOR');
+                                                const isInCourse = (u.courses || []).some(uc => uc.id === course.id);
+                                                return isInstr && isInCourse;
+                                            });
+                                            const allInstrs = directInstr ? [directInstr, ...instrsFromUsers.filter(u => u.id !== directInstr.id)] : instrsFromUsers;
+                                            return allInstrs.length > 0 ? allInstrs.map(u => `${u.firstName} ${u.lastname}`).join(', ') : 'Sin asignar';
                                         })()}
-                                    </div>
+                                                                            </div>
                                 </td>
                                 <td data-label="Acciones" className="actions-cell">
                                     <button className="btn-icon btn-edit" title="Editar" onClick={() => { setEditingCourse(course); setIsCourseModalOpen(true); }}>
