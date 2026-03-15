@@ -7,6 +7,7 @@ import UserCoursesMenu from './UserCoursesMenu';
 import CalendarView from './CalendarView';
 import ReportView from './ReportView';
 import StatisticsView from './StatisticsView';
+import ConsultationMenu from './ConsultationMenu';
 import './AdminMenu.css';
 
 export default function CoorAcadMenu() {
@@ -640,20 +641,8 @@ export default function CoorAcadMenu() {
                     <li className={`admin-nav-item ${activeTab === 'courses' ? 'active' : ''}`} onClick={() => setActiveTab('courses')}>Cursos</li>
                     <li className={`admin-nav-item ${activeTab === 'pro-courses' ? 'active' : ''}`} onClick={() => setActiveTab('pro-courses')}>Programación</li>
                     <li className={`admin-nav-item ${activeTab === 'calendar' ? 'active' : ''}`} onClick={() => setActiveTab('calendar')}>Calendario</li>
+                    <li className={`admin-nav-item ${activeTab === 'consultations' ? 'active' : ''}`} onClick={() => setActiveTab('consultations')}>🔍 Consultas y Reportes</li>
 
-                    <li className="admin-nav-group">
-                        <div className="admin-nav-group-header" onClick={() => setIsReportsMenuOpen(!isReportsMenuOpen)}>
-                            <span>Reportes</span>
-                            <svg className={`chevron-icon ${isReportsMenuOpen ? 'open' : ''}`} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                        </div>
-                        {isReportsMenuOpen && (
-                            <div className="admin-nav-group-content">
-                                <li className={`admin-nav-item ${activeTab === 'reports-courses' ? 'active' : ''}`} onClick={() => setActiveTab('reports-courses')}>Reporte Cursos</li>
-                                <li className={`admin-nav-item ${activeTab === 'reports-maintenances' ? 'active' : ''}`} onClick={() => setActiveTab('reports-maintenances')}>Reporte Mantenimientos</li>
-                                <li className={`admin-nav-item ${activeTab === 'reports-users' ? 'active' : ''}`} onClick={() => setActiveTab('reports-users')}>Reporte Usuarios</li>
-                            </div>
-                        )}
-                    </li>
                 </ul>
             </div>
 
@@ -667,13 +656,11 @@ export default function CoorAcadMenu() {
                                         activeTab === 'user-courses' ? 'Asignación de Estudiantes' :
                                             activeTab === 'pro-courses' ? 'Programación de Cursos' :
                                                 activeTab === 'calendar' ? 'Calendario Académico' :
-                                                    activeTab === 'reports-courses' ? 'Reporte de Cursos' :
-                                                        activeTab === 'reports-maintenances' ? 'Reporte de Mantenimientos' :
-                                                            activeTab === 'reports-users' ? 'Reporte de Usuarios' : ''}
+                                                    activeTab === 'reports-users' ? 'Reporte de Usuarios' : ''}
                         </h1>
                         <p className="admin-subtitle">Panel de control de recursos académicos</p>
                     </div>
-                    {activeTab !== 'calendar' && activeTab !== 'user-courses' && !activeTab.startsWith('reports-') && (
+                    {activeTab !== 'calendar' && activeTab !== 'user-courses' && activeTab !== 'consultations' && !activeTab.startsWith('reports-') && (
                         <button className="btn-primary" onClick={() => {
                             if (activeTab === 'users') { setEditingUser(null); setIsUserModalOpen(true); }
                             else if (activeTab === 'courses') { setEditingCourse(null); setIsCourseModalOpen(true); }
@@ -695,14 +682,12 @@ export default function CoorAcadMenu() {
                         activeTab === 'user-courses' ? <UserCoursesMenu /> :
                             activeTab === 'courses' ? renderCourseTable() :
                                 activeTab === 'pro-courses' ? renderProCourseTable() :
-                                    activeTab === 'reports-courses' ? <ReportView type="courses" data={courses} simulators={simulators} courses={courses} /> :
-                                        activeTab === 'reports-maintenances' ? <ReportView type="maintenances" data={maintenances} simulators={simulators} courses={courses} /> :
-                                            activeTab === 'reports-users' ? <ReportView type="users" data={users} simulators={simulators} courses={courses} /> :
-                                                loading && proCourses.length === 0 ? (
-                                                    <div className="loading-state">Cargando calendario...</div>
-                                                ) : (
-                                                    <CalendarView events={proCourses} type="course" />
-                                                )
+                                    activeTab === 'consultations' ? <ConsultationMenu /> :
+                                        loading && proCourses.length === 0 ? (
+                                            <div className="loading-state">Cargando calendario...</div>
+                                        ) : (
+                                            <CalendarView events={proCourses} type="course" />
+                                        )
                 }
             </main>
 

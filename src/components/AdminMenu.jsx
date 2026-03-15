@@ -13,6 +13,7 @@ import UserCoursesMenu from './UserCoursesMenu';
 import CalendarView from './CalendarView';
 import ReportView from './ReportView';
 import StatisticsView from './StatisticsView';
+import ConsultationMenu from './ConsultationMenu';
 import './AdminMenu.css';
 
 export default function AdminMenu() {
@@ -62,6 +63,8 @@ export default function AdminMenu() {
     const [historySearchTerm, setHistorySearchTerm] = useState('');
     const [historyCurrentPage, setHistoryCurrentPage] = useState(1);
     const [historyItemsPerPage, setHistoryItemsPerPage] = useState(10);
+    const [userCurrentPage, setUserCurrentPage] = useState(1);
+    const [userItemsPerPage, setUserItemsPerPage] = useState(10);
 
     const fetchUsers = useCallback(async () => {
         setLoading(true);
@@ -497,6 +500,12 @@ export default function AdminMenu() {
     const indexOfFirstHistory = indexOfLastHistory - historyItemsPerPage;
     const currentHistory = filteredMaintenanceHistory.slice(indexOfFirstHistory, indexOfLastHistory);
 
+    // Pagination for Users
+    const totalUserPages = Math.ceil(filteredUsers.length / userItemsPerPage);
+    const indexOfLastUser = userCurrentPage * userItemsPerPage;
+    const indexOfFirstUser = indexOfLastUser - userItemsPerPage;
+    const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
+
     const getCourseColor = (courseId) => {
         const colors = [
             '#3b82f6', // Blue
@@ -524,7 +533,10 @@ export default function AdminMenu() {
                     type="text"
                     placeholder="Buscar usuario por nombre o email..."
                     value={userSearchTerm}
-                    onChange={(e) => setUserSearchTerm(e.target.value)}
+                    onChange={(e) => {
+                        setUserSearchTerm(e.target.value);
+                        setUserCurrentPage(1);
+                    }}
                     style={{
                         flex: 1,
                         border: 'none',
@@ -534,7 +546,7 @@ export default function AdminMenu() {
                     }}
                 />
                 {userSearchTerm && (
-                    <button onClick={() => setUserSearchTerm('')} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#64748b' }}>
+                    <button onClick={() => { setUserSearchTerm(''); setUserCurrentPage(1); }} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#64748b' }}>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                     </button>
                 )}
@@ -551,7 +563,7 @@ export default function AdminMenu() {
                     </tr>
                 </thead>
                 <tbody>
-                    {filteredUsers.map(user => (
+                    {currentUsers.map(user => (
                         <tr key={user.id}>
                             <td data-label="ID">#{user.id}</td>
                             <td data-label="Nombre Completo" className="font-medium">{`${user.firstName} ${user.lastname}`}</td>
@@ -586,6 +598,48 @@ export default function AdminMenu() {
                     ))}
                 </tbody>
             </table>
+
+            {/* Pagination Controls */}
+            {filteredUsers.length > 0 && (
+                <div className="pagination-container">
+                    <div className="pagination-info">
+                        Mostrando {indexOfFirstUser + 1} - {Math.min(indexOfLastUser, filteredUsers.length)} de {filteredUsers.length}
+                    </div>
+                    <div className="pagination-actions">
+                        <div className="items-per-page">
+                            <label>Mostrar:</label>
+                            <select
+                                value={userItemsPerPage}
+                                onChange={(e) => {
+                                    setUserItemsPerPage(Number(e.target.value));
+                                    setUserCurrentPage(1);
+                                }}
+                            >
+                                <option value={10}>10</option>
+                                <option value={20}>20</option>
+                                <option value={50}>50</option>
+                            </select>
+                        </div>
+                        <div className="pagination-buttons">
+                            <button
+                                className="btn-pagination"
+                                disabled={userCurrentPage === 1}
+                                onClick={() => setUserCurrentPage(prev => prev - 1)}
+                            >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                            </button>
+                            <span className="current-page">Página {userCurrentPage} de {totalUserPages || 1}</span>
+                            <button
+                                className="btn-pagination"
+                                disabled={userCurrentPage >= totalUserPages}
+                                onClick={() => setUserCurrentPage(prev => prev + 1)}
+                            >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 
@@ -1331,6 +1385,7 @@ export default function AdminMenu() {
                     <li className={`admin-nav-item ${activeTab === 'maintenances' ? 'active' : ''}`} onClick={() => setActiveTab('maintenances')}>Mantenimiento</li>
                     <li className={`admin-nav-item ${activeTab === 'maintenance-types' ? 'active' : ''}`} onClick={() => setActiveTab('maintenance-types')}>Tipos de Mantenimiento</li>
                     <li className={`admin-nav-item ${activeTab === 'maintenance-history' ? 'active' : ''}`} onClick={() => setActiveTab('maintenance-history')}>Historial Técnico</li>
+                    <li className={`admin-nav-item ${activeTab === 'consultations' ? 'active' : ''}`} onClick={() => setActiveTab('consultations')}>🔍 Consultas y Reportes</li>
 
                     <li className="admin-nav-group">
                         <div className="admin-nav-group-header" onClick={() => setIsCalendarMenuOpen(!isCalendarMenuOpen)}>
@@ -1343,24 +1398,6 @@ export default function AdminMenu() {
                                 <li className={`admin-nav-item ${activeTab === 'calendar-maint' ? 'active' : ''}`} onClick={() => setActiveTab('calendar-maint')}>Calendario Mantenimientos</li>
                             </div>
                         )}
-                    </li>
-
-                    <li className="admin-nav-group">
-                        <div className="admin-nav-group-header" onClick={() => setIsReportsMenuOpen(!isReportsMenuOpen)}>
-                            <span>Reportes</span>
-                            <svg className={`chevron-icon ${isReportsMenuOpen ? 'open' : ''}`} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                        </div>
-                        {isReportsMenuOpen && (
-                            <div className="admin-nav-group-content">
-                                <li className={`admin-nav-item ${activeTab === 'reports-courses' ? 'active' : ''}`} onClick={() => setActiveTab('reports-courses')}>Reporte Cursos</li>
-                                <li className={`admin-nav-item ${activeTab === 'reports-maintenances' ? 'active' : ''}`} onClick={() => setActiveTab('reports-maintenances')}>Reporte Mantenimientos</li>
-                                <li className={`admin-nav-item ${activeTab === 'reports-users' ? 'active' : ''}`} onClick={() => setActiveTab('reports-users')}>Reporte Usuarios</li>
-                            </div>
-                        )}
-                    </li>
-
-                    <li className={`admin-nav-item ${activeTab === 'settings' ? 'active' : ''}`} onClick={() => setActiveTab('settings')}>
-                        Configuración
                     </li>
                 </ul>
             </div>
@@ -1381,12 +1418,10 @@ export default function AdminMenu() {
                                                                 activeTab === 'maintenance-history' ? 'Historial Técnico' :
                                                                     activeTab === 'calendar-courses' ? 'Calendario de Cursos' :
                                                                         activeTab === 'calendar-maint' ? 'Calendario de Mantenimientos' :
-                                                                            activeTab === 'reports-courses' ? 'Generar Reporte de Cursos' :
-                                                                                activeTab === 'reports-maintenances' ? 'Generar Reporte de Mantenimientos' :
-                                                                                    activeTab === 'reports-users' ? 'Generar Reporte de Usuarios' : 'Configuración'}
+                                                                            activeTab === 'consultations' ? 'Consultas y Reportes' : ''}
                     </h2>
                     <div className="admin-header-actions">
-                        {activeTab !== 'dashboard' && !activeTab.startsWith('calendar-') && !activeTab.startsWith('reports-') && activeTab !== 'user-courses' && activeTab !== 'roles' && (
+                        {activeTab !== 'dashboard' && !activeTab.startsWith('calendar-') && !activeTab.startsWith('reports-') && activeTab !== 'consultations' && activeTab !== 'user-courses' && activeTab !== 'roles' && (
                             <button className="btn-primary" onClick={() => {
                                 if (activeTab === 'users') { setEditingUser(null); setIsUserModalOpen(true); }
                                 else if (activeTab === 'rooms') { setEditingRoom(null); setIsRoomModalOpen(true); }
@@ -1433,10 +1468,8 @@ export default function AdminMenu() {
                                                             activeTab === 'maintenance-history' ? renderHistoryTable() :
                                                                 activeTab === 'calendar-courses' ? <CalendarView events={proCourses} type="course" /> :
                                                                     activeTab === 'calendar-maint' ? <CalendarView events={maintenances} type="maint" /> :
-                                                                        activeTab === 'reports-courses' ? <ReportView type="courses" data={courses} simulators={simulators} courses={courses} roles={roles} maintenanceTypes={maintenanceTypes} /> :
-                                                                            activeTab === 'reports-maintenances' ? <ReportView type="maintenances" data={maintenances} simulators={simulators} courses={courses} roles={roles} maintenanceTypes={maintenanceTypes} /> :
-                                                                                activeTab === 'reports-users' ? <ReportView type="users" data={users} simulators={simulators} courses={courses} roles={roles} maintenanceTypes={maintenanceTypes} /> :
-                                                                                    <div className="settings-placeholder">Próximamente...</div>
+                                                                        activeTab === 'reports-users' ? <ReportView type="users" data={users} simulators={simulators} courses={courses} roles={roles} maintenanceTypes={maintenanceTypes} /> :
+                                                                            activeTab === 'consultations' ? <ConsultationMenu /> : null
                 )}
             </div>
 
@@ -1473,6 +1506,6 @@ export default function AdminMenu() {
             <MaintenanceModal isOpen={isMaintenanceModalOpen} onClose={() => { setIsMaintenanceModalOpen(false); setEditingMaintenance(null); }} onSuccess={handleMaintenanceSaved} editMaintenance={editingMaintenance} />
             <MaintenanceHistoryModal isOpen={isHistoryModalOpen} onClose={() => { setIsHistoryModalOpen(false); setEditingHistory(null); }} onSuccess={handleHistorySaved} editHistory={editingHistory} />
             <MaintenanceTypeModal isOpen={isMaintenanceTypeModalOpen} onClose={() => { setIsMaintenanceTypeModalOpen(false); setEditingMaintenanceType(null); }} onSuccess={handleMaintenanceTypeSaved} editType={editingMaintenanceType} />
-        </div>
+        </div >
     );
 }

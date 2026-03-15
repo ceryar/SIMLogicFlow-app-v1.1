@@ -42,7 +42,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:8080',
+        target: 'https://simlogicflow-api-v11-production.up.railway.app',
         changeOrigin: true,
       }
     }

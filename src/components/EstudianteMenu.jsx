@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import CalendarView from './CalendarView';
+import ConsultationMenu from './ConsultationMenu';
 import './AdminMenu.css';
 
 export default function EstudianteMenu({ userId }) {
@@ -141,6 +142,12 @@ export default function EstudianteMenu({ userId }) {
                     >
                         Mi Calendario
                     </li>
+                    <li
+                        className={`admin-nav-item ${activeTab === 'consultations' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('consultations')}
+                    >
+                        🔍 Consultas
+                    </li>
                 </ul>
                 <div style={{ marginTop: 'auto', padding: '1rem', background: 'rgba(110, 142, 251, 0.05)', borderRadius: '12px' }}>
                     <p style={{ fontSize: '0.8rem', color: '#64748b', margin: 0 }}>
@@ -151,16 +158,23 @@ export default function EstudianteMenu({ userId }) {
 
             <div className="admin-content">
                 <div className="admin-header">
-                    <h2>{activeTab === 'my-courses' ? 'Mis Cursos Matriculados' : 'Mi Calendario Académico'}</h2>
+                    <h2>
+                        {activeTab === 'my-courses' ? 'Mis Cursos Matriculados' :
+                            activeTab === 'calendar' ? 'Mi Calendario Académico' :
+                                'Consultas Académicas'}
+                    </h2>
                 </div>
 
-                {activeTab === 'my-courses' ? renderCoursesTable() : (
-                    loading && proCourses.length === 0 ? (
-                        <div className="loading-state">Cargando calendario...</div>
+                {activeTab === 'my-courses' ? renderCoursesTable() :
+                    activeTab === 'calendar' ? (
+                        loading && proCourses.length === 0 ? (
+                            <div className="loading-state">Cargando calendario...</div>
+                        ) : (
+                            <CalendarView events={proCourses} type="course" />
+                        )
                     ) : (
-                        <CalendarView events={proCourses} type="course" />
-                    )
-                )}
+                        <ConsultationMenu />
+                    )}
             </div>
         </div>
     );

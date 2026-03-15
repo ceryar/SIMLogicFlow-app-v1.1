@@ -6,6 +6,7 @@ import MaintenanceTypeModal from './MaintenanceTypeModal';
 import CalendarView from './CalendarView';
 import ReportView from './ReportView';
 import StatisticsView from './StatisticsView';
+import ConsultationMenu from './ConsultationMenu';
 import './AdminMenu.css';
 
 export default function TecnicoMenu() {
@@ -501,20 +502,8 @@ export default function TecnicoMenu() {
                     <li className={`admin-nav-item ${activeTab === 'maintenance-history' ? 'active' : ''}`} onClick={() => setActiveTab('maintenance-history')}>Historial</li>
                     <li className={`admin-nav-item ${activeTab === 'calendar-maint' ? 'active' : ''}`} onClick={() => setActiveTab('calendar-maint')}>Calendario Mantenimientos</li>
                     <li className={`admin-nav-item ${activeTab === 'calendar-courses' ? 'active' : ''}`} onClick={() => setActiveTab('calendar-courses')}>Calendario Cursos</li>
+                    <li className={`admin-nav-item ${activeTab === 'consultations' ? 'active' : ''}`} onClick={() => setActiveTab('consultations')}>🔍 Consultas y Reportes</li>
 
-                    <li className="admin-nav-group">
-                        <div className="admin-nav-group-header" onClick={() => setIsReportsMenuOpen(!isReportsMenuOpen)}>
-                            <span>Reportes</span>
-                            <svg className={`chevron-icon ${isReportsMenuOpen ? 'open' : ''}`} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                        </div>
-                        {isReportsMenuOpen && (
-                            <div className="admin-nav-group-content">
-                                <li className={`admin-nav-item ${activeTab === 'reports-courses' ? 'active' : ''}`} onClick={() => setActiveTab('reports-courses')}>Reporte Cursos</li>
-                                <li className={`admin-nav-item ${activeTab === 'reports-maintenances' ? 'active' : ''}`} onClick={() => setActiveTab('reports-maintenances')}>Reporte Mantenimientos</li>
-                                <li className={`admin-nav-item ${activeTab === 'reports-users' ? 'active' : ''}`} onClick={() => setActiveTab('reports-users')}>Reporte Usuarios</li>
-                            </div>
-                        )}
-                    </li>
                 </ul>
             </div>
 
@@ -525,13 +514,11 @@ export default function TecnicoMenu() {
                             activeTab === 'maintenances' ? 'Gestión de Mantenimientos' :
                                 activeTab === 'maintenance-history' ? 'Historial Técnico' :
                                     activeTab === 'calendar-maint' ? 'Calendario de Mantenimientos' :
-                                        activeTab === 'reports-courses' ? 'Reporte de Cursos' :
-                                            activeTab === 'reports-maintenances' ? 'Reporte de Mantenimientos' :
-                                                activeTab === 'reports-users' ? 'Reporte de Usuarios' :
-                                                    'Calendario de Cursos'}
+                                        activeTab === 'consultations' ? 'Consultas y Reportes' :
+                                            'Calendario de Cursos'}
                     </h2>
                     <div className="admin-header-actions">
-                        {activeTab !== 'calendar-maint' && activeTab !== 'calendar-courses' && !activeTab.startsWith('reports-') && (
+                        {activeTab !== 'calendar-maint' && activeTab !== 'calendar-courses' && activeTab !== 'consultations' && !activeTab.startsWith('reports-') && (
                             <button className="btn-primary" onClick={() => {
                                 if (activeTab === 'maintenances') { setEditingMaintenance(null); setIsMaintenanceModalOpen(true); }
                                 else if (activeTab === 'maintenance-history') { setEditingHistory(null); setIsHistoryModalOpen(true); }
@@ -556,12 +543,8 @@ export default function TecnicoMenu() {
                     renderHistoryTable()
                 ) : activeTab === 'calendar-maint' ? (
                     loading && maintenances.length === 0 ? <div className="loading-state">Cargando calendario...</div> : <CalendarView events={maintenances} type="maint" />
-                ) : activeTab === 'reports-courses' ? (
-                    <ReportView type="courses" data={courses} simulators={simulators} courses={courses} roles={roles} maintenanceTypes={maintenanceTypes} />
-                ) : activeTab === 'reports-maintenances' ? (
-                    <ReportView type="maintenances" data={maintenances} simulators={simulators} courses={courses} roles={roles} maintenanceTypes={maintenanceTypes} />
-                ) : activeTab === 'reports-users' ? (
-                    <ReportView type="users" data={users} simulators={simulators} courses={courses} roles={roles} maintenanceTypes={maintenanceTypes} />
+                ) : activeTab === 'consultations' ? (
+                    <ConsultationMenu />
                 ) : (
                     loading && proCourses.length === 0 ? <div className="loading-state">Cargando calendario...</div> : <CalendarView events={proCourses} type="course" />
                 )}

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import CalendarView from './CalendarView';
+import ConsultationMenu from './ConsultationMenu';
 import './AdminMenu.css';
 
 export default function PseudopilotoMenu({ userId }) {
@@ -134,21 +135,31 @@ export default function PseudopilotoMenu({ userId }) {
                     <li className={`admin-nav-item ${activeTab === 'calendar' ? 'active' : ''}`} onClick={() => setActiveTab('calendar')}>
                         Calendario
                     </li>
+                    <li className={`admin-nav-item ${activeTab === 'consultations' ? 'active' : ''}`} onClick={() => setActiveTab('consultations')}>
+                        🔍 Consultas
+                    </li>
                 </ul>
             </div>
 
             <div className="admin-content">
                 <div className="admin-header">
-                    <h2>{activeTab === 'my-courses' ? 'Mis Sesiones Programadas' : 'Calendario de Sesiones'}</h2>
+                    <h2>
+                        {activeTab === 'my-courses' ? 'Mis Sesiones Programadas' :
+                            activeTab === 'calendar' ? 'Calendario de Sesiones' :
+                                'Consultas de Sesión'}
+                    </h2>
                 </div>
 
-                {activeTab === 'my-courses' ? renderCoursesTable() : (
-                    loading && proCourses.length === 0 ? (
-                        <div className="loading-state">Cargando calendario...</div>
+                {activeTab === 'my-courses' ? renderCoursesTable() :
+                    activeTab === 'calendar' ? (
+                        loading && proCourses.length === 0 ? (
+                            <div className="loading-state">Cargando calendario...</div>
+                        ) : (
+                            <CalendarView events={proCourses} type="course" />
+                        )
                     ) : (
-                        <CalendarView events={proCourses} type="course" />
-                    )
-                )}
+                        <ConsultationMenu />
+                    )}
             </div>
         </div>
     );

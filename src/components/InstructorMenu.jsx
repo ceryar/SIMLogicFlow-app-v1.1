@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import CalendarView from './CalendarView';
+import ConsultationMenu from './ConsultationMenu';
 import './AdminMenu.css';
 
 export default function InstructorMenu({ userId }) {
@@ -134,23 +135,33 @@ export default function InstructorMenu({ userId }) {
                     <li className={`admin-nav-item ${activeTab === 'calendar' ? 'active' : ''}`} onClick={() => setActiveTab('calendar')}>
                         Calendario
                     </li>
+                    <li className={`admin-nav-item ${activeTab === 'consultations' ? 'active' : ''}`} onClick={() => setActiveTab('consultations')}>
+                        🔍 Consultas y Reportes
+                    </li>
                 </ul>
             </div>
 
             <div className="admin-content">
                 <div className="admin-header">
-                    <h2>{activeTab === 'my-courses' ? 'Mis Cursos Programados' : 'Calendario de Instrucción'}</h2>
+                    <h2>
+                        {activeTab === 'my-courses' ? 'Mis Cursos Programados' :
+                            activeTab === 'calendar' ? 'Calendario de Instrucción' :
+                                'Consultas y Reportes'}
+                    </h2>
                 </div>
 
-                {activeTab === 'my-courses' ? renderCoursesTable() : (
-                    loading && proCourses.length === 0 ? (
-                        <div className="loading-state">Cargando calendario...</div>
-                    ) : error ? (
-                        <div className="error-state" style={{ marginBottom: '20px' }}>{error}</div>
+                {activeTab === 'my-courses' ? renderCoursesTable() :
+                    activeTab === 'calendar' ? (
+                        loading && proCourses.length === 0 ? (
+                            <div className="loading-state">Cargando calendario...</div>
+                        ) : error ? (
+                            <div className="error-state" style={{ marginBottom: '20px' }}>{error}</div>
+                        ) : (
+                            <CalendarView events={proCourses} type="course" />
+                        )
                     ) : (
-                        <CalendarView events={proCourses} type="course" />
-                    )
-                )}
+                        <ConsultationMenu />
+                    )}
             </div>
         </div>
     );

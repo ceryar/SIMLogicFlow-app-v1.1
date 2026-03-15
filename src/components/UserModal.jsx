@@ -141,8 +141,14 @@ export default function UserModal({ isOpen, onClose, onSuccess, editUser = null,
             setFormData(initialFormState);
         } catch (err) {
             console.error('Error saving user:', err);
-            const errorMessage = err.response?.data?.message || err.message || 'Unknown error';
-            setError(`Failed to ${editUser ? 'update' : 'create'} user: ${errorMessage}`);
+            let errorMessage = err.response?.data?.message || err.message || 'Unknown error';
+
+            // Handle specific duplicate document error
+            if (errorMessage.includes('duplicate key') && errorMessage.includes('document_number')) {
+                errorMessage = 'El número de documento ya existe. Por favor, verifique e intente con otro.';
+            }
+
+            setError(`Error al ${editUser ? 'actualizar' : 'crear'} usuario: ${errorMessage}`);
         } finally {
             setLoading(false);
         }

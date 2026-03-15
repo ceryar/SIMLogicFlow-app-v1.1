@@ -20,6 +20,7 @@ export default function ReportView({ type, data, courses = [], simulators = [], 
                 let itemDate = null;
                 if (type === 'courses') itemDate = item.fecInicio;
                 else if (type === 'maintenances') itemDate = item.fecIni;
+                else if (type === 'sessions') itemDate = item.fecha || item.fecIni;
 
                 if (!itemDate) return true;
 
@@ -39,11 +40,15 @@ export default function ReportView({ type, data, courses = [], simulators = [], 
             result = result.filter(item => item.active === isActive);
         }
 
-        // Course Filter (Relevant for Users)
-        if (type === 'users' && selectedCourseId) {
-            result = result.filter(user =>
-                user.courses && user.courses.some(c => c.id === parseInt(selectedCourseId))
-            );
+        // Course Filter (Relevant for Users and Sessions)
+        if (selectedCourseId) {
+            if (type === 'users') {
+                result = result.filter(user =>
+                    user.courses && user.courses.some(c => c.id === parseInt(selectedCourseId))
+                );
+            } else if (type === 'sessions') {
+                result = result.filter(s => s.course?.id === parseInt(selectedCourseId));
+            }
         }
 
         // Role Filter (Relevant for Users)
@@ -60,7 +65,7 @@ export default function ReportView({ type, data, courses = [], simulators = [], 
         if (selectedSimulatorId) {
             if (type === 'maintenances') {
                 result = result.filter(m => m.simulator?.id === parseInt(selectedSimulatorId));
-            } else if (type === 'courses') {
+            } else if (type === 'courses' || type === 'sessions') {
                 result = result.filter(c => c.simulator?.id === parseInt(selectedSimulatorId));
             }
         }
@@ -75,10 +80,14 @@ export default function ReportView({ type, data, courses = [], simulators = [], 
                 } else if (type === 'users') {
                     return (item.firstName?.toLowerCase().includes(term)) ||
                         (item.lastname?.toLowerCase().includes(term)) ||
-                        (item.email?.toLowerCase().includes(term));
-                } else if (type === 'maintenances') {
+                        (item.email?.toLowerCase().includes(term)) ||
+                        (item.documentNumber || '').includes(term);
+                } else if (type === 'maintenances' || type === 'sessions') {
                     return (item.description?.toLowerCase().includes(term)) ||
-                        (item.simulator?.name?.toLowerCase().includes(term));
+                        (item.simulator?.name?.toLowerCase().includes(term)) ||
+                        (item.course?.name?.toLowerCase().includes(term)) ||
+                        (item.horaini || '').includes(term) ||
+                        (item.horafin || '').includes(term);
                 }
                 return true;
             });
@@ -123,6 +132,17 @@ export default function ReportView({ type, data, courses = [], simulators = [], 
                 m.technician ? `${m.technician.firstName} ${m.technician.lastname}` : 'Sin asignar',
                 m.description || ''
             ]);
+        } else if (type === 'sessions') {
+            headers = ['ID', 'Curso', 'Simulador', 'Fecha', 'Horario', 'Instructor', 'Pseudopiloto'];
+            rows = filteredData.map(s => [
+                s.id,
+                s.course?.name || 'N/A',
+                s.simulator?.name || 'N/A',
+                s.fecha || s.fecIni,
+                `${s.horaini || s.horaIni} - ${s.horafin || s.horaFin}`,
+                s.instructor ? `${s.instructor.firstName} ${s.instructor.lastname}` : 'N/A',
+                s.pseudoPilot ? `${s.pseudoPilot.firstName} ${s.pseudoPilot.lastname}` : 'N/A'
+            ]);
         }
 
         const csvContent = [
@@ -141,6 +161,99 @@ export default function ReportView({ type, data, courses = [], simulators = [], 
         document.body.removeChild(link);
     };
 
+    const handleDownloadPDF = async () => {
+        try {
+            const { default: jsPDF } = await import('jspdf');
+            const { default: autoTable } = await import('jspdf-autotable');
+
+            const doc = new jsPDF('l', 'mm', 'a4'); // Landscape for better table space
+
+            // Styling identical to StatisticsView
+            // Header
+            doc.setFontSize(22);
+            doc.setTextColor(59, 130, 246); // #3b82f6
+            doc.text('SimLogicFlow', 14, 20);
+
+            const titleMap = {
+                'users': 'Reporte Detallado de Usuarios',
+                'courses': 'Reporte de Programas Académicos',
+                'maintenances': 'Reporte de Mantenimientos',
+                'sessions': 'Reporte de Sesiones y Horarios'
+            };
+            doc.text(titleMap[type] || 'Reporte del Sistema', 14, 30);
+
+            // Metadata
+            doc.setFontSize(10);
+            doc.setTextColor(100, 116, 139); // #64748b
+            doc.text(`Fecha de generación: ${new Date().toLocaleString()}`, 14, 38);
+
+            let filterSummary = `Filtros: ${searchTerm ? `Búsqueda: "${searchTerm}" | ` : ''}${startDate ? `Desde: ${startDate} | ` : ''}${endDate ? `Hasta: ${endDate}` : ''}`;
+            if (filterSummary === 'Filtros: ') filterSummary = 'Filtros: Ninguno (Todos los registros)';
+            doc.text(filterSummary, 14, 44);
+
+            doc.text(`Total de registros: ${filteredData.length}`, 14, 50);
+
+            let tableHead = [];
+            let tableBody = [];
+
+            if (type === 'users') {
+                tableHead = [['Nombre Completo', 'Email', 'Documento', 'Rol', 'Estado']];
+                tableBody = filteredData.map(u => [
+                    `${u.firstName} ${u.lastname}`,
+                    u.email,
+                    u.documentNumber || '—',
+                    u.role?.name || 'N/A',
+                    u.active ? 'Activo' : 'Inactivo'
+                ]);
+            } else if (type === 'courses') {
+                tableHead = [['Nombre del Curso', 'Fecha Inicio', 'Fecha Fin', 'Simulador', 'Horas', 'Estado']];
+                tableBody = filteredData.map(c => [
+                    c.name,
+                    c.fecInicio || '—',
+                    c.fecFin || '—',
+                    c.simulator?.name || 'N/A',
+                    c.horas || 0,
+                    c.active ? 'Activo' : 'Inactivo'
+                ]);
+            } else if (type === 'maintenances') {
+                tableHead = [['Simulador', 'Tipo', 'Fecha', 'Horario', 'Técnico', 'Descripción']];
+                tableBody = filteredData.map(m => [
+                    m.simulator?.name || 'N/A',
+                    m.maintenanceType?.name || 'N/A',
+                    m.fecIni,
+                    `${m.horaIni} - ${m.horaFin}`,
+                    m.technician ? `${m.technician.firstName} ${m.technician.lastname}` : '—',
+                    m.description || '—'
+                ]);
+            } else if (type === 'sessions') {
+                tableHead = [['Curso', 'Simulador', 'Fecha', 'Horario', 'Instructor', 'Pseudopiloto']];
+                tableBody = filteredData.map(s => [
+                    s.course?.name || 'N/A',
+                    s.simulator?.name || 'N/A',
+                    s.fecha || s.fecIni,
+                    `${s.horaini || s.horaIni} - ${s.horafin || s.horaFin}`,
+                    s.instructor ? `${s.instructor.firstName} ${s.instructor.lastname}` : '—',
+                    s.pseudoPilot ? `${s.pseudoPilot.firstName} ${s.pseudoPilot.lastname}` : '—'
+                ]);
+            }
+
+            autoTable(doc, {
+                startY: 55,
+                head: tableHead,
+                body: tableBody,
+                theme: 'striped',
+                headStyles: { fillColor: [59, 130, 246], fontSize: 10 },
+                styles: { fontSize: 9, cellPadding: 3 },
+                alternateRowStyles: { fillColor: [248, 250, 252] }
+            });
+
+            doc.save(`SimLogicFlow_Reporte_${type}_${new Date().getTime()}.pdf`);
+        } catch (error) {
+            console.error("Error generating report PDF:", error);
+            alert("Error al generar el PDF.");
+        }
+    };
+
     return (
         <div className="report-container" style={{ padding: '20px' }}>
             <div className="report-filters card" style={{ padding: '20px', marginBottom: '20px', display: 'flex', flexWrap: 'wrap', gap: '20px', alignItems: 'flex-end', background: 'white', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
@@ -148,7 +261,11 @@ export default function ReportView({ type, data, courses = [], simulators = [], 
                     <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#475569', fontSize: '14px' }}>Buscar</label>
                     <input
                         type="text"
-                        placeholder={type === 'courses' ? "Nombre o descripción..." : "Buscar..."}
+                        placeholder={
+                            type === 'courses' ? "Nombre o descripción..." :
+                                type === 'sessions' ? "Curso, simulador u horario (ej. 08:00)..." :
+                                    type === 'maintenances' ? "Simulador o descripción..." : "Buscar..."
+                        }
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #e2e8f0', minWidth: '220px', outline: 'none' }}
@@ -173,9 +290,9 @@ export default function ReportView({ type, data, courses = [], simulators = [], 
                     />
                 </div>
 
-                {type === 'users' && courses.length > 0 && (
+                {(type === 'users' || type === 'sessions') && courses.length > 0 && (
                     <div className="filter-group">
-                        <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#475569', fontSize: '14px' }}>Filtrar por Curso</label>
+                        <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#475569', fontSize: '14px' }}>Curso</label>
                         <select
                             value={selectedCourseId}
                             onChange={(e) => setSelectedCourseId(e.target.value)}
@@ -184,54 +301,6 @@ export default function ReportView({ type, data, courses = [], simulators = [], 
                             <option value="">Todos los cursos</option>
                             {courses.map(course => (
                                 <option key={course.id} value={course.id}>{course.name}</option>
-                            ))}
-                        </select>
-                    </div>
-                )}
-
-                {type === 'users' && roles.length > 0 && (
-                    <div className="filter-group">
-                        <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#475569', fontSize: '14px' }}>Filtrar por Rol</label>
-                        <select
-                            value={selectedRoleId}
-                            onChange={(e) => setSelectedRoleId(e.target.value)}
-                            style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #e2e8f0', minWidth: '200px', outline: 'none' }}
-                        >
-                            <option value="">Todos los roles</option>
-                            {roles.map(role => (
-                                <option key={role.id} value={role.id}>{role.name}</option>
-                            ))}
-                        </select>
-                    </div>
-                )}
-
-                {type === 'maintenances' && maintenanceTypes.length > 0 && (
-                    <div className="filter-group">
-                        <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#475569', fontSize: '14px' }}>Filtrar por Tipo Mantenimiento</label>
-                        <select
-                            value={selectedMaintTypeId}
-                            onChange={(e) => setSelectedMaintTypeId(e.target.value)}
-                            style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #e2e8f0', minWidth: '200px', outline: 'none' }}
-                        >
-                            <option value="">Todos los tipos</option>
-                            {maintenanceTypes.map(mtype => (
-                                <option key={mtype.id} value={mtype.id}>{mtype.name}</option>
-                            ))}
-                        </select>
-                    </div>
-                )}
-
-                {(type === 'maintenances' || type === 'courses') && simulators.length > 0 && (
-                    <div className="filter-group">
-                        <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#475569', fontSize: '14px' }}>Filtrar por Simulador</label>
-                        <select
-                            value={selectedSimulatorId}
-                            onChange={(e) => setSelectedSimulatorId(e.target.value)}
-                            style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #e2e8f0', minWidth: '200px', outline: 'none' }}
-                        >
-                            <option value="">Todos los simuladores</option>
-                            {simulators.map(sim => (
-                                <option key={sim.id} value={sim.id}>{sim.name}</option>
                             ))}
                         </select>
                     </div>
@@ -250,14 +319,22 @@ export default function ReportView({ type, data, courses = [], simulators = [], 
                     </select>
                 </div>
 
-                <button
-                    className="btn-primary"
-                    onClick={handleDownloadCSV}
-                    style={{ height: '44px', display: 'flex', alignItems: 'center', gap: '8px', padding: '0 24px', borderRadius: '8px', fontWeight: '600', transition: 'all 0.2s', background: 'linear-gradient(135deg, #3b82f6, #2563eb)' }}
-                >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                    Descargar CSV
-                </button>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                    <button
+                        className="btn-primary"
+                        onClick={handleDownloadCSV}
+                        style={{ height: '44px', display: 'flex', alignItems: 'center', gap: '8px', padding: '0 20px', borderRadius: '8px', fontWeight: '600', transition: 'all 0.2s', background: '#3b82f6' }}
+                    >
+                        CSV
+                    </button>
+                    <button
+                        className="btn-primary"
+                        onClick={handleDownloadPDF}
+                        style={{ height: '44px', display: 'flex', alignItems: 'center', gap: '8px', padding: '0 20px', borderRadius: '8px', fontWeight: '600', transition: 'all 0.2s', background: '#ef4444' }}
+                    >
+                        PDF
+                    </button>
+                </div>
             </div>
 
             <div className="report-preview card" style={{ padding: '60px 40px', textAlign: 'center', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', border: '2px dashed #cbd5e1', background: '#f8fafc', borderRadius: '12px' }}>
@@ -271,18 +348,18 @@ export default function ReportView({ type, data, courses = [], simulators = [], 
                     Registros encontrados
                 </div>
 
-                <div style={{ display: 'flex', gap: '32px', textAlign: 'left' }}>
+                <div style={{ display: 'flex', gap: '32px', textAlign: 'left', flexWrap: 'wrap', justifyContent: 'center' }}>
                     <div style={{ padding: '16px', borderRadius: '12px', background: 'white', border: '1px solid #e2e8f0', minWidth: '200px' }}>
-                        <div style={{ fontSize: '12px', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}>Tipo de Reporte</div>
-                        <div style={{ fontSize: '16px', fontWeight: '600', color: '#334155' }}>
-                            {type === 'users' ? 'Usuarios' : type === 'courses' ? 'Cursos' : 'Mantenimientos'}
+                        <div style={{ fontSize: '11px', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}>Tipo de Reporte</div>
+                        <div style={{ fontSize: '15px', fontWeight: '600', color: '#334155' }}>
+                            {type === 'users' ? 'Usuarios' : type === 'courses' ? 'Programas' : type === 'sessions' ? 'Sesiones' : 'Mantenimientos'}
                         </div>
                     </div>
                     {(startDate || endDate) && (
                         <div style={{ padding: '16px', borderRadius: '12px', background: 'white', border: '1px solid #e2e8f0', minWidth: '200px' }}>
-                            <div style={{ fontSize: '12px', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}>Rango de Fechas</div>
-                            <div style={{ fontSize: '16px', fontWeight: '600', color: '#334155' }}>
-                                {startDate || '...'} al {endDate || 'ahora'}
+                            <div style={{ fontSize: '11px', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '4px' }}>Rango de Fechas</div>
+                            <div style={{ fontSize: '15px', fontWeight: '600', color: '#334155' }}>
+                                {startDate || '—'} al {endDate || 'hoy'}
                             </div>
                         </div>
                     )}
@@ -291,7 +368,7 @@ export default function ReportView({ type, data, courses = [], simulators = [], 
                 <div style={{ marginTop: '40px', padding: '16px 24px', background: '#eff6ff', borderRadius: '8px', border: '1px solid #dbeafe', maxWidth: '500px' }}>
                     <p style={{ color: '#1e40af', fontSize: '14px', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                        El archivo CSV incluirá el detalle de los {filteredData.length} registros filtrados.
+                        Exportación disponible en CSV y PDF con diseño profesional.
                     </p>
                 </div>
             </div>
