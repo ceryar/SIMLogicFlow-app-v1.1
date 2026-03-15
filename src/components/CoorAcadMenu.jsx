@@ -159,13 +159,7 @@ export default function CoorAcadMenu() {
 
     const handleDeleteUser = async (e, id, email) => {
         e.stopPropagation();
-        const targetUser = users.find(u => u.id === id);
-        if (targetUser && targetUser.role?.name !== 'ESTUDIANTE') {
-            alert('Como Coordinador Académico, solo puede eliminar estudiantes.');
-            return;
-        }
-
-        if (!window.confirm(`¿Está seguro de eliminar al estudiante ${email}?`)) return;
+        if (!window.confirm(`¿Está seguro de eliminar al usuario ${email}?`)) return;
         try {
             const token = localStorage.getItem('token');
             await axios.delete(`/api/v1/users/${id}`, {
@@ -266,7 +260,7 @@ export default function CoorAcadMenu() {
                     placeholder="Buscar usuario por nombre o email..."
                     value={userSearchTerm}
                     onChange={(e) => setUserSearchTerm(e.target.value)}
-                    Joe style={{
+                    style={{
                         flex: 1,
                         border: 'none',
                         outline: 'none',
@@ -302,7 +296,7 @@ export default function CoorAcadMenu() {
                     ) : filteredUsers.length === 0 ? (
                         <tr>
                             <td colSpan="6" style={{ textAlign: 'center', padding: '2rem' }}>
-                                No se encontraron estudiantes.
+                                No se encontraron usuarios.
                             </td>
                         </tr>
                     ) : (
@@ -322,16 +316,12 @@ export default function CoorAcadMenu() {
                                     </span>
                                 </td>
                                 <td data-label="Acciones" className="actions-cell">
-                                    {user.role?.name === 'ESTUDIANTE' && (
-                                        <>
-                                            <button className="btn-icon btn-edit" title="Editar" onClick={() => { setEditingUser(user); setIsUserModalOpen(true); }}>
-                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                                            </button>
-                                            <button className="btn-icon btn-delete" title="Eliminar" onClick={(e) => handleDeleteUser(e, user.id, user.email)}>
-                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                                            </button>
-                                        </>
-                                    )}
+                                    <button className="btn-icon btn-edit" title="Editar" onClick={() => { setEditingUser(user); setIsUserModalOpen(true); }}>
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                    </button>
+                                    <button className="btn-icon btn-delete" title="Eliminar" onClick={(e) => handleDeleteUser(e, user.id, user.email)}>
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                    </button>
                                 </td>
                             </tr>
                         ))
@@ -690,7 +680,7 @@ export default function CoorAcadMenu() {
                             {activeTab === 'dashboard' ? 'Panel de Estadísticas Académicas' :
                                 activeTab === 'users' ? 'Gestión de Usuarios' :
                                     activeTab === 'courses' ? 'Gestión de Cursos' :
-                                        activeTab === 'user-courses' ? 'Asignación de Estudiantes' :
+                                        activeTab === 'user-courses' ? 'Usuarios — Asignación de Cursos' :
                                             activeTab === 'pro-courses' ? 'Programación de Cursos' :
                                                 activeTab === 'calendar' ? 'Calendario Académico' :
                                                     activeTab === 'reports-users' ? 'Reporte de Usuarios' : ''}
@@ -733,7 +723,7 @@ export default function CoorAcadMenu() {
                 onClose={() => { setIsUserModalOpen(false); setEditingUser(null); }}
                 onSuccess={handleUserSaved}
                 editUser={editingUser}
-                currentUserRole="COORDINADOR ACADÉMICO"
+                currentUserRole="ADMINISTRADOR"
             />
 
             <CourseModal
