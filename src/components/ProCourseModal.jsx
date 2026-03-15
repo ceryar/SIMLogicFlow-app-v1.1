@@ -189,7 +189,8 @@ export default function ProCourseModal({ isOpen, onClose, onSuccess, editProCour
 
                 // 1. Room Conflict (Strictly by physical room/aula)
                 const otherRooms = (pcCourseFull?.rooms || []);
-                const conflictingRooms = selectedCourse.rooms.filter(room => {
+                const currentRooms = (selectedCourse.rooms || []);
+                const conflictingRooms = currentRooms.filter(room => {
                     const isOccupied = otherRooms.some(r => r.id === room.id);
                     if (!isOccupied) return false;
                     const roomName = (room.name || '').toUpperCase();
@@ -205,23 +206,23 @@ export default function ProCourseModal({ isOpen, onClose, onSuccess, editProCour
                 // Personnel (Instructor)
                 const otherInstrId = pc.instructor?.id || pcCourseFull?.instructor?.id;
                 if (selInstrId && otherInstrId === selInstrId) {
-                    return `Conflicto de INSTRUCTOR: ${selectedCourse.instructor.firstName} ya tiene una sesión asignada en el curso "${pcCourseFull?.name}" en este horario (${pc.horaini} - ${pc.horafin}).`;
+                    return `Conflicto de INSTRUCTOR: ${selectedCourse.instructor?.firstName || 'Asignado'} ya tiene una sesión asignada en el curso "${pcCourseFull?.name}" en este horario (${pc.horaini} - ${pc.horafin}).`;
                 }
 
                 // 3. Personnel Conflict (Pseudo) - No check, they can monitor everything concurrently
-                Joe
                 // 4. Personnel Conflict (Coordinator)
                 const otherCoordId = pc.coordinator?.id || pcCourseFull?.coordinator?.id;
                 if (selCoordId && otherCoordId === selCoordId) {
-                    return `Conflicto de COORDINADOR: ${selectedCourse.coordinator.firstName} ya tiene una sesión asignada en el curso "${pcCourseFull?.name}" en este horario.`;
+                    return `Conflicto de COORDINADOR: ${selectedCourse.coordinator?.firstName || 'Asignado'} ya tiene una sesión asignada en el curso "${pcCourseFull?.name}" en este horario.`;
                 }
 
                 // 5. Student Conflict
                 const otherUserIds = (pcCourseFull?.users || []).map(u => u.id);
                 const conflictingUsers = selUserIds.filter(id => otherUserIds.includes(id));
                 if (conflictingUsers.length > 0) {
-                    const firstConflicting = selectedCourse.users.find(u => u.id === conflictingUsers[0]);
-                    return `Conflicto de USUARIO: ${firstConflicting.firstName} ${firstConflicting.lastname} ya tiene clase en el curso "${pcCourseFull?.name || 'Otro'}" en este horario.`;
+                    const currentUsers = (selectedCourse.users || []);
+                    const firstConflicting = currentUsers.find(u => u.id === conflictingUsers[0]);
+                    return `Conflicto de USUARIO: ${firstConflicting?.firstName || 'Usuario'} ${firstConflicting?.lastname || ''} ya tiene clase en el curso "${pcCourseFull?.name || 'Otro'}" en este horario.`;
                 }
             }
         }
