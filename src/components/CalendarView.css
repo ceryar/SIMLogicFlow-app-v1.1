@@ -263,8 +263,12 @@
     .calendar-grid-header.month-view,
     .calendar-grid.week-view,
     .calendar-grid-header.week-view {
-        min-width: 600px;
-        /* Forces readability on small screens */
+        min-width: 700px;
+    }
+
+    .calendar-grid.month-view {
+        grid-auto-rows: 120px;
+        /* Force uniform row height on mobile */
     }
 
     .calendar-day {
@@ -307,8 +311,7 @@
     .calendar-grid-header.month-view,
     .calendar-grid.week-view,
     .calendar-grid-header.week-view {
-        min-width: 500px;
-        /* Increased for better text breathing room */
+        min-width: 700px;
     }
 
     .btn-view-mode {
@@ -352,8 +355,11 @@
     color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    padding: 12px 0;
+    padding: 12px 8px;
+    /* Standardize horizontal padding */
     background: var(--bg-surface);
+    min-width: 0;
+    /* Stabilize grid track */
 }
 
 /* ---- Day Cell ---- */
@@ -367,6 +373,8 @@
     display: flex;
     flex-direction: column;
     gap: 2px;
+    min-width: 0;
+    /* CRITICAL: Prevent content from expanding width */
 }
 
 .calendar-day.empty {
@@ -426,8 +434,10 @@
     flex-direction: column;
     gap: 2px;
     margin-top: 4px;
-    overflow-y: auto;
-    max-height: calc(100% - 24px);
+    overflow: hidden;
+    /* Prevent vertical overflow from distending the grid cell height unexpectedly */
+    flex: 1;
+    /* Take up available space */
 }
 
 /* Hide scrollbar for cleaner look but keep functionality */
