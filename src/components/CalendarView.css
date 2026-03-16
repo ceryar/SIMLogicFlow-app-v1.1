@@ -279,10 +279,13 @@
     }
 
     .calendar-event {
-        font-size: 0.7rem;
+        font-size: 0.68rem;
+        /* Slightly smaller for mobile */
         padding: 3px 5px;
         margin: 2px 0;
         border-radius: 6px;
+        max-width: 100%;
+        /* Force labels to truncate */
     }
 
     .event-time {
@@ -304,8 +307,8 @@
     .calendar-grid-header.month-view,
     .calendar-grid.week-view,
     .calendar-grid-header.week-view {
-        min-width: 450px;
-        /* Even more compact but still scrollable */
+        min-width: 500px;
+        /* Increased for better text breathing room */
     }
 
     .btn-view-mode {
@@ -444,15 +447,20 @@
     font-weight: 700;
     white-space: nowrap;
     text-overflow: ellipsis;
+    overflow: hidden;
+    /* CRITICAL: prevent text from pushing width */
     border-left: 3px solid;
     cursor: pointer;
     transition: all 0.2s ease;
     display: block;
     margin: 1px 0;
+    width: calc(100% - 2px);
+    /* Ensure it stays within parent */
 }
 
 .calendar-event:hover {
-    transform: scale(1.02);
+    transform: scale(1.01);
+    /* Reduced slightly to prevent clipping */
     box-shadow: var(--shadow-sm);
     filter: brightness(0.95);
 }
@@ -461,6 +469,7 @@
     display: block;
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .event-time {
