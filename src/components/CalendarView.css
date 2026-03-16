@@ -83,16 +83,18 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    min-height: 40px;
+    /* Enhanced touch target */
 }
 
 .btn-calendar-today {
-    padding: 8px 16px;
+    padding: 8px 20px;
     font-size: 0.85rem;
     font-weight: 700;
 }
 
 .btn-calendar-nav {
-    padding: 8px 12px;
+    padding: 8px 14px;
 }
 
 .btn-calendar-jump:hover,
@@ -148,52 +150,66 @@
     }
 }
 
-.calendar-header h3 {
-    font-size: 1.1rem;
-}
-
-.calendar-header {
-    flex-direction: column;
-    align-items: stretch;
-}
-
-.calendar-detail {
-    width: 100%;
-    margin-top: 20px;
-    max-height: none;
-    position: relative;
-    bottom: auto;
-    z-index: 10;
-    box-shadow: var(--shadow-md);
-    animation: slideInUp 0.3s ease;
-}
-
-@keyframes slideInUp {
-    from {
-        transform: translateY(20px);
-        opacity: 0;
+@media (max-width: 1024px) {
+    .calendar-wrapper {
+        flex-direction: column;
+        max-height: none;
+        height: auto;
     }
 
-    to {
-        transform: translateY(0);
-        opacity: 1;
+    .calendar-header h3 {
+        font-size: 1.15rem;
+    }
+
+    .calendar-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+
+    .calendar-detail {
+        width: 100%;
+        margin-top: 25px;
+        max-height: none;
+        position: relative;
+        bottom: auto;
+        z-index: 10;
+        box-shadow: var(--shadow-xl);
+        border-radius: 20px;
+        background: var(--bg-surface);
+        padding-bottom: 20px;
+        animation: slideInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes slideInUp {
+        from {
+            transform: translateY(30px);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
     }
 }
 
 @media (max-width: 768px) {
     .calendar-wrapper {
-        padding: 5px;
+        padding: 0;
+        gap: 12px;
     }
 
     .calendar-header {
-        padding: 10px;
-        gap: 10px;
+        padding: 15px 12px;
+        gap: 12px;
     }
 
     .calendar-nav-group {
         order: 2;
         width: 100%;
-        justify-content: space-between;
+        justify-content: center;
+        gap: 10px;
     }
 
     .calendar-title-wrapper {
@@ -205,7 +221,7 @@
         order: 3;
         width: 100%;
         justify-content: center;
-        overflow-x: auto;
+        padding: 2px;
     }
 
     .calendar-selectors-menu {
@@ -233,7 +249,8 @@
     }
 
     .calendar-grid-header {
-        font-size: 0.65rem;
+        font-size: 0.7rem;
+        font-weight: 800;
     }
 
     /* Important: Allow horizontal scroll on mobile for the 7-day grid */
@@ -251,45 +268,49 @@
     }
 
     .calendar-day {
-        min-height: 80px;
-        padding: 4px;
+        min-height: 100px;
+        /* Slightly taller for better touch */
+        padding: 6px 4px;
     }
 
     .day-number {
-        font-size: 0.8rem;
+        font-size: 0.85rem;
+        font-weight: 800;
     }
 
     .calendar-event {
-        font-size: 0.65rem;
-        padding: 2px 4px;
+        font-size: 0.7rem;
+        padding: 3px 5px;
+        margin: 2px 0;
+        border-radius: 6px;
     }
 
     .event-time {
         display: none;
+        /* Hide time in month view on small screens to save space */
+    }
+
+    .event-more {
+        font-size: 0.65rem;
+        font-weight: 800;
+        color: var(--primary-color);
+        padding: 2px;
     }
 }
 
 @media (max-width: 480px) {
-    .calendar-selectors-menu {
-        grid-template-columns: 1fr 1fr;
-    }
-
-    .calendar-date-selector {
-        grid-column: span 2;
-        justify-content: center;
-        display: flex;
-    }
-
-    .btn-view-mode {
-        padding: 6px 8px;
-        font-size: 0.7rem;
-    }
 
     .calendar-grid.month-view,
     .calendar-grid-header.month-view,
     .calendar-grid.week-view,
     .calendar-grid-header.week-view {
-        min-width: 500px;
+        min-width: 450px;
+        /* Even more compact but still scrollable */
+    }
+
+    .btn-view-mode {
+        padding: 6px 10px;
+        font-size: 0.75rem;
     }
 }
 
