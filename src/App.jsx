@@ -40,7 +40,7 @@ function App() {
     setTheme(prev => prev === 'light' ? 'dark' : 'light');
   };
 
-  const { triggerCacheWarmUp } = usePWA();
+  const { triggerCacheWarmUp, isOnline } = usePWA();
 
   const checkAuth = async () => {
     const token = localStorage.getItem('token');
@@ -77,19 +77,19 @@ function App() {
   const renderDashboard = () => {
     switch (userRole) {
       case 'ADMINISTRADOR':
-        return <AdminMenu />;
+        return <AdminMenu isOnline={isOnline} />;
       case 'COORDINADOR ACADÉMICO':
-        return <CoorAcadMenu />;
+        return <CoorAcadMenu isOnline={isOnline} />;
       case 'COORDINADOR TÉCNICO':
       case 'TÉCNICO MANTENIMIENTO':
       case 'TECNICO':
-        return <TecnicoMenu />;
+        return <TecnicoMenu isOnline={isOnline} />;
       case 'ESTUDIANTE':
-        return <EstudianteMenu userId={userId} />;
+        return <EstudianteMenu userId={userId} isOnline={isOnline} />;
       case 'INSTRUCTOR':
-        return <InstructorMenu userId={userId} />;
+        return <InstructorMenu userId={userId} isOnline={isOnline} />;
       case 'PSEUDOPILOTO':
-        return <PseudopilotoMenu userId={userId} />;
+        return <PseudopilotoMenu userId={userId} isOnline={isOnline} />;
       default:
         return (
           <main className="main-content">
@@ -107,6 +107,15 @@ function App() {
     <div className="app-container">
       {/* PWA Banners: offline, update, install */}
       <PWABanner />
+
+      {!isOnline && (
+        <div className="offline-notification-banner">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M1 1l22 22M16.72 11.06A10.94 10.94 0 0 1 19 12.55M5 12.55a10.94 10.94 0 0 1 5.17-2.39M10.71 5.05A16 16 0 0 1 22.58 9M1.42 9a15.91 15.91 0 0 1 4.7-2.88M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"></path>
+          </svg>
+          <span>Modo Lectura (Sin Conexión) — Las funciones de edición están deshabilitadas</span>
+        </div>
+      )}
 
       <nav className="navbar">
         <div className="nav-brand">SimLogicFlow</div>

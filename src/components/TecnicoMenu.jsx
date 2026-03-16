@@ -9,7 +9,7 @@ import StatisticsView from './StatisticsView';
 import ConsultationMenu from './ConsultationMenu';
 import './AdminMenu.css';
 
-export default function TecnicoMenu() {
+export default function TecnicoMenu({ isOnline }) {
     const [activeTab, setActiveTab] = useState('maintenances');
     const [isReportsMenuOpen, setIsReportsMenuOpen] = useState(false);
     const [isMaintenanceModalOpen, setIsMaintenanceModalOpen] = useState(false);
@@ -312,13 +312,21 @@ export default function TecnicoMenu() {
                                 <td data-label="Técnico">{m.technician ? `${m.technician.firstName} ${m.technician.lastname}` : 'Sin asignar'}</td>
                                 <td data-label="Descripción">{m.description}</td>
                                 <td data-label="Acciones" className="actions-cell">
-                                    <button className="btn-icon btn-edit" title="Editar" onClick={() => { setEditingMaintenance(m); setIsMaintenanceModalOpen(true); }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
-                                    <button className="btn-icon btn-delete" title="Eliminar" onClick={() => handleDeleteMaintenance(m.id)}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
+                                    {isOnline && (
+                                        <>
+                                            <button className="btn-icon btn-edit" title="Editar" onClick={() => { setEditingMaintenance(m); setIsMaintenanceModalOpen(true); }}>
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                            </button>
+                                            <button className="btn-icon btn-delete" title="Eliminar" onClick={() => handleDeleteMaintenance(m.id)}>
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                            </button>
+                                        </>
+                                    )}
+                                    {!isOnline && <span className="read-only-badge">Sólo lectura</span>}
                                 </td>
-                            </tr>
-                        ))
+                                ))
                     )}
-                </tbody>
+                            </tbody>
             </table>
 
             {/* Pagination Controls */}
@@ -437,13 +445,21 @@ export default function TecnicoMenu() {
                                 <td data-label="Técnico">{h.maintenance?.technician ? `${h.maintenance.technician.firstName} ${h.maintenance.technician.lastname}` : 'Sin asignar'}</td>
                                 <td data-label="Observación">{h.observation}</td>
                                 <td data-label="Acciones" className="actions-cell">
-                                    <button className="btn-icon btn-edit" title="Editar" onClick={() => { setEditingHistory(h); setIsHistoryModalOpen(true); }}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
-                                    <button className="btn-icon btn-delete" title="Eliminar" onClick={() => handleDeleteHistory(h.id)}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
+                                    {isOnline && (
+                                        <>
+                                            <button className="btn-icon btn-edit" title="Editar" onClick={() => { setEditingHistory(h); setIsHistoryModalOpen(true); }}>
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                            </button>
+                                            <button className="btn-icon btn-delete" title="Eliminar" onClick={() => handleDeleteHistory(h.id)}>
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                            </button>
+                                        </>
+                                    )}
+                                    {!isOnline && <span className="read-only-badge">Sólo lectura</span>}
                                 </td>
-                            </tr>
-                        ))
+                                ))
                     )}
-                </tbody>
+                            </tbody>
             </table>
 
             {/* Pagination Controls */}
@@ -518,7 +534,7 @@ export default function TecnicoMenu() {
                                             'Calendario de Cursos'}
                     </h2>
                     <div className="admin-header-actions">
-                        {activeTab !== 'calendar-maint' && activeTab !== 'calendar-courses' && activeTab !== 'consultations' && !activeTab.startsWith('reports-') && (
+                        {isOnline && activeTab !== 'calendar-maint' && activeTab !== 'calendar-courses' && activeTab !== 'consultations' && !activeTab.startsWith('reports-') && (
                             <button className="btn-primary" onClick={() => {
                                 if (activeTab === 'maintenances') { setEditingMaintenance(null); setIsMaintenanceModalOpen(true); }
                                 else if (activeTab === 'maintenance-history') { setEditingHistory(null); setIsHistoryModalOpen(true); }

@@ -10,7 +10,7 @@ import StatisticsView from './StatisticsView';
 import ConsultationMenu from './ConsultationMenu';
 import './AdminMenu.css';
 
-export default function CoorAcadMenu() {
+export default function CoorAcadMenu({ isOnline }) {
     const [activeTab, setActiveTab] = useState('users');
     const [isReportsMenuOpen, setIsReportsMenuOpen] = useState(false);
     const [isUserModalOpen, setIsUserModalOpen] = useState(false);
@@ -316,16 +316,26 @@ export default function CoorAcadMenu() {
                                     </span>
                                 </td>
                                 <td data-label="Acciones" className="actions-cell">
-                                    <button className="btn-icon btn-edit" title="Editar" onClick={() => { setEditingUser(user); setIsUserModalOpen(true); }}>
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                                    </button>
-                                    <button className="btn-icon btn-delete" title="Eliminar" onClick={(e) => handleDeleteUser(e, user.id, user.email)}>
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                                    </button>
+                                    {isOnline && (
+                                        <>
+                                            <button className="btn-icon btn-edit" title="Editar" onClick={() => { setEditingUser(user); setIsUserModalOpen(true); }}>
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                                </svg>
+                                            </button>
+                                            <button className="btn-icon btn-delete" title="Eliminar" onClick={(e) => handleDeleteUser(e, user.id, user.email)}>
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                                </svg>
+                                            </button>
+                                        </>
+                                    )}
+                                    {!isOnline && <span className="read-only-badge">Sólo lectura</span>}
                                 </td>
                             </tr>
-                        ))
-                    )}
+                        ))}
                 </tbody>
             </table>
         </div>
@@ -468,16 +478,26 @@ export default function CoorAcadMenu() {
                                     </div>
                                 </td>
                                 <td data-label="Acciones" className="actions-cell">
-                                    <button className="btn-icon btn-edit" title="Editar" onClick={() => { setEditingCourse(course); setIsCourseModalOpen(true); }}>
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                                    </button>
-                                    <button className="btn-icon btn-delete" title="Eliminar" onClick={(e) => handleDeleteCourse(e, course.id, course.name)}>
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                                    </button>
+                                    {isOnline && (
+                                        <>
+                                            <button className="btn-icon btn-edit" title="Editar" onClick={() => { setEditingCourse(course); setIsCourseModalOpen(true); }}>
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                                </svg>
+                                            </button>
+                                            <button className="btn-icon btn-delete" title="Eliminar" onClick={() => handleDeleteCourse(course.id, course.name)}>
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                                </svg>
+                                            </button>
+                                        </>
+                                    )}
+                                    {!isOnline && <span className="read-only-badge">Sólo lectura</span>}
                                 </td>
                             </tr>
-                        ))
-                    )}
+                        ))}
                 </tbody>
             </table>
 
@@ -600,12 +620,17 @@ export default function CoorAcadMenu() {
                                 <td data-label="Pseudo">{pro.pseudoPilot ? `${pro.pseudoPilot.firstName} ${pro.pseudoPilot.lastname}` : '—'}</td>
                                 <td data-label="Horas">{pro.horas}h</td>
                                 <td data-label="Acciones" className="actions-cell">
-                                    <button className="btn-icon btn-edit" title="Editar" onClick={() => { setEditingProCourse(pro); setIsProCourseModalOpen(true); }}>
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                                    </button>
-                                    <button className="btn-icon btn-delete" title="Eliminar" onClick={(e) => handleDeleteProCourse(e, pro.id)}>
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                                    </button>
+                                    {isOnline && (
+                                        <>
+                                            <button className="btn-icon btn-edit" title="Editar" onClick={() => { setEditingProCourse(pro); setIsProCourseModalOpen(true); }}>
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                            </button>
+                                            <button className="btn-icon btn-delete" title="Eliminar" onClick={(e) => handleDeleteProCourse(e, pro.id)}>
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                            </button>
+                                        </>
+                                    )}
+                                    {!isOnline && <span className="read-only-badge">Sólo lectura</span>}
                                 </td>
                             </tr>
                         ))
@@ -687,7 +712,7 @@ export default function CoorAcadMenu() {
                         </h1>
                         <p className="admin-subtitle">Panel de control de recursos académicos</p>
                     </div>
-                    {activeTab !== 'calendar' && activeTab !== 'user-courses' && activeTab !== 'consultations' && !activeTab.startsWith('reports-') && (
+                    {isOnline && activeTab !== 'calendar' && activeTab !== 'user-courses' && activeTab !== 'consultations' && !activeTab.startsWith('reports-') && (
                         <button className="btn-primary" onClick={() => {
                             if (activeTab === 'users') { setEditingUser(null); setIsUserModalOpen(true); }
                             else if (activeTab === 'courses') { setEditingCourse(null); setIsCourseModalOpen(true); }
