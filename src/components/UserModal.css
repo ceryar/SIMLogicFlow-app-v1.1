@@ -29,8 +29,9 @@
 
 @media (prefers-color-scheme: dark) {
     .modal-content {
-        background: #1e293b;
-        border: 1px solid #334155;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        color: #1e293b;
     }
 }
 
@@ -57,8 +58,9 @@
 
 @media (prefers-color-scheme: dark) {
     .modal-header {
-        background: #1e293b;
-        border-bottom-color: #334155;
+        background: #ffffff;
+        border-bottom-color: #f1f5f9;
+        color: #1e293b;
     }
 }
 
@@ -70,7 +72,7 @@
 
 @media (prefers-color-scheme: dark) {
     .modal-header h3 {
-        color: #f8fafc;
+        color: #1e293b;
     }
 }
 
@@ -141,7 +143,7 @@
 
 @media (prefers-color-scheme: dark) {
     .form-group label {
-        color: #94a3b8;
+        color: #475569;
     }
 }
 
@@ -184,9 +186,9 @@
 
     .form-group input:not([type="checkbox"]),
     .form-group select {
-        background-color: #0f172a;
-        border-color: #334155;
-        color: #f1f5f9;
+        background-color: #ffffff;
+        border-color: #cbd5e1;
+        color: #1e293b;
     }
 }
 
@@ -203,9 +205,9 @@
 
 @media (prefers-color-scheme: dark) {
     .form-group textarea {
-        background-color: #0f172a;
-        border-color: #334155;
-        color: #f8fafc;
+        background-color: #ffffff;
+        border-color: #cbd5e1;
+        color: #1e293b;
     }
 }
 
@@ -436,14 +438,14 @@ input:checked+.slider:before {
 
 @media (prefers-color-scheme: dark) {
     .datepicker-dropdown {
-        background: #1e293b;
-        border-color: #334155;
+        background: #ffffff;
+        border-color: #e2e8f0;
     }
 
     .datepicker-input {
-        background-color: #0f172a;
-        color: #f8fafc;
-        border-color: #334155;
+        background-color: #ffffff;
+        color: #1e293b;
+        border-color: #cbd5e1;
     }
 }
 
@@ -458,7 +460,7 @@ input:checked+.slider:before {
 
 @media (prefers-color-scheme: dark) {
     .datepicker-header {
-        color: #f8fafc;
+        color: #1e293b;
     }
 }
 
@@ -511,7 +513,7 @@ input:checked+.slider:before {
 
 @media (prefers-color-scheme: dark) {
     .datepicker-day:hover:not(.empty) {
-        background: #334155;
+        background: #f1f5f9;
     }
 }
 
@@ -595,16 +597,16 @@ input:checked+.slider:before {
 
 @media (prefers-color-scheme: dark) {
     .hours-progress-bar {
-        background: rgba(0, 0, 0, 0.2);
-        border-color: rgba(255, 255, 255, 0.05);
+        background: rgba(100, 116, 139, 0.05);
+        border-color: rgba(100, 116, 139, 0.1);
     }
 
     .hours-track {
-        background: #334155;
+        background: #e2e8f0;
     }
 
     .hours-meta strong {
-        color: #cbd5e1;
+        color: #475569;
     }
 }
 

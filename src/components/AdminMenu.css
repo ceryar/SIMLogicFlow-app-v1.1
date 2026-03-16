@@ -2,22 +2,22 @@
     display: flex;
     min-height: calc(100vh - 72px);
     width: 100%;
-    background-color: #f8fafc;
+    background-color: #ffffff;
     box-sizing: border-box;
     color: #1e293b;
 }
 
 @media (prefers-color-scheme: dark) {
     .admin-container {
-        background-color: #0f172a;
-        color: #f1f5f9;
+        background-color: #ffffff;
+        color: #1e293b;
     }
 }
 
 .admin-sidebar {
     width: 260px;
     min-width: 260px;
-    background: white;
+    background: #f8fafc;
     border-right: 1px solid #e2e8f0;
     padding: 1.5rem;
     display: flex;
@@ -28,9 +28,9 @@
 
 @media (prefers-color-scheme: dark) {
     .admin-sidebar {
-        background: #1e293b;
-        border-right-color: #334155;
-        box-shadow: 4px 0 15px rgba(0, 0, 0, 0.2);
+        background: #f8fafc;
+        border-right-color: #e2e8f0;
+        color: #1e293b;
     }
 }
 
@@ -168,7 +168,7 @@
 
 @media (prefers-color-scheme: dark) {
     .admin-header h2 {
-        color: #f8fafc;
+        color: #1e293b;
     }
 }
 
@@ -230,9 +230,9 @@
 
 @media (prefers-color-scheme: dark) {
     .admin-table th {
-        background-color: #2d2d3f;
-        color: #94a3b8;
-        border-bottom-color: #3f3f5a;
+        background-color: #f8fafc;
+        color: #64748b;
+        border-bottom-color: #e2e8f0;
     }
 }
 
@@ -245,8 +245,8 @@
 
 @media (prefers-color-scheme: dark) {
     .admin-table td {
-        border-bottom-color: #2d2d3f;
-        color: #cbd5e1;
+        border-bottom-color: #f1f5f9;
+        color: #334155;
     }
 }
 
