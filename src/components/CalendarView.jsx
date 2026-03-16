@@ -93,55 +93,27 @@ export default function CalendarView({ events, type }) {
 
     const getEventColor = (event) => {
         const colors = [
-            '#6366f1', // Indigo
-            '#10b981', // Green
-            '#f59e0b', // Orange
-            '#3b82f6', // Blue
-            '#ec4899', // Pink
-            '#8b5cf6', // Purple
-            '#06b6d4', // Cyan
-            '#f43f5e', // Rose
-            '#84cc16', // Lime
-            '#ef4444', // Red
+            '#6366f1', '#10b981', '#f59e0b', '#3b82f6', '#ec4899',
+            '#8b5cf6', '#06b6d4', '#f43f5e', '#84cc16', '#ef4444'
         ];
-
-        let id = 0;
-        if (type === 'course') {
-            // Priority: Session level simulator -> Course level simulator -> Course ID (fallback)
-            id = event.simulator?.id || event.course?.simulator?.id || event.course?.id || 0;
-        } else {
-            id = event.simulator?.id || 0;
-        }
-
+        // Mirroring maint logic: Simulator ID is the primary key for color
+        const id = event.simulator?.id || event.course?.simulator?.id || event.course?.id || 0;
         return colors[id % colors.length];
     };
 
     const getEventLabel = (event) => {
-        // Support different property paths for course/maint
         const simName = event.simulator?.name || event.course?.simulator?.name || '';
+        const name = type === 'course'
+            ? (event.course?.name || 'Curso')
+            : (event.maintenanceType?.name || 'Mantenimiento');
 
-        let eventName = '';
-        if (type === 'course') {
-            eventName = event.course?.name || 'Curso';
-        } else {
-            eventName = event.maintenanceType?.name || 'Mantenimiento';
-        }
-
-        if (simName) {
-            return `${simName} | ${eventName}`;
-        }
-        return eventName;
+        return simName ? `${simName} | ${name}` : name;
     };
 
     const getEventTime = (event) => {
-        if (type === 'course') {
-            return event.horaini && event.horafin
-                ? `${formatTime(event.horaini)} – ${formatTime(event.horafin)}`
-                : null;
-        }
-        return event.horaIni && event.horaFin
-            ? `${formatTime(event.horaIni)} – ${formatTime(event.horaFin)}`
-            : null;
+        const start = event.horaini || event.horaIni;
+        const end = event.horafin || event.horaFin;
+        return (start && end) ? `${formatTime(start)} – ${formatTime(end)}` : null;
     };
 
     const getEventsForDay = (dateString) => {
@@ -361,53 +333,38 @@ export default function CalendarView({ events, type }) {
                                                     {timeStr}
                                                 </div>
                                             )}
-                                            {type === 'course' && (
-                                                <>
-                                                    {(ev.course?.simulator?.name || ev.simulator?.name) && (
-                                                        <div className="detail-meta">🎮 Simulador: {ev.course?.simulator?.name || ev.simulator?.name}</div>
-                                                    )}
-                                                    {ev.course?.name && (
-                                                        <div className="detail-meta">📚 Curso: {ev.course.name}</div>
-                                                    )}
-                                                    {ev.course?.rooms && ev.course.rooms.length > 0 && (
-                                                        <div className="detail-meta">🏫 Aula: {ev.course.rooms.map(r => r.name).join(', ')}</div>
-                                                    )}
-                                                    {ev.instructor && (
-                                                        <div className="detail-meta">👤 Instructor: {ev.instructor.firstName} {ev.instructor.lastname}</div>
-                                                    )}
-                                                    {ev.pseudoPilot && (
-                                                        <div className="detail-meta">👤 Pseudopiloto: {ev.pseudoPilot.firstName} {ev.pseudoPilot.lastname}</div>
-                                                    )}
-                                                    {ev.course?.users && ev.course.users.filter(u => u.role?.name === 'COORACAD' || u.role?.name === 'ADMINISTRADOR' || u.role?.name === 'COORDINADOR ACADÉMICO').length > 0 && (
-                                                        <div className="detail-meta">📁 Gestión: {ev.course.users
-                                                            .filter(u => u.role?.name === 'COORACAD' || u.role?.name === 'ADMINISTRADOR' || u.role?.name === 'COORDINADOR ACADÉMICO')
-                                                            .map(u => `${u.firstName} ${u.lastname}`).join(', ')}
-                                                        </div>
-                                                    )}
-                                                </>
-                                            )}
-                                            {type === 'maint' && (
-                                                <>
-                                                    {ev.simulator?.name && (
-                                                        <div className="detail-meta">🎮 Simulador: {ev.simulator.name}</div>
-                                                    )}
-                                                    {ev.maintenanceType?.name && (
-                                                        <div className="detail-meta">🔧 Mantenimiento: {ev.maintenanceType.name}</div>
-                                                    )}
-                                                    {ev.technician && (
-                                                        <div className="detail-meta">👤 Técnico: {ev.technician.firstName} {ev.technician.lastname}</div>
-                                                    )}
-                                                    {ev.fecFin && ev.fecFin !== ev.fecIni && (
-                                                        <div className="detail-meta">📅 Hasta: {ev.fecFin}</div>
-                                                    )}
-                                                    {ev.horas && (
-                                                        <div className="detail-meta" style={{ color: 'var(--primary-color)', fontWeight: 'bold' }}>⏱️ Duración: {ev.horas}h</div>
-                                                    )}
-                                                    {ev.description && (
-                                                        <div className="detail-desc">📝 {ev.description}</div>
-                                                    )}
-                                                </>
-                                            )}
+
+                                            {/* Unified Metadata Hierarchy */}
+                                            <div className="detail-meta-group">
+                                                {(ev.simulator?.name || ev.course?.simulator?.name) && (
+                                                    <div className="detail-meta">🎮 Simulador: {ev.simulator?.name || ev.course?.simulator?.name}</div>
+                                                )}
+
+                                                {type === 'course' ? (
+                                                    <>
+                                                        {ev.course?.name && <div className="detail-meta">📚 Curso: {ev.course.name}</div>}
+                                                        {ev.course?.rooms?.length > 0 && <div className="detail-meta">🏫 Aula: {ev.course.rooms.map(r => r.name).join(', ')}</div>}
+                                                        {ev.instructor && <div className="detail-meta">👤 Instructor: {ev.instructor.firstName} {ev.instructor.lastname}</div>}
+                                                        {ev.pseudoPilot && <div className="detail-meta">👤 Pseudopiloto: {ev.pseudoPilot.firstName} {ev.pseudoPilot.lastname}</div>}
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        {ev.maintenanceType?.name && <div className="detail-meta">🔧 Tipo: {ev.maintenanceType.name}</div>}
+                                                        {ev.technician && <div className="detail-meta">👤 Técnico: {ev.technician.firstName} {ev.technician.lastname}</div>}
+                                                        {ev.fecFin && ev.fecFin !== ev.fecIni && <div className="detail-meta">📅 Hasta: {ev.fecFin}</div>}
+                                                        {ev.horas && <div className="detail-meta" style={{ color: 'var(--primary-color)', fontWeight: 'bold' }}>⏱️ Duración: {ev.horas}h</div>}
+                                                    </>
+                                                )}
+
+                                                {/* Common Footers */}
+                                                {type === 'course' && ev.course?.users?.filter(u => u.role?.name.includes('COORDINADOR') || u.role?.name === 'ADMIN').length > 0 && (
+                                                    <div className="detail-meta">📁 Gestión: {ev.course.users
+                                                        .filter(u => u.role?.name.includes('COORDINADOR') || u.role?.name === 'ADMIN')
+                                                        .map(u => `${u.firstName} ${u.lastname}`).join(', ')}
+                                                    </div>
+                                                )}
+                                                {ev.description && <div className="detail-desc">📝 {ev.description}</div>}
+                                            </div>
                                         </div>
                                     </li>
                                 );
