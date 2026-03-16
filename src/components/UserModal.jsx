@@ -141,7 +141,7 @@ export default function UserModal({ isOpen, onClose, onSuccess, editUser = null,
             setFormData(initialFormState);
         } catch (err) {
             console.error('Error saving user:', err);
-            let errorMessage = err.response?.data?.message || err.message || 'Unknown error';
+            let errorMessage = err.response?.data?.message || err.message || 'Error desconocido';
 
             // Handle specific duplicate document error
             if (errorMessage.includes('duplicate key') && errorMessage.includes('document_number')) {
@@ -158,7 +158,7 @@ export default function UserModal({ isOpen, onClose, onSuccess, editUser = null,
         <div className="modal-overlay">
             <div className="modal-content">
                 <div className="modal-header">
-                    <h3>{editUser ? 'Edit User' : 'Create New User'}</h3>
+                    <h3>{editUser ? 'Editar Usuario' : 'Crear Nuevo Usuario'}</h3>
                     <button className="btn-close" onClick={onClose}>
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -172,27 +172,27 @@ export default function UserModal({ isOpen, onClose, onSuccess, editUser = null,
                 <form onSubmit={handleSubmit} className="modal-form">
                     <div className="form-grid">
                         <div className="form-group">
-                            <label htmlFor="firstName">First Name *</label>
-                            <input type="text" id="firstName" name="firstName" required value={formData.firstName} onChange={handleChange} placeholder="John" />
+                            <label htmlFor="firstName">Primer Nombre *</label>
+                            <input type="text" id="firstName" name="firstName" required value={formData.firstName} onChange={handleChange} placeholder="Ej. Juan" />
                         </div>
 
                         <div className="form-group">
-                            <label htmlFor="middleName">Middle Name</label>
-                            <input type="text" id="middleName" name="middleName" value={formData.middleName} onChange={handleChange} placeholder="Optional" />
+                            <label htmlFor="middleName">Segundo Nombre</label>
+                            <input type="text" id="middleName" name="middleName" value={formData.middleName} onChange={handleChange} placeholder="Opcional" />
                         </div>
 
                         <div className="form-group">
-                            <label htmlFor="lastname">Last Name *</label>
-                            <input type="text" id="lastname" name="lastname" required value={formData.lastname} onChange={handleChange} placeholder="Doe" />
+                            <label htmlFor="lastname">Primer Apellido *</label>
+                            <input type="text" id="lastname" name="lastname" required value={formData.lastname} onChange={handleChange} placeholder="Ej. Pérez" />
                         </div>
 
                         <div className="form-group">
-                            <label htmlFor="secondlasname">Second Last Name</label>
-                            <input type="text" id="secondlasname" name="secondlasname" value={formData.secondlasname} onChange={handleChange} placeholder="Optional" />
+                            <label htmlFor="secondlasname">Segundo Apellido</label>
+                            <input type="text" id="secondlasname" name="secondlasname" value={formData.secondlasname} onChange={handleChange} placeholder="Opcional" />
                         </div>
 
                         <div className="form-group">
-                            <label htmlFor="documentTypeId">Document Type *</label>
+                            <label htmlFor="documentTypeId">Tipo de Documento *</label>
                             <select id="documentTypeId" name="documentTypeId" required value={formData.documentTypeId} onChange={handleChange}>
                                 {documentTypes.map(type => (
                                     <option key={type.id} value={type.id}>{type.name} ({type.id})</option>
@@ -207,12 +207,12 @@ export default function UserModal({ isOpen, onClose, onSuccess, editUser = null,
                         </div>
 
                         <div className="form-group">
-                            <label htmlFor="documentNumber">Document Number *</label>
+                            <label htmlFor="documentNumber">Número de Documento *</label>
                             <input type="text" id="documentNumber" name="documentNumber" required value={formData.documentNumber} onChange={handleChange} placeholder="1111739898" />
                         </div>
 
                         <div className="form-group">
-                            <label htmlFor="email">Email *</label>
+                            <label htmlFor="email">Correo Electrónico *</label>
                             <input type="email" id="email" name="email" required value={formData.email} onChange={handleChange} placeholder="john@email.com" />
                         </div>
 
@@ -238,7 +238,7 @@ export default function UserModal({ isOpen, onClose, onSuccess, editUser = null,
                         </div>
 
                         <div className="form-group">
-                            <label htmlFor="roleId">Role *</label>
+                            <label htmlFor="roleId">Rol *</label>
                             <select id="roleId" name="roleId" required value={formData.roleId} onChange={handleChange} disabled={currentUserRole === 'COORACAD' || currentUserRole === 'COORDINADOR ACADÉMICO'}>
                                 {currentUserRole === 'COORACAD' || currentUserRole === 'COORDINADOR ACADÉMICO' ? (
                                     <option value={2}>Estudiante (2)</option>
@@ -266,7 +266,7 @@ export default function UserModal({ isOpen, onClose, onSuccess, editUser = null,
                         </div>
 
                         <div className="form-group switch-group">
-                            <label htmlFor="active">Active Status</label>
+                            <label htmlFor="active">Estado Activo</label>
                             <label className="switch">
                                 <input type="checkbox" id="active" name="active" checked={formData.active} onChange={handleChange} />
                                 <span className="slider round"></span>
@@ -276,11 +276,11 @@ export default function UserModal({ isOpen, onClose, onSuccess, editUser = null,
 
                     <div className="modal-actions">
                         <button type="button" className="btn-secondary" onClick={onClose} disabled={loading}>
-                            Cancel
+                            Cancelar
                         </button>
                         {isOnline && (
                             <button type="submit" className={`btn-primary ${loading ? 'loading' : ''}`} disabled={loading}>
-                                {loading ? (editUser ? 'Saving...' : 'Creating...') : (editUser ? 'Save Changes' : 'Create User')}
+                                {loading ? (editUser ? 'Guardando...' : 'Creando...') : (editUser ? 'Guardar Cambios' : 'Crear Usuario')}
                             </button>
                         )}
                     </div>
