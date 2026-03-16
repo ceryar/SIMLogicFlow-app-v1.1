@@ -126,6 +126,42 @@
     background: var(--bg-hover);
 }
 
+/* ---- Responsive ---- */
+@media (max-width: 1024px) {
+    .calendar-wrapper {
+        flex-direction: column;
+    }
+
+    .calendar-detail {
+        width: 100%;
+        margin-top: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .calendar-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .calendar-view-switcher {
+        justify-content: center;
+    }
+
+    .calendar-day {
+        min-height: 80px;
+        padding: 4px;
+    }
+
+    .day-number {
+        font-size: 0.8rem;
+    }
+
+    .event-label {
+        font-size: 0.6rem;
+    }
+}
+
 /* ---- Grid ---- */
 .calendar-grid,
 .calendar-grid-header {
@@ -135,26 +171,51 @@
     background: var(--bg-surface);
 }
 
+.calendar-grid.month-view,
+.calendar-grid-header.month-view,
+.calendar-grid.week-view,
+.calendar-grid-header.week-view {
+    grid-template-columns: repeat(7, 1fr);
+}
+
+.calendar-grid.day-view,
+.calendar-grid-header.day-view {
+    grid-template-columns: 1fr;
+}
+
 .calendar-weekday {
     text-align: center;
-    font-size: 0.75rem;
-    font-weight: 700;
+    font-size: 0.8rem;
+    font-weight: 800;
     color: var(--text-muted);
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.05em;
+    padding: 10px 0;
 }
 
 /* ---- Day Cell ---- */
 .calendar-day {
-    min-height: 100px;
+    min-height: 120px;
     border-radius: 12px;
-    padding: 10px;
+    padding: 8px;
     cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.2s ease;
     position: relative;
     background: var(--bg-body);
     border: 1px solid var(--border-color);
-    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.calendar-day.empty {
+    background: transparent;
+    border-color: transparent;
+    cursor: default;
+}
+
+.calendar-day.day-view-day {
+    min-height: 300px;
 }
 
 .calendar-day:not(.empty):hover {
@@ -189,12 +250,53 @@
 }
 
 /* ---- Event Chips ---- */
+.day-events {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 4px;
+    overflow-y: auto;
+    max-height: calc(100% - 24px);
+}
+
+/* Hide scrollbar for cleaner look but keep functionality */
+.day-events::-webkit-scrollbar {
+    width: 2px;
+}
+
+.day-events::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 10px;
+}
+
 .calendar-event {
-    border-radius: 6px;
-    padding: 4px 8px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    margin-bottom: 2px;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border-left: 3px solid;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+
+.calendar-event:hover {
+    transform: scale(1.02);
+    filter: brightness(0.95);
+}
+
+.event-label {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.event-time {
+    font-size: 0.6rem;
+    opacity: 0.8;
+    display: block;
 }
 
 /* ---- Detail Sidebar ---- */
