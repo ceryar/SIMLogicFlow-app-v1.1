@@ -1166,23 +1166,45 @@ export default function AdminMenu() {
                                 <td data-label="Personal">
                                     <div className="entity-indicator" title="Coordinador">
                                         👤 Coord: {(() => {
-                                            const coords = (course.users || []).filter(u => {
+                                            const allPotential = [...(course.users || [])];
+                                            if (course.coordinator) allPotential.push(course.coordinator);
+
+                                            const coords = allPotential.filter(u => {
                                                 const r = u.role?.name?.toUpperCase() || '';
-                                                return r.includes('COORDINADOR ACADÉMICO') || r === 'COORACAD' || r === 'ADMINISTRADOR';
+                                                return r.includes('COORDINADOR') || r === 'COORACAD' || r === 'ADMINISTRADOR';
                                             });
-                                            return coords.length > 0 ? coords.map(u => `${u.firstName} ${u.lastname}`).join(', ') : 'Sin asignar';
+
+                                            // De-duplicate by ID
+                                            const unique = coords.filter((v, i, a) => a.findIndex(t => (t.id === v.id)) === i);
+                                            return unique.length > 0 ? unique.map(u => `${u.firstName} ${u.lastname}`).join(', ') : 'Sin asignar';
                                         })()}
                                     </div>
                                     <div className="entity-indicator" title="Pseudopiloto">
                                         👤 Pseudo: {(() => {
-                                            const pseudos = (course.users || []).filter(u => (u.role?.name?.toUpperCase() || '').includes('PSEUDOPILOTO'));
-                                            return pseudos.length > 0 ? pseudos.map(u => `${u.firstName} ${u.lastname}`).join(', ') : 'Sin asignar';
+                                            const allPotential = [...(course.users || [])];
+                                            if (course.pseudoPilot) allPotential.push(course.pseudoPilot);
+
+                                            const pseudos = allPotential.filter(u => {
+                                                const r = u.role?.name?.toUpperCase() || '';
+                                                return r.includes('PSEUDO');
+                                            });
+
+                                            const unique = pseudos.filter((v, i, a) => a.findIndex(t => (t.id === v.id)) === i);
+                                            return unique.length > 0 ? unique.map(u => `${u.firstName} ${u.lastname}`).join(', ') : 'Sin asignar';
                                         })()}
                                     </div>
                                     <div className="entity-indicator" title="Instructor">
                                         👤 Instr: {(() => {
-                                            const instrs = (course.users || []).filter(u => (u.role?.name?.toUpperCase() || '').includes('INSTRUCTOR'));
-                                            return instrs.length > 0 ? instrs.map(u => `${u.firstName} ${u.lastname}`).join(', ') : 'Sin asignar';
+                                            const allPotential = [...(course.users || [])];
+                                            if (course.instructor) allPotential.push(course.instructor);
+
+                                            const instrs = allPotential.filter(u => {
+                                                const r = u.role?.name?.toUpperCase() || '';
+                                                return r.includes('INSTRUCTOR');
+                                            });
+
+                                            const unique = instrs.filter((v, i, a) => a.findIndex(t => (t.id === v.id)) === i);
+                                            return unique.length > 0 ? unique.map(u => `${u.firstName} ${u.lastname}`).join(', ') : 'Sin asignar';
                                         })()}
                                     </div>
                                 </td>
