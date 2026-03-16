@@ -338,7 +338,8 @@
 
     .admin-content,
     .admin-main {
-        padding: 1rem;
+        padding: 0.75rem;
+        overflow-x: auto;
     }
 
     .admin-header h2 {

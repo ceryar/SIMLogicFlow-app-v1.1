@@ -148,29 +148,35 @@
     }
 }
 
-@media (max-width: 1024px) {
-    .calendar-wrapper {
-        flex-direction: column;
-        max-height: none;
-        height: auto;
+.calendar-header h3 {
+    font-size: 1.1rem;
+}
+
+.calendar-header {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.calendar-detail {
+    width: 100%;
+    margin-top: 20px;
+    max-height: none;
+    position: relative;
+    bottom: auto;
+    z-index: 10;
+    box-shadow: var(--shadow-md);
+    animation: slideInUp 0.3s ease;
+}
+
+@keyframes slideInUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
     }
 
-    .calendar-container {
-        width: 100%;
-    }
-
-    .calendar-detail {
-        width: 100%;
-        margin-top: 10px;
-        max-height: 500px;
-        position: sticky;
-        bottom: 20px;
-        z-index: 100;
-        box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.1);
-    }
-
-    .calendar-header h3 {
-        font-size: 1.25rem;
+    to {
+        transform: translateY(0);
+        opacity: 1;
     }
 }
 
@@ -203,15 +209,27 @@
     }
 
     .calendar-selectors-menu {
-        display: grid;
-        grid-template-columns: 1fr 1fr auto;
+        display: flex;
+        flex-direction: column;
         width: 100%;
-        gap: 6px;
+        gap: 8px;
     }
 
     .calendar-select-menu {
-        padding: 8px 10px;
-        font-size: 0.8rem;
+        width: 100%;
+        padding: 10px;
+        font-size: 0.9rem;
+    }
+
+    .calendar-date-selector {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+
+    .calendar-date-selector .datepicker-input-wrapper {
+        width: 100%;
+        height: 42px;
     }
 
     .calendar-grid-header {
