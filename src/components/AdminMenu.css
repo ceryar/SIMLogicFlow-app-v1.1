@@ -212,9 +212,9 @@
 
 @media (prefers-color-scheme: dark) {
     .table-card {
-        background: #1e293b;
-        border-color: #334155;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        background: white;
+        border-color: rgba(0, 0, 0, 0.05);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
     }
 }
 
@@ -432,8 +432,8 @@
 
     @media (prefers-color-scheme: dark) {
         .admin-table tr {
-            border-color: #334155;
-            background: #1e1e2f;
+            border-color: #e2e8f0;
+            background: white;
         }
     }
 
@@ -451,7 +451,7 @@
 
     @media (prefers-color-scheme: dark) {
         .admin-table td {
-            border-bottom-color: #2d2d3f;
+            border-bottom-color: #f1f5f9;
         }
     }
 
@@ -567,9 +567,9 @@
 
 @media (prefers-color-scheme: dark) {
     .pagination-container {
-        background-color: #2d2d3f;
-        border-top-color: #3f3f5a;
-        color: #94a3b8;
+        background-color: #f8fafc;
+        border-top-color: #e2e8f0;
+        color: #64748b;
     }
 }
 
@@ -580,7 +580,7 @@
 
 @media (prefers-color-scheme: dark) {
     .pagination-info {
-        color: #94a3b8;
+        color: #64748b;
     }
 }
 
@@ -609,9 +609,9 @@
 
 @media (prefers-color-scheme: dark) {
     .items-per-page select {
-        background: #1e1e2f;
-        border-color: #3f3f5a;
-        color: #cbd5e1;
+        background: white;
+        border-color: #e2e8f0;
+        color: #1e293b;
     }
 }
 
@@ -637,9 +637,9 @@
 
 @media (prefers-color-scheme: dark) {
     .btn-pagination {
-        background: #1e1e2f;
-        border-color: #3f3f5a;
-        color: #94a3b8;
+        background: white;
+        border-color: #e2e8f0;
+        color: #64748b;
     }
 }
 
@@ -651,8 +651,8 @@
 
 @media (prefers-color-scheme: dark) {
     .btn-pagination:hover:not(:disabled) {
-        background: #334155;
-        color: #f8fafc;
+        background: #f1f5f9;
+        color: #0f172a;
     }
 }
 
@@ -669,6 +669,6 @@
 
 @media (prefers-color-scheme: dark) {
     .current-page {
-        color: #cbd5e1;
+        color: #475569;
     }
 }
