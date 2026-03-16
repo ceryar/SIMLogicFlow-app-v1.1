@@ -344,8 +344,15 @@ export default function CalendarView({ events, type }) {
                                                     <>
                                                         {ev.course?.name && <div className="detail-meta">📚 Curso: {ev.course.name}</div>}
                                                         {ev.course?.rooms?.length > 0 && <div className="detail-meta">🏫 Aula: {ev.course.rooms.map(r => r.name).join(', ')}</div>}
-                                                        {ev.instructor && <div className="detail-meta">👤 Instructor: {ev.instructor.firstName} {ev.instructor.lastname}</div>}
-                                                        {ev.pseudoPilot && <div className="detail-meta">👤 Pseudopiloto: {ev.pseudoPilot.firstName} {ev.pseudoPilot.lastname}</div>}
+                                                        {(ev.course?.instructor || ev.instructor) && (
+                                                            <div className="detail-meta">👤 Instructor: {(ev.course?.instructor || ev.instructor).firstName} {(ev.course?.instructor || ev.instructor).lastname}</div>
+                                                        )}
+                                                        {(ev.course?.pseudoPilot || ev.pseudoPilot) && (
+                                                            <div className="detail-meta">👤 Pseudopiloto: {(ev.course?.pseudoPilot || ev.pseudoPilot).firstName} {(ev.course?.pseudoPilot || ev.pseudoPilot).lastname}</div>
+                                                        )}
+                                                        {ev.course?.coordinator && (
+                                                            <div className="detail-meta">⚙️ Gestión: {ev.course.coordinator.firstName} {ev.course.coordinator.lastname}</div>
+                                                        )}
                                                     </>
                                                 ) : (
                                                     <>
@@ -357,12 +364,6 @@ export default function CalendarView({ events, type }) {
                                                 )}
 
                                                 {/* Common Footers */}
-                                                {type === 'course' && ev.course?.users?.filter(u => u.role?.name.includes('COORDINADOR') || u.role?.name === 'ADMIN').length > 0 && (
-                                                    <div className="detail-meta">📁 Gestión: {ev.course.users
-                                                        .filter(u => u.role?.name.includes('COORDINADOR') || u.role?.name === 'ADMIN')
-                                                        .map(u => `${u.firstName} ${u.lastname}`).join(', ')}
-                                                    </div>
-                                                )}
                                                 {ev.description && <div className="detail-desc">📝 {ev.description}</div>}
                                             </div>
                                         </div>
