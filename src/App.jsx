@@ -28,6 +28,18 @@ function App() {
     }
   });
 
+  // ── Theme State ──
+  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
+
+  useEffect(() => {
+    document.body.className = theme === 'dark' ? 'dark-theme' : 'light-theme';
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  };
+
   const { triggerCacheWarmUp } = usePWA();
 
   const checkAuth = async () => {
@@ -99,6 +111,25 @@ function App() {
       <nav className="navbar">
         <div className="nav-brand">SimLogicFlow</div>
         <div className="nav-user">
+          <button onClick={toggleTheme} className="theme-toggle-btn" title="Cambiar tema">
+            {theme === 'light' ? (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+              </svg>
+            ) : (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="18.36" x2="5.64" y2="16.94"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+              </svg>
+            )}
+          </button>
           <span className="user-email">{userEmail}</span>
           <span className="user-role badge">
             {userRole === 'COORACAD' || userRole === 'COORDINADOR ACADÉMICO' ? 'COORDINADOR ACADÉMICO' :

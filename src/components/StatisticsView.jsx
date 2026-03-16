@@ -238,12 +238,12 @@ export default function StatisticsView({ users = [], courses = [], proCourses = 
     const maxUsageHours = Math.max(...stats.simulatorUsage.map(s => s.hours), 1);
 
     return (
-        <div className="statistics-container" style={{ padding: '20px', color: '#1e293b' }}>
+        <div className="statistics-container" style={{ padding: '20px', color: 'var(--text-main)' }}>
 
             {/* Filters Row */}
-            <div style={{ marginBottom: '30px', display: 'flex', gap: '15px', alignItems: 'center', flexWrap: 'wrap', background: '#f8fafc', padding: '15px', borderRadius: '12px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+            <div style={{ marginBottom: '30px', display: 'flex', gap: '15px', alignItems: 'center', flexWrap: 'wrap', background: 'var(--bg-surface)', padding: '15px', borderRadius: '12px', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                    <span style={{ fontWeight: '700', fontSize: '12px', color: '#64748b' }}>Periodo:</span>
+                    <span style={{ fontWeight: '700', fontSize: '12px', color: 'var(--text-muted)' }}>Periodo:</span>
                     <div style={{ display: 'flex', gap: '8px' }}>
                         {[
                             { id: 'all', label: 'Todo' },
@@ -258,12 +258,12 @@ export default function StatisticsView({ users = [], courses = [], proCourses = 
                                     padding: '8px 16px',
                                     borderRadius: '8px',
                                     border: 'none',
-                                    background: filterType === btn.id ? '#3b82f6' : '#fff',
-                                    color: filterType === btn.id ? '#fff' : '#64748b',
+                                    background: filterType === btn.id ? 'var(--primary-color)' : 'var(--bg-body)',
+                                    color: filterType === btn.id ? '#fff' : 'var(--text-muted)',
                                     fontWeight: '600',
                                     fontSize: '13px',
                                     cursor: 'pointer',
-                                    boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+                                    boxShadow: 'var(--shadow-sm)',
                                     transition: 'all 0.2s'
                                 }}
                             >
@@ -279,24 +279,24 @@ export default function StatisticsView({ users = [], courses = [], proCourses = 
                             type="date"
                             value={startDate}
                             onChange={(e) => setStartDate(e.target.value)}
-                            style={{ padding: '6px 10px', borderRadius: '6px', border: '1px solid #e2e8f0', fontSize: '13px' }}
+                            style={{ padding: '6px 10px', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--bg-input)', color: 'var(--text-main)', fontSize: '13px' }}
                         />
-                        <span style={{ color: '#64748b' }}>a</span>
+                        <span style={{ color: 'var(--text-muted)' }}>a</span>
                         <input
                             type="date"
                             value={endDate}
                             onChange={(e) => setEndDate(e.target.value)}
-                            style={{ padding: '6px 10px', borderRadius: '6px', border: '1px solid #e2e8f0', fontSize: '13px' }}
+                            style={{ padding: '6px 10px', borderRadius: '6px', border: '1px solid var(--border-color)', background: 'var(--bg-input)', color: 'var(--text-main)', fontSize: '13px' }}
                         />
                     </div>
                 )}
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                    <span style={{ fontWeight: '700', fontSize: '12px', color: '#64748b' }}>Simulador:</span>
+                    <span style={{ fontWeight: '700', fontSize: '12px', color: 'var(--text-muted)' }}>Simulador:</span>
                     <select
                         value={selectedSimulatorId}
                         onChange={(e) => setSelectedSimulatorId(e.target.value)}
-                        style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: 'white', fontSize: '13px', fontWeight: '600', minWidth: '180px' }}
+                        style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-input)', color: 'var(--text-main)', fontSize: '13px', fontWeight: '600', minWidth: '180px' }}
                     >
                         <option value="">Todos los Simuladores</option>
                         {simulators.map(sim => (
@@ -306,11 +306,11 @@ export default function StatisticsView({ users = [], courses = [], proCourses = 
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                    <span style={{ fontWeight: '700', fontSize: '12px', color: '#64748b' }}>Curso:</span>
+                    <span style={{ fontWeight: '700', fontSize: '12px', color: 'var(--text-muted)' }}>Curso:</span>
                     <select
                         value={selectedCourseId}
                         onChange={(e) => setSelectedCourseId(e.target.value)}
-                        style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #e2e8f0', background: 'white', fontSize: '13px', fontWeight: '600', minWidth: '180px' }}
+                        style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-input)', color: 'var(--text-main)', fontSize: '13px', fontWeight: '600', minWidth: '180px' }}
                     >
                         <option value="">Todos los Cursos</option>
                         {(selectedSimulatorId
@@ -327,7 +327,7 @@ export default function StatisticsView({ users = [], courses = [], proCourses = 
                     style={{
                         marginLeft: 'auto',
                         padding: '10px 20px',
-                        background: '#ef4444',
+                        background: 'var(--error-color)',
                         color: 'white',
                         border: 'none',
                         borderRadius: '8px',
@@ -337,7 +337,7 @@ export default function StatisticsView({ users = [], courses = [], proCourses = 
                         display: 'flex',
                         alignItems: 'center',
                         gap: '8px',
-                        boxShadow: '0 2px 4px rgba(239, 68, 68, 0.2)',
+                        boxShadow: '0 4px 12px rgba(239, 68, 68, 0.2)',
                         transition: 'transform 0.2s',
                         alignSelf: 'flex-end',
                         marginBottom: '4px'
@@ -351,29 +351,29 @@ export default function StatisticsView({ users = [], courses = [], proCourses = 
 
             {/* Overview Cards */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px', marginBottom: '30px' }}>
-                <StatCard title="Total Usuarios" value={stats.totalUsers} icon="👥" color="#3b82f6" />
-                <StatCard title="Cursos Activos" value={stats.totalCourses} icon="📚" color="#8b5cf6" />
-                <StatCard title="Simuladores Operativos" value={`${stats.activeSimulators}/${simulators.length}`} icon="🕹️" color="#10b981" />
-                <StatCard title="Mantenimientos" value={stats.totalMaintenances} icon="🛠️" color="#f59e0b" />
+                <StatCard title="Total Usuarios" value={stats.totalUsers} icon="👥" color="var(--primary-color)" />
+                <StatCard title="Cursos Activos" value={stats.totalCourses} icon="📚" color="var(--accent-color)" />
+                <StatCard title="Simuladores Operativos" value={`${stats.activeSimulators}/${simulators.length}`} icon="🕹️" color="var(--success-color)" />
+                <StatCard title="Mantenimientos" value={stats.totalMaintenances} icon="🛠️" color="var(--warning-color)" />
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(450px, 1fr))', gap: '30px' }}>
 
                 {/* Simulator Usage Chart */}
-                <div className="card" style={{ padding: '24px', background: 'white', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}>
-                    <h3 style={{ marginBottom: '20px', fontSize: '18px', fontWeight: '700' }}>Uso de Simuladores (Horas)</h3>
+                <div style={{ padding: '24px', background: 'var(--bg-surface)', borderRadius: '16px', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-md)' }}>
+                    <h3 style={{ marginBottom: '20px', fontSize: '18px', fontWeight: '800', color: 'var(--text-main)', letterSpacing: '-0.025em' }}>Uso de Simuladores (Horas)</h3>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                         {stats.simulatorUsage.map(sim => (
                             <div key={sim.name}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '14px' }}>
-                                    <span style={{ fontWeight: '600' }}>{sim.name}</span>
-                                    <span style={{ color: '#64748b' }}>{sim.hours}h</span>
+                                    <span style={{ fontWeight: '700', color: 'var(--text-main)' }}>{sim.name}</span>
+                                    <span style={{ color: 'var(--text-muted)' }}>{sim.hours}h</span>
                                 </div>
-                                <div style={{ height: '12px', background: '#f1f5f9', borderRadius: '6px', overflow: 'hidden' }}>
+                                <div style={{ height: '12px', background: 'var(--bg-body)', borderRadius: '6px', overflow: 'hidden' }}>
                                     <div style={{
                                         height: '100%',
                                         width: `${(sim.hours / maxUsageHours) * 100}%`,
-                                        background: 'linear-gradient(90deg, #3b82f6, #60a5fa)',
+                                        background: 'linear-gradient(90deg, var(--primary-color), var(--accent-color))',
                                         borderRadius: '6px',
                                         transition: 'width 1s ease-out'
                                     }}></div>
@@ -384,18 +384,17 @@ export default function StatisticsView({ users = [], courses = [], proCourses = 
                 </div>
 
                 {/* Maintenance Distribution */}
-                <div className="card" style={{ padding: '24px', background: 'white', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}>
-                    <h3 style={{ marginBottom: '20px', fontSize: '18px', fontWeight: '700' }}>Distribución de Mantenimiento</h3>
+                <div style={{ padding: '24px', background: 'var(--bg-surface)', borderRadius: '16px', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-md)' }}>
+                    <h3 style={{ marginBottom: '20px', fontSize: '18px', fontWeight: '800', color: 'var(--text-main)', letterSpacing: '-0.025em' }}>Distribución de Mantenimiento</h3>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '40px', height: '200px' }}>
                         <div style={{ position: 'relative', width: '160px', height: '160px' }}>
-                            {/* Simple SVG Donut Chart logic */}
                             <svg viewBox="0 0 36 36" style={{ transform: 'rotate(-90deg)' }}>
-                                <circle cx="18" cy="18" r="15.9" fill="transparent" stroke="#f1f5f9" strokeWidth="3.8"></circle>
+                                <circle cx="18" cy="18" r="15.9" fill="transparent" stroke="var(--bg-body)" strokeWidth="3.8"></circle>
                                 {Object.entries(stats.maintDistribution).map(([type, count], i, arr) => {
                                     const total = stats.totalMaintenances || 1;
                                     const percentage = (count / total) * 100;
                                     const offset = arr.slice(0, i).reduce((acc, [_, c]) => acc + (c / total) * 100, 0);
-                                    const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'];
+                                    const colors = ['var(--primary-color)', 'var(--success-color)', 'var(--warning-color)', 'var(--error-color)'];
                                     return (
                                         <circle
                                             key={type}
@@ -410,18 +409,18 @@ export default function StatisticsView({ users = [], courses = [], proCourses = 
                                 })}
                             </svg>
                             <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center' }}>
-                                <div style={{ fontSize: '24px', fontWeight: '800' }}>{stats.totalMaintenances}</div>
-                                <div style={{ fontSize: '10px', color: '#64748b' }}>TOTAL</div>
+                                <div style={{ fontSize: '24px', fontWeight: '800', color: 'var(--text-main)' }}>{stats.totalMaintenances}</div>
+                                <div style={{ fontSize: '10px', color: 'var(--text-muted)', fontWeight: '700' }}>TOTAL</div>
                             </div>
                         </div>
                         <div style={{ flex: 1 }}>
                             {Object.entries(stats.maintDistribution).map(([type, count], i) => {
-                                const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'];
+                                const colors = ['var(--primary-color)', 'var(--success-color)', 'var(--warning-color)', 'var(--error-color)'];
                                 return (
                                     <div key={type} style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px', fontSize: '14px' }}>
                                         <div style={{ width: '12px', height: '12px', borderRadius: '3px', background: colors[i % colors.length] }}></div>
-                                        <span style={{ fontWeight: '500' }}>{type}</span>
-                                        <span style={{ marginLeft: 'auto', color: '#64748b' }}>{count}</span>
+                                        <span style={{ fontWeight: '600', color: 'var(--text-main)' }}>{type}</span>
+                                        <span style={{ marginLeft: 'auto', color: 'var(--text-muted)', fontWeight: '600' }}>{count}</span>
                                     </div>
                                 );
                             })}
@@ -430,24 +429,24 @@ export default function StatisticsView({ users = [], courses = [], proCourses = 
                 </div>
 
                 {/* Progress Tracking */}
-                <div className="card" style={{ padding: '24px', background: 'white', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', gridColumn: '1 / -1' }}>
-                    <h3 style={{ marginBottom: '20px', fontSize: '18px', fontWeight: '700' }}>Estado de Cursos (Horas Realizadas vs Totales)</h3>
+                <div style={{ padding: '24px', background: 'var(--bg-surface)', borderRadius: '16px', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-lg)', gridColumn: '1 / -1' }}>
+                    <h3 style={{ marginBottom: '20px', fontSize: '18px', fontWeight: '800', color: 'var(--text-main)', letterSpacing: '-0.025em' }}>Estado de Cursos (Horas Realizadas vs Totales)</h3>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
                         {stats.courseIntensity.map(course => {
                             const percent = Math.min((course.programmedHours / (course.totalHours || 1)) * 100, 100);
                             return (
-                                <div key={course.name} style={{ textAlign: 'center', padding: '16px', border: '1px solid #f1f5f9', borderRadius: '12px' }}>
-                                    <div style={{ fontWeight: '700', fontSize: '14px', marginBottom: '12px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{course.name}</div>
+                                <div key={course.name} style={{ textAlign: 'center', padding: '16px', background: 'var(--bg-body)', border: '1px solid var(--border-color)', borderRadius: '12px' }}>
+                                    <div style={{ fontWeight: '700', fontSize: '14px', marginBottom: '12px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-main)' }}>{course.name}</div>
                                     <div style={{ position: 'relative', width: '80px', height: '80px', margin: '0 auto 12px' }}>
                                         <svg viewBox="0 0 36 36" style={{ transform: 'rotate(-90deg)' }}>
-                                            <circle cx="18" cy="18" r="16" fill="transparent" stroke="#f1f5f9" strokeWidth="4"></circle>
-                                            <circle cx="18" cy="18" r="16" fill="transparent" stroke="#8b5cf6" strokeWidth="4" strokeDasharray={`${percent} 100`}></circle>
+                                            <circle cx="18" cy="18" r="16" fill="transparent" stroke="var(--bg-surface)" strokeWidth="4"></circle>
+                                            <circle cx="18" cy="18" r="16" fill="transparent" stroke="var(--primary-color)" strokeWidth="4" strokeDasharray={`${percent} 100`}></circle>
                                         </svg>
-                                        <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', fontWeight: '700', fontSize: '12px' }}>
+                                        <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', fontWeight: '800', fontSize: '12px', color: 'var(--text-main)' }}>
                                             {Math.round(percent)}%
                                         </div>
                                     </div>
-                                    <div style={{ fontSize: '12px', color: '#64748b' }}>
+                                    <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: '600' }}>
                                         {course.programmedHours}/{course.totalHours} Horas
                                     </div>
                                 </div>
@@ -462,12 +461,12 @@ export default function StatisticsView({ users = [], courses = [], proCourses = 
 
 function StatCard({ title, value, icon, color }) {
     return (
-        <div className="card" style={{ padding: '24px', background: 'white', borderRadius: '16px', borderLeft: `6px solid ${color}`, boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ padding: '24px', background: 'var(--bg-surface)', borderRadius: '16px', borderLeft: `6px solid ${color}`, borderTop: '1px solid var(--border-color)', borderRight: '1px solid var(--border-color)', borderBottom: '1px solid var(--border-color)', boxShadow: 'var(--shadow-md)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div>
-                <div style={{ fontSize: '14px', fontWeight: '600', color: '#64748b', marginBottom: '4px' }}>{title}</div>
-                <div style={{ fontSize: '28px', fontWeight: '800' }}>{value}</div>
+                <div style={{ fontSize: '13px', fontWeight: '700', color: 'var(--text-muted)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{title}</div>
+                <div style={{ fontSize: '28px', fontWeight: '800', color: 'var(--text-main)' }}>{value}</div>
             </div>
-            <div style={{ fontSize: '32px' }}>{icon}</div>
+            <div style={{ fontSize: '32px', opacity: '0.8' }}>{icon}</div>
         </div>
     );
 }
