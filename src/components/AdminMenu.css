@@ -4,11 +4,13 @@
     width: 100%;
     background-color: #f8fafc;
     box-sizing: border-box;
+    color: #1e293b;
 }
 
 @media (prefers-color-scheme: dark) {
     .admin-container {
-        background-color: #121218;
+        background-color: #0f172a;
+        color: #f1f5f9;
     }
 }
 
@@ -21,12 +23,14 @@
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
+    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.02);
 }
 
 @media (prefers-color-scheme: dark) {
     .admin-sidebar {
-        background: #1e1e2f;
-        border-right-color: #2d2d3f;
+        background: #1e293b;
+        border-right-color: #334155;
+        box-shadow: 4px 0 15px rgba(0, 0, 0, 0.2);
     }
 }
 
@@ -84,9 +88,10 @@
 }
 
 .admin-nav-item.active {
-    background: linear-gradient(135deg, rgba(0, 45, 114, 0.1), rgba(234, 170, 0, 0.1));
-    color: var(--primary-color);
+    background: #6366f1;
+    color: white;
     font-weight: 600;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
 }
 
 /* Sidebar Groups */
@@ -109,7 +114,7 @@
 
 @media (prefers-color-scheme: dark) {
     .admin-nav-group-header {
-        color: #cbd5e1;
+        color: #94a3b8;
     }
 }
 
@@ -171,21 +176,22 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    background: linear-gradient(135deg, var(--primary-color), #004b9c);
+    background: #6366f1;
     color: white;
     border: none;
     padding: 0.65rem 1.25rem;
-    border-radius: 8px;
+    border-radius: 10px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 45, 114, 0.3);
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
     font-size: 0.9rem;
 }
 
 .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 45, 114, 0.4);
+    background: #4f46e5;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 15px rgba(99, 102, 241, 0.35);
 }
 
 .table-card {
@@ -199,8 +205,9 @@
 
 @media (prefers-color-scheme: dark) {
     .table-card {
-        background: #1e1e2f;
-        border-color: rgba(255, 255, 255, 0.05);
+        background: #1e293b;
+        border-color: #334155;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     }
 }
 
