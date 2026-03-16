@@ -4,9 +4,10 @@
 
 .calendar-wrapper {
     display: flex;
-    gap: 20px;
-    align-items: flex-start;
-    height: 100%;
+    gap: 24px;
+    align-items: stretch;
+    height: calc(100vh - 120px);
+    padding: 10px;
 }
 
 /* ---- Main Calendar ---- */
@@ -24,10 +25,12 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 20px 24px;
+    padding: 16px 24px;
     border-bottom: 1px solid var(--border-color);
-    gap: 15px;
-    flex-wrap: wrap;
+    gap: 20px;
+    background: var(--bg-surface);
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
 }
 
 .calendar-nav-group {
@@ -166,9 +169,11 @@
 .calendar-grid,
 .calendar-grid-header {
     display: grid;
-    gap: 8px;
-    padding: 16px;
-    background: var(--bg-surface);
+    padding: 0;
+    background: var(--border-color);
+    /* Grid lines color */
+    gap: 1px;
+    /* Gap creates the border effect */
 }
 
 .calendar-grid.month-view,
@@ -178,6 +183,10 @@
     grid-template-columns: repeat(7, 1fr);
 }
 
+.calendar-grid.month-view {
+    grid-auto-rows: minmax(120px, 1fr);
+}
+
 .calendar-grid.day-view,
 .calendar-grid-header.day-view {
     grid-template-columns: 1fr;
@@ -185,24 +194,23 @@
 
 .calendar-weekday {
     text-align: center;
-    font-size: 0.8rem;
-    font-weight: 800;
+    font-size: 0.75rem;
+    font-weight: 700;
     color: var(--text-muted);
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    padding: 10px 0;
+    letter-spacing: 0.1em;
+    padding: 12px 0;
+    background: var(--bg-surface);
 }
 
 /* ---- Day Cell ---- */
 .calendar-day {
-    min-height: 120px;
-    border-radius: 12px;
-    padding: 8px;
+    min-height: 100px;
+    padding: 10px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: background 0.2s ease;
     position: relative;
-    background: var(--bg-body);
-    border: 1px solid var(--border-color);
+    background: var(--bg-surface);
     display: flex;
     flex-direction: column;
     gap: 4px;
@@ -226,9 +234,19 @@
 }
 
 .calendar-day.today {
-    background: var(--bg-surface);
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 1.5px var(--primary-color);
+    background: rgba(99, 102, 241, 0.03);
+}
+
+.calendar-day.today::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 2px solid var(--primary-color);
+    pointer-events: none;
+    z-index: 1;
 }
 
 .calendar-day.today .day-number {

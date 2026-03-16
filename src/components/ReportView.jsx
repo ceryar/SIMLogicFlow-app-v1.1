@@ -306,16 +306,19 @@ export default function ReportView({ type, data, users = [], courses = [], simul
                         const rooms = courseObj.rooms || [];
                         const salaStr = rooms.length > 0 ? rooms.map(r => r.name).join(', ') : 'N/A';
 
-                        // Robust personal finding from global users list
-                        const courseUsers = users.filter(u => u.courses?.some(uc => uc.id === (courseObj.id || 0)));
+                        // Robust personal finding from global users list using safe string comparison
+                        const targetCourseId = String(courseObj.id || 0);
+                        const courseUsers = users.filter(u =>
+                            Array.isArray(u.courses) && u.courses.some(uc => String(uc.id) === targetCourseId)
+                        );
 
                         const instr = s.instructor || courseObj.instructor || courseUsers.find(u => {
-                            const r = u.role?.name?.toUpperCase() || '';
+                            const r = (u.role?.name || '').toUpperCase();
                             return r.includes('INSTRUCTOR');
                         });
 
                         const pseudo = s.pseudoPilot || courseObj.pseudoPilot || courseUsers.find(u => {
-                            const r = u.role?.name?.toUpperCase() || '';
+                            const r = (u.role?.name || '').toUpperCase();
                             return r.includes('PSEUDO');
                         });
 
@@ -324,7 +327,7 @@ export default function ReportView({ type, data, users = [], courses = [], simul
                             sim?.name || 'N/A',
                             salaStr,
                             s.fecha || s.fecIni,
-                            `${s.horaini || s.horaIni} - ${s.horafin || s.horaFin}`,
+                            `${s.horaini || s.horaIni} - ${s.horafin || s.horafin}`,
                             instr ? `${instr.firstName} ${instr.lastname}` : '—',
                             pseudo ? `${pseudo.firstName} ${pseudo.lastname}` : '—'
                         ];
