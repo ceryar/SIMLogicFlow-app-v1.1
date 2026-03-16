@@ -173,12 +173,11 @@ export default function ReportView({ type, data, courses = [], simulators = [], 
             const { default: jsPDF } = await import('jspdf');
             const { default: autoTable } = await import('jspdf-autotable');
 
-            const doc = new jsPDF('l', 'mm', 'a4'); // Landscape for better table space
+            const doc = new jsPDF('l', 'mm', 'a4');
 
-            // Styling identical to StatisticsView
             // Header
             doc.setFontSize(22);
-            doc.setTextColor(59, 130, 246); // #3b82f6
+            doc.setTextColor(59, 130, 246);
             doc.text('SimLogicFlow', 14, 20);
 
             const titleMap = {
@@ -189,75 +188,125 @@ export default function ReportView({ type, data, courses = [], simulators = [], 
             };
             doc.text(titleMap[type] || 'Reporte del Sistema', 14, 30);
 
-            // Metadata
+            // Metadata & Course Name
             doc.setFontSize(10);
-            doc.setTextColor(100, 116, 139); // #64748b
+            doc.setTextColor(100, 116, 139);
             doc.text(`Fecha de generación: ${new Date().toLocaleString()}`, 14, 38);
+
+            const courseName = selectedCourseId ? courses.find(c => String(c.id) === String(selectedCourseId))?.name : null;
+            let currentY = 44;
+
+            if (courseName) {
+                doc.setFontSize(12);
+                doc.setTextColor(30, 41, 59);
+                doc.setFont('helvetica', 'bold');
+                doc.text(`Curso: ${courseName}`, 14, currentY);
+                currentY += 6;
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(10);
+                doc.setTextColor(100, 116, 139);
+            }
 
             let filterSummary = `Filtros: ${searchTerm ? `Búsqueda: "${searchTerm}" | ` : ''}${startDate ? `Desde: ${startDate} | ` : ''}${endDate ? `Hasta: ${endDate}` : ''}`;
             if (filterSummary === 'Filtros: ') filterSummary = 'Filtros: Ninguno (Todos los registros)';
-            doc.text(filterSummary, 14, 44);
+            doc.text(filterSummary, 14, currentY);
+            currentY += 6;
 
-            doc.text(`Total de registros: ${filteredData.length}`, 14, 50);
-
-            let tableHead = [];
-            let tableBody = [];
+            doc.text(`Total de registros: ${filteredData.length}`, 14, currentY);
+            currentY += 10;
 
             if (type === 'users') {
-                tableHead = [['Nombre Completo', 'Email', 'Documento', 'Rol', 'Estado']];
-                tableBody = filteredData.map(u => [
-                    `${u.firstName} ${u.lastname}`,
-                    u.email,
-                    u.documentNumber || '—',
-                    u.role?.name || 'N/A',
-                    u.active ? 'Activo' : 'Inactivo'
-                ]);
-            } else if (type === 'courses') {
-                tableHead = [['Nombre del Curso', 'Fecha Inicio', 'Fecha Fin', 'Simulador', 'Horas', 'Instructor', 'Pseudopiloto']];
-                tableBody = filteredData.map(c => {
-                    const instr = c.instructor || (c.users || []).find(u => (u.role?.name || '').toUpperCase().includes('INSTRUCTOR'));
-                    const pseudo = c.pseudoPilot || (c.users || []).find(u => (u.role?.name || '').toUpperCase().includes('PSEUDO'));
-                    return [
-                        c.name,
-                        c.fecInicio || '—',
-                        c.fecFin || '—',
-                        c.simulator?.name || 'N/A',
-                        c.horas || 0,
-                        instr ? `${instr.firstName} ${instr.lastname}` : '—',
-                        pseudo ? `${pseudo.firstName} ${pseudo.lastname}` : '—'
-                    ];
-                });
-            } else if (type === 'maintenances') {
-                tableHead = [['Simulador', 'Tipo', 'Fecha', 'Horario', 'Técnico', 'Descripción']];
-                tableBody = filteredData.map(m => [
-                    m.simulator?.name || 'N/A',
-                    m.maintenanceType?.name || 'N/A',
-                    m.fecIni,
-                    `${m.horaIni} - ${m.horaFin}`,
-                    m.technician ? `${m.technician.firstName} ${m.technician.lastname}` : '—',
-                    m.description || '—'
-                ]);
-            } else if (type === 'sessions') {
-                tableHead = [['Curso', 'Simulador', 'Fecha', 'Horario', 'Instructor', 'Pseudopiloto']];
-                tableBody = filteredData.map(s => [
-                    s.course?.name || 'N/A',
-                    s.simulator?.name || 'N/A',
-                    s.fecha || s.fecIni,
-                    `${s.horaini || s.horaIni} - ${s.horafin || s.horaFin}`,
-                    s.instructor ? `${s.instructor.firstName} ${s.instructor.lastname}` : '—',
-                    s.pseudoPilot ? `${s.pseudoPilot.firstName} ${s.pseudoPilot.lastname}` : '—'
-                ]);
-            }
+                // Group users by role
+                const rolesMap = filteredData.reduce((acc, user) => {
+                    const rName = user.role?.name || 'Sin Rol';
+                    if (!acc[rName]) acc[rName] = [];
+                    acc[rName].push(user);
+                    return acc;
+                }, {});
 
-            autoTable(doc, {
-                startY: 55,
-                head: tableHead,
-                body: tableBody,
-                theme: 'striped',
-                headStyles: { fillColor: [59, 130, 246], fontSize: 10 },
-                styles: { fontSize: 9, cellPadding: 3 },
-                alternateRowStyles: { fillColor: [248, 250, 252] }
-            });
+                Object.entries(rolesMap).forEach(([roleName, roleUsers]) => {
+                    doc.setFontSize(12);
+                    doc.setTextColor(51, 65, 85);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text(`Rol: ${roleName} (${roleUsers.length})`, 14, currentY);
+                    currentY += 4;
+
+                    autoTable(doc, {
+                        startY: currentY,
+                        head: [['Nombre Completo', 'Email', 'Documento', 'Cursos', 'Estado']],
+                        body: roleUsers.map(u => [
+                            `${u.firstName} ${u.lastname}`,
+                            u.email,
+                            u.documentNumber || '—',
+                            u.courses?.map(c => c.name).join(', ') || '—',
+                            u.active ? 'Activo' : 'Inactivo'
+                        ]),
+                        theme: 'striped',
+                        headStyles: { fillColor: [59, 130, 246], fontSize: 9 },
+                        styles: { fontSize: 8, cellPadding: 2 },
+                        alternateRowStyles: { fillColor: [248, 250, 252] },
+                        margin: { left: 14 }
+                    });
+
+                    currentY = doc.lastAutoTable.finalY + 10;
+
+                    // Check if we need a new page
+                    if (currentY > 180 && Object.keys(rolesMap).indexOf(roleName) < Object.keys(rolesMap).length - 1) {
+                        doc.addPage();
+                        currentY = 20;
+                    }
+                });
+            } else {
+                let tableHead = [];
+                let tableBody = [];
+
+                if (type === 'courses') {
+                    tableHead = [['Nombre del Curso', 'Fecha Inicio', 'Fecha Fin', 'Simulador', 'Horas', 'Instructor', 'Pseudopiloto']];
+                    tableBody = filteredData.map(c => {
+                        const instr = c.instructor || (c.users || []).find(u => (u.role?.name || '').toUpperCase().includes('INSTRUCTOR'));
+                        const pseudo = c.pseudoPilot || (c.users || []).find(u => (u.role?.name || '').toUpperCase().includes('PSEUDO'));
+                        return [
+                            c.name,
+                            c.fecInicio || '—',
+                            c.fecFin || '—',
+                            c.simulator?.name || 'N/A',
+                            c.horas || 0,
+                            instr ? `${instr.firstName} ${instr.lastname}` : '—',
+                            pseudo ? `${pseudo.firstName} ${pseudo.lastname}` : '—'
+                        ];
+                    });
+                } else if (type === 'maintenances') {
+                    tableHead = [['Simulador', 'Tipo', 'Fecha', 'Horario', 'Técnico', 'Descripción']];
+                    tableBody = filteredData.map(m => [
+                        m.simulator?.name || 'N/A',
+                        m.maintenanceType?.name || 'N/A',
+                        m.fecIni,
+                        `${m.horaIni} - ${m.horaFin}`,
+                        m.technician ? `${m.technician.firstName} ${m.technician.lastname}` : '—',
+                        m.description || '—'
+                    ]);
+                } else if (type === 'sessions') {
+                    tableHead = [['Curso', 'Simulador', 'Fecha', 'Horario', 'Instructor', 'Pseudopiloto']];
+                    tableBody = filteredData.map(s => [
+                        s.course?.name || 'N/A',
+                        s.simulator?.name || 'N/A',
+                        s.fecha || s.fecIni,
+                        `${s.horaini || s.horaIni} - ${s.horafin || s.horaFin}`,
+                        s.instructor ? `${s.instructor.firstName} ${s.instructor.lastname}` : '—',
+                        s.pseudoPilot ? `${s.pseudoPilot.firstName} ${s.pseudoPilot.lastname}` : '—'
+                    ]);
+                }
+
+                autoTable(doc, {
+                    startY: currentY,
+                    head: tableHead,
+                    body: tableBody,
+                    theme: 'striped',
+                    headStyles: { fillColor: [59, 130, 246], fontSize: 10 },
+                    styles: { fontSize: 9, cellPadding: 3 },
+                    alternateRowStyles: { fillColor: [248, 250, 252] }
+                });
+            }
 
             doc.save(`SimLogicFlow_Reporte_${type}_${new Date().getTime()}.pdf`);
         } catch (error) {
