@@ -183,7 +183,6 @@ export default function MaintenanceModal({ isOpen, onClose, onSuccess, editMaint
                                 value={formData.fecIni}
                                 onChange={(e) => setFormData({ ...formData, fecIni: e.target.value })}
                                 placeholder="Seleccionar fecha inicio"
-                                maxDate={new Date().toISOString().split('T')[0]}
                             />
                         </div>
 
@@ -195,7 +194,6 @@ export default function MaintenanceModal({ isOpen, onClose, onSuccess, editMaint
                                 value={formData.fecFin}
                                 onChange={(e) => setFormData({ ...formData, fecFin: e.target.value })}
                                 placeholder="Seleccionar fecha fin"
-                                maxDate={new Date().toISOString().split('T')[0]}
                             />
                         </div>
 
