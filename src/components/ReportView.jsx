@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 
-export default function ReportView({ type, data, courses = [], simulators = [], roles = [], maintenanceTypes = [] }) {
+export default function ReportView({ type, data, users = [], courses = [], simulators = [], roles = [], maintenanceTypes = [] }) {
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const [selectedCourseId, setSelectedCourseId] = useState('');
@@ -263,8 +263,19 @@ export default function ReportView({ type, data, courses = [], simulators = [], 
                 if (type === 'courses') {
                     tableHead = [['Nombre del Curso', 'Simulador', 'Sala', 'Fecha Inicio', 'Fecha Fin', 'Horas', 'Instructor', 'Pseudopiloto']];
                     tableBody = filteredData.map(c => {
-                        const instr = c.instructor || (c.users || []).find(u => (u.role?.name || '').toUpperCase().includes('INSTRUCTOR'));
-                        const pseudo = c.pseudoPilot || (c.users || []).find(u => (u.role?.name || '').toUpperCase().includes('PSEUDO'));
+                        // Attempt to find instructor and pseudo from global users list if not directly on course
+                        const courseUsers = users.filter(u => u.courses?.some(uc => uc.id === c.id));
+
+                        const instr = c.instructor || courseUsers.find(u => {
+                            const r = u.role?.name?.toUpperCase() || '';
+                            return r.includes('INSTRUCTOR');
+                        });
+
+                        const pseudo = c.pseudoPilot || courseUsers.find(u => {
+                            const r = u.role?.name?.toUpperCase() || '';
+                            return r.includes('PSEUDO');
+                        });
+
                         const salaStr = (c.rooms && c.rooms.length > 0) ? c.rooms.map(r => r.name).join(', ') : 'N/A';
                         return [
                             c.name,
@@ -292,10 +303,21 @@ export default function ReportView({ type, data, courses = [], simulators = [], 
                     tableBody = filteredData.map(s => {
                         const courseObj = s.course || {};
                         const sim = s.simulator || courseObj.simulator;
-                        const instr = s.instructor || courseObj.instructor;
-                        const pseudo = s.pseudoPilot || courseObj.pseudoPilot;
                         const rooms = courseObj.rooms || [];
                         const salaStr = rooms.length > 0 ? rooms.map(r => r.name).join(', ') : 'N/A';
+
+                        // Robust personal finding from global users list
+                        const courseUsers = users.filter(u => u.courses?.some(uc => uc.id === (courseObj.id || 0)));
+
+                        const instr = s.instructor || courseObj.instructor || courseUsers.find(u => {
+                            const r = u.role?.name?.toUpperCase() || '';
+                            return r.includes('INSTRUCTOR');
+                        });
+
+                        const pseudo = s.pseudoPilot || courseObj.pseudoPilot || courseUsers.find(u => {
+                            const r = u.role?.name?.toUpperCase() || '';
+                            return r.includes('PSEUDO');
+                        });
 
                         return [
                             courseObj.name || 'N/A',

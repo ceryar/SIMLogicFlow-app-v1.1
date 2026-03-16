@@ -551,6 +551,7 @@ export default function ConsultationMenu() {
                                     (['ESTUDIANTE', 'INSTRUCTOR', 'PSEUDOPILOTO'].includes(userRole)) ? proCourses : users
                             }
                             courses={courses}
+                            users={users}
                             simulators={simulators}
                             roles={roles}
                             maintenanceTypes={[]}
