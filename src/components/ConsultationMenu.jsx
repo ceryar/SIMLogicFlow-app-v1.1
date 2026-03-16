@@ -77,34 +77,28 @@ export default function ConsultationMenu() {
                     : Promise.resolve({ data: [] })
             ]);
 
-            let finalCourses = coursesRes.data || [];
-            let userSpecificCourses = userCoursesRes.data || [];
-            if (!Array.isArray(userSpecificCourses)) userSpecificCourses = [userSpecificCourses];
-
-            // Merge and track which courses we already know are authorized
-            const authorizedIds = new Set();
-
-            // 1. Process global courses (for Admins/Coordinators)
-            finalCourses.forEach(c => authorizedIds.add(c.id));
-
-            // 2. Add user specific courses (already authorized)
-            userSpecificCourses.forEach(c => {
-                if (c && c.id) {
-                    authorizedIds.add(c.id);
-                    if (!finalCourses.find(fc => fc.id === c.id)) {
-                        finalCourses.push(c);
-                    }
-                }
-            });
-
-            let finalUsers = usersRes.data || [];
-            let finalProCourses = proCoursesRes.data || [];
-            let finalMaintenances = maintRes.data || [];
-
             const isFullAuth = [
                 'ADMINISTRADOR', 'COORDINADOR ACADÉMICO', 'COORACAD',
                 'COORDINADOR TÉCNICO', 'COORDINADOR', 'ADMIN'
             ].includes(userRole?.toUpperCase());
+
+            const authorizedIds = new Set();
+            let finalCourses = [];
+
+            if (isFullAuth) {
+                // Admins/Coordinators see all courses
+                finalCourses = coursesRes.data || [];
+                finalCourses.forEach(c => authorizedIds.add(c.id));
+            } else {
+                // Others only see courses where they are assigned (matriculated)
+                finalCourses = userCoursesRes.data || [];
+                if (!Array.isArray(finalCourses)) finalCourses = [finalCourses].filter(Boolean);
+                finalCourses.forEach(c => authorizedIds.add(c.id));
+            }
+
+            let finalUsers = usersRes.data || [];
+            let finalProCourses = proCoursesRes.data || [];
+            let finalMaintenances = maintRes.data || [];
 
             if (!isFullAuth && userId) {
                 const uid = parseInt(userId);
