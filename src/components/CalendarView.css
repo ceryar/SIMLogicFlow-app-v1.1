@@ -136,9 +136,15 @@
 }
 
 /* ---- Responsive ---- */
+@media (max-width: 1400px) {
+    .calendar-wrapper {
+        gap: 15px;
+    }
+}
+
 @media (max-width: 1200px) {
     .calendar-detail {
-        width: 260px;
+        width: 280px;
     }
 }
 
@@ -146,12 +152,21 @@
     .calendar-wrapper {
         flex-direction: column;
         max-height: none;
+        height: auto;
+    }
+
+    .calendar-container {
+        width: 100%;
     }
 
     .calendar-detail {
         width: 100%;
-        margin-top: 20px;
-        max-height: 400px;
+        margin-top: 10px;
+        max-height: 500px;
+        position: sticky;
+        bottom: 20px;
+        z-index: 100;
+        box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.1);
     }
 
     .calendar-header h3 {
@@ -160,9 +175,13 @@
 }
 
 @media (max-width: 768px) {
+    .calendar-wrapper {
+        padding: 5px;
+    }
+
     .calendar-header {
-        padding: 12px;
-        gap: 12px;
+        padding: 10px;
+        gap: 10px;
     }
 
     .calendar-nav-group {
@@ -180,21 +199,41 @@
         order: 3;
         width: 100%;
         justify-content: center;
+        overflow-x: auto;
     }
 
     .calendar-selectors-menu {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
+        display: grid;
+        grid-template-columns: 1fr 1fr auto;
+        width: 100%;
+        gap: 6px;
     }
 
     .calendar-select-menu {
-        flex: 1;
-        min-width: 100px;
+        padding: 8px 10px;
+        font-size: 0.8rem;
+    }
+
+    .calendar-grid-header {
+        font-size: 0.65rem;
+    }
+
+    /* Important: Allow horizontal scroll on mobile for the 7-day grid */
+    .calendar-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .calendar-grid.month-view,
+    .calendar-grid-header.month-view,
+    .calendar-grid.week-view,
+    .calendar-grid-header.week-view {
+        min-width: 600px;
+        /* Forces readability on small screens */
     }
 
     .calendar-day {
-        min-height: 70px;
+        min-height: 80px;
         padding: 4px;
     }
 
@@ -202,26 +241,37 @@
         font-size: 0.8rem;
     }
 
-    .event-label {
+    .calendar-event {
         font-size: 0.65rem;
-        padding: 1px 4px;
+        padding: 2px 4px;
     }
 
     .event-time {
         display: none;
-        /* Hide time on very small screens to save space */
     }
 }
 
 @media (max-width: 480px) {
-    .btn-view-mode {
-        padding: 6px 10px;
-        font-size: 0.75rem;
+    .calendar-selectors-menu {
+        grid-template-columns: 1fr 1fr;
     }
 
-    .calendar-weekday {
-        font-size: 0.65rem;
-        padding: 8px 0;
+    .calendar-date-selector {
+        grid-column: span 2;
+        justify-content: center;
+        display: flex;
+    }
+
+    .btn-view-mode {
+        padding: 6px 8px;
+        font-size: 0.7rem;
+    }
+
+    .calendar-grid.month-view,
+    .calendar-grid-header.month-view,
+    .calendar-grid.week-view,
+    .calendar-grid-header.week-view {
+        min-width: 500px;
     }
 }
 
