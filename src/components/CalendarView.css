@@ -6,9 +6,11 @@
     display: flex;
     gap: 20px;
     align-items: stretch;
-    height: 680px;
-    max-height: 85vh;
+    min-height: 500px;
+    height: auto;
+    max-height: 90vh;
     padding: 0;
+    transition: all 0.3s ease;
 }
 
 /* ---- Main Calendar ---- */
@@ -26,9 +28,10 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px 24px;
+    padding: 12px 20px;
     border-bottom: 1px solid var(--border-color);
-    gap: 20px;
+    gap: 15px;
+    flex-wrap: wrap;
     background: var(--bg-surface);
     border-top-left-radius: 16px;
     border-top-right-radius: 16px;
@@ -131,29 +134,64 @@
 }
 
 /* ---- Responsive ---- */
+@media (max-width: 1200px) {
+    .calendar-detail {
+        width: 260px;
+    }
+}
+
 @media (max-width: 1024px) {
     .calendar-wrapper {
         flex-direction: column;
+        max-height: none;
     }
 
     .calendar-detail {
         width: 100%;
         margin-top: 20px;
+        max-height: 400px;
+    }
+
+    .calendar-header h3 {
+        font-size: 1.25rem;
     }
 }
 
 @media (max-width: 768px) {
     .calendar-header {
-        flex-direction: column;
-        align-items: stretch;
+        padding: 12px;
+        gap: 12px;
+    }
+
+    .calendar-nav-group {
+        order: 2;
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .calendar-title-wrapper {
+        order: 1;
+        width: 100%;
     }
 
     .calendar-view-switcher {
+        order: 3;
+        width: 100%;
         justify-content: center;
     }
 
+    .calendar-selectors-menu {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .calendar-select-menu {
+        flex: 1;
+        min-width: 100px;
+    }
+
     .calendar-day {
-        min-height: 80px;
+        min-height: 70px;
         padding: 4px;
     }
 
@@ -162,7 +200,25 @@
     }
 
     .event-label {
-        font-size: 0.6rem;
+        font-size: 0.65rem;
+        padding: 1px 4px;
+    }
+
+    .event-time {
+        display: none;
+        /* Hide time on very small screens to save space */
+    }
+}
+
+@media (max-width: 480px) {
+    .btn-view-mode {
+        padding: 6px 10px;
+        font-size: 0.75rem;
+    }
+
+    .calendar-weekday {
+        font-size: 0.65rem;
+        padding: 8px 0;
     }
 }
 
