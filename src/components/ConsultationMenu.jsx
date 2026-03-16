@@ -101,12 +101,18 @@ export default function ConsultationMenu() {
             let finalProCourses = proCoursesRes.data || [];
             let finalMaintenances = maintRes.data || [];
 
-            const isFullAuth = ['ADMINISTRADOR', 'COORDINADOR ACADÉMICO', 'COORACAD', 'COORDINADOR TÉCNICO', 'TECNICO'].includes(userRole);
+            const isFullAuth = [
+                'ADMINISTRADOR', 'COORDINADOR ACADÉMICO', 'COORACAD',
+                'COORDINADOR TÉCNICO', 'COORDINADOR', 'ADMIN'
+            ].includes(userRole?.toUpperCase());
 
             if (!isFullAuth && userId) {
                 const uid = parseInt(userId);
 
-                // Filter pro-courses (sessions)
+                // 1. Filter the courses list to only those the user is authorized for
+                finalCourses = finalCourses.filter(c => authorizedIds.has(c.id));
+
+                // 2. Filter pro-courses (sessions)
                 // They are authorized if:
                 // a) The user is the instructor of the session
                 // b) The user is the pseudoPilot of the session
@@ -117,16 +123,11 @@ export default function ConsultationMenu() {
                     (pc.course?.id && authorizedIds.has(pc.course.id))
                 );
 
-                // For the courses list themselves, we already have them in finalCourses
-                // backed by authorizedIds.
-
-                // Filter maintenances for technicians
+                // 3. Filter maintenances (for technicians work)
                 finalMaintenances = finalMaintenances.filter(m => m.technician?.id === uid);
 
-                // Students only see themselves in the users list for reports
-                if (userRole === 'ESTUDIANTE') {
-                    finalUsers = finalUsers.filter(u => u.id === uid);
-                }
+                // 4. Non-admins should only see themselves in the users list to protect privacy
+                finalUsers = finalUsers.filter(u => u.id === uid);
             }
 
             setUsers(finalUsers);

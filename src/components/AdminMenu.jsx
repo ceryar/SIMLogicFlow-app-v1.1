@@ -234,10 +234,25 @@ export default function AdminMenu() {
             'pro-courses': fetchProCourses,
             maintenances: fetchMaintenances,
             'calendar-maint': fetchMaintenances,
+            'calendar-courses': fetchProCourses,
             'maintenance-history': fetchMaintenanceHistory,
             'maintenance-types': fetchMaintenanceTypes,
             roles: fetchRoles,
-            simulators: fetchSimulators
+            simulators: fetchSimulators,
+            'reports-users': () => {
+                fetchUsers();
+                fetchSimulators();
+                fetchCourses();
+                fetchRoles();
+                fetchMaintenanceTypes();
+            },
+            consultations: () => {
+                fetchUsers();
+                fetchSimulators();
+                fetchCourses();
+                fetchProCourses();
+                fetchMaintenances();
+            }
         };
 
         if (fetchMap[activeTab]) {

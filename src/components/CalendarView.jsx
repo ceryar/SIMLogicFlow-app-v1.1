@@ -135,7 +135,12 @@ export default function CalendarView({ events, type }) {
 
     const getEventsForDay = (dateString) => {
         return events.filter(event => {
-            const eventDate = event.fecha || event.fecIni;
+            let eventDate = event.fecha || event.fecIni;
+            if (!eventDate) return false;
+            // If it's a full ISO string, take only the date part
+            if (eventDate.includes('T')) {
+                eventDate = eventDate.split('T')[0];
+            }
             return eventDate === dateString;
         });
     };
