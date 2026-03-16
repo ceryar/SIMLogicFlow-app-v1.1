@@ -11,7 +11,10 @@ export default function CourseModal({ isOpen, onClose, onSuccess, editCourse }) 
         fecFin: '',
         horas: '',
         roomIds: [],
-        simulatorId: ''
+        simulatorId: '',
+        coordinatorId: '',
+        pseudoPilotId: '',
+        instructorId: ''
     });
     const [rooms, setRooms] = useState([]);
     const [simulators, setSimulators] = useState([]);
@@ -53,7 +56,10 @@ export default function CourseModal({ isOpen, onClose, onSuccess, editCourse }) 
                 fecFin: editCourse.fecFin || '',
                 horas: editCourse.horas || '',
                 roomIds: editCourse.rooms ? editCourse.rooms.map(r => r.id) : [],
-                simulatorId: editCourse.simulator ? editCourse.simulator.id : ''
+                simulatorId: editCourse.simulator ? editCourse.simulator.id : '',
+                coordinatorId: editCourse.coordinator ? editCourse.coordinator.id : '',
+                pseudoPilotId: editCourse.pseudoPilot ? editCourse.pseudoPilot.id : '',
+                instructorId: editCourse.instructor ? editCourse.instructor.id : ''
             });
         } else {
             setFormData({
@@ -63,7 +69,10 @@ export default function CourseModal({ isOpen, onClose, onSuccess, editCourse }) 
                 fecFin: '',
                 horas: '',
                 roomIds: [],
-                simulatorId: ''
+                simulatorId: '',
+                coordinatorId: '',
+                pseudoPilotId: '',
+                instructorId: ''
             });
         }
         setError(null);
@@ -198,6 +207,48 @@ export default function CourseModal({ isOpen, onClose, onSuccess, editCourse }) 
                                     placeholder="Objetivos y contenido del curso"
                                     rows="2"
                                 ></textarea>
+                            </div>
+
+                            <div className="form-group">
+                                <label>Coordinador</label>
+                                <select
+                                    value={formData.coordinatorId}
+                                    onChange={(e) => setFormData({ ...formData, coordinatorId: e.target.value })}
+                                >
+                                    <option value="">Sin asignar</option>
+                                    {users.filter(u => {
+                                        const r = u.role?.name?.toUpperCase() || '';
+                                        return r.includes('COORDINADOR') || r === 'COORACAD' || r === 'ADMINISTRADOR';
+                                    }).map(u => (
+                                        <option key={u.id} value={u.id}>{u.firstName} {u.lastname}</option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div className="form-group">
+                                <label>Pseudopiloto</label>
+                                <select
+                                    value={formData.pseudoPilotId}
+                                    onChange={(e) => setFormData({ ...formData, pseudoPilotId: e.target.value })}
+                                >
+                                    <option value="">Sin asignar</option>
+                                    {users.filter(u => (u.role?.name?.toUpperCase() || '').includes('PSEUDO')).map(u => (
+                                        <option key={u.id} value={u.id}>{u.firstName} {u.lastname}</option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div className="form-group">
+                                <label>Instructor</label>
+                                <select
+                                    value={formData.instructorId}
+                                    onChange={(e) => setFormData({ ...formData, instructorId: e.target.value })}
+                                >
+                                    <option value="">Sin asignar</option>
+                                    {users.filter(u => (u.role?.name?.toUpperCase() || '').includes('INSTRUCTOR')).map(u => (
+                                        <option key={u.id} value={u.id}>{u.firstName} {u.lastname}</option>
+                                    ))}
+                                </select>
                             </div>
 
                             <div className="form-group full-width">
