@@ -299,14 +299,39 @@
 /* ---- User List Pagination ---- */
 .uc-pagination-simple {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 16px;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
     margin-top: auto;
     border-top: 1px solid #e2e8f0;
     background: #f8fafc;
     border-bottom-left-radius: 12px;
     border-bottom-right-radius: 12px;
+}
+
+.uc-pagination-actions-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.uc-page-select {
+    width: 100%;
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+    background: white;
+    font-size: 0.75rem;
+    color: #475569;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.uc-page-select:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
 }
 
 .uc-page-info {

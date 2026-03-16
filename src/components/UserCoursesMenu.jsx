@@ -86,7 +86,9 @@ export default function UserCoursesMenu() {
     const [capacityWarning, setCapacityWarning] = useState(null);
     const [courseSearchQuery, setCourseSearchQuery] = useState('');
     const [userCurrentPage, setUserCurrentPage] = useState(1);
-    const [userItemsPerPage, setUserItemsPerPage] = useState(10);
+    const [userItemsPerPage, setUserItemsPerPage] = useState(12);
+    const [courseCurrentPage, setCourseCurrentPage] = useState(1);
+    const [courseItemsPerPage, setCourseItemsPerPage] = useState(5);
 
     const token = localStorage.getItem('token');
     const authHeader = { headers: { Authorization: `Bearer ${token}` } };
@@ -131,6 +133,7 @@ export default function UserCoursesMenu() {
         setSuccessMsg(null);
         setCapacityWarning(null);
         setCourseSearchQuery('');
+        setCourseCurrentPage(1); // Reset course pagination
         fetchUserCourses(user.id);
     };
 
@@ -276,6 +279,12 @@ export default function UserCoursesMenu() {
             });
     }, [courses, userCourses, courseSearchQuery]);
 
+    // Pagination for Assigned Courses
+    const totalCoursePages = Math.ceil(userCourses.length / courseItemsPerPage);
+    const indexOfLastCourse = courseCurrentPage * courseItemsPerPage;
+    const indexOfFirstCourse = indexOfLastCourse - courseItemsPerPage;
+    const currentAssignedCourses = userCourses.slice(indexOfFirstCourse, indexOfLastCourse);
+
     return (
         <div className="uc-layout">
             {/* LEFT PANEL */}
@@ -324,27 +333,41 @@ export default function UserCoursesMenu() {
                         )}
                     </ul>
                 )}
-                {filteredUsers.length > userItemsPerPage && (
+                {filteredUsers.length > 0 && (
                     <div className="uc-pagination-simple">
-                        <button
-                            className="uc-page-btn"
-                            disabled={userCurrentPage === 1}
-                            onClick={(e) => { e.stopPropagation(); setUserCurrentPage(prev => prev - 1); }}
-                            title="Anterior"
+                        <div className="uc-pagination-actions-top">
+                            <button
+                                className="uc-page-btn"
+                                disabled={userCurrentPage === 1}
+                                onClick={(e) => { e.stopPropagation(); setUserCurrentPage(prev => prev - 1); }}
+                                title="Anterior"
+                            >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                            </button>
+                            <span className="uc-page-info">
+                                <strong>{userCurrentPage}</strong> / {totalUserPages || 1}
+                            </span>
+                            <button
+                                className="uc-page-btn"
+                                disabled={userCurrentPage >= totalUserPages}
+                                onClick={(e) => { e.stopPropagation(); setUserCurrentPage(prev => prev + 1); }}
+                                title="Siguiente"
+                            >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                            </button>
+                        </div>
+                        <select
+                            className="uc-page-select"
+                            value={userItemsPerPage}
+                            onChange={(e) => {
+                                setUserItemsPerPage(Number(e.target.value));
+                                setUserCurrentPage(1);
+                            }}
                         >
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                        </button>
-                        <span className="uc-page-info">
-                            Página <strong>{userCurrentPage}</strong> de {totalUserPages}
-                        </span>
-                        <button
-                            className="uc-page-btn"
-                            disabled={userCurrentPage >= totalUserPages}
-                            onClick={(e) => { e.stopPropagation(); setUserCurrentPage(prev => prev + 1); }}
-                            title="Siguiente"
-                        >
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                        </button>
+                            <option value={10}>10</option>
+                            <option value={20}>20</option>
+                            <option value={50}>50</option>
+                        </select>
                     </div>
                 )}
             </div>
@@ -483,48 +506,90 @@ export default function UserCoursesMenu() {
                                     <p>Este usuario no tiene cursos asignados</p>
                                 </div>
                             ) : (
-                                <table className="admin-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Curso</th>
-                                            <th>Simulador</th>
-                                            <th>Salas</th>
-                                            <th>Vigencia</th>
-                                            <th>Horas</th>
-                                            <th className="text-right">Quitar</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {userCourses.map(course => (
-                                            <tr key={course.id}>
-                                                <td data-label="Curso" className="font-medium">{course.name}</td>
-                                                <td data-label="Simulador">{course.simulator?.name || '—'}</td>
-                                                <td data-label="Salas">
-                                                    {course.rooms && Array.from(course.rooms).length > 0
-                                                        ? Array.from(course.rooms).map(r => (
-                                                            <span key={r.id} className="uc-room-chip">{r.name}</span>
-                                                        ))
-                                                        : '—'}
-                                                </td>
-                                                <td data-label="Vigencia">{course.fecInicio} — {course.fecFin}</td>
-                                                <td data-label="Horas">{course.horas}h</td>
-                                                <td data-label="Quitar" className="actions-cell">
-                                                    <button className="btn-icon btn-delete" onClick={() => handleRemoveCourse(course.id, course.name)}>
-                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                                            <polyline points="3 6 5 6 21 6"></polyline>
-                                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                                        </svg>
-                                                    </button>
-                                                </td>
+                                <>
+                                    <table className="admin-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Curso</th>
+                                                <th>Simulador</th>
+                                                <th>Salas</th>
+                                                <th>Vigencia</th>
+                                                <th>Horas</th>
+                                                <th className="text-right">Quitar</th>
                                             </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
+                                        </thead>
+                                        <tbody>
+                                            {currentAssignedCourses.map(course => (
+                                                <tr key={course.id}>
+                                                    <td data-label="Curso" className="font-medium">{course.name}</td>
+                                                    <td data-label="Simulador">{course.simulator?.name || '—'}</td>
+                                                    <td data-label="Salas">
+                                                        {course.rooms && Array.from(course.rooms).length > 0
+                                                            ? Array.from(course.rooms).map(r => (
+                                                                <span key={r.id} className="uc-room-chip">{r.name}</span>
+                                                            ))
+                                                            : '—'}
+                                                    </td>
+                                                    <td data-label="Vigencia">{course.fecInicio} — {course.fecFin}</td>
+                                                    <td data-label="Horas">{course.horas}h</td>
+                                                    <td data-label="Quitar" className="actions-cell">
+                                                        <button className="btn-icon btn-delete" onClick={() => handleRemoveCourse(course.id, course.name)}>
+                                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                                <polyline points="3 6 5 6 21 6"></polyline>
+                                                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                                            </svg>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                    {userCourses.length > 0 && (
+                                        <div className="pagination-container" style={{ marginTop: '15px' }}>
+                                            <div className="pagination-info">
+                                                Mostrando {indexOfFirstCourse + 1} - {Math.min(indexOfLastCourse, userCourses.length)} de {userCourses.length}
+                                            </div>
+                                            <div className="pagination-actions">
+                                                <div className="items-per-page">
+                                                    <label>Mostrar:</label>
+                                                    <select
+                                                        value={courseItemsPerPage}
+                                                        onChange={(e) => {
+                                                            setCourseItemsPerPage(Number(e.target.value));
+                                                            setCourseCurrentPage(1);
+                                                        }}
+                                                    >
+                                                        <option value={5}>5</option>
+                                                        <option value={10}>10</option>
+                                                        <option value={20}>20</option>
+                                                    </select>
+                                                </div>
+                                                <div className="pagination-buttons">
+                                                    <button
+                                                        className="btn-pagination"
+                                                        disabled={courseCurrentPage === 1}
+                                                        onClick={() => setCourseCurrentPage(prev => prev - 1)}
+                                                    >
+                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                                                    </button>
+                                                    <span className="current-page">Página {courseCurrentPage} de {totalCoursePages || 1}</span>
+                                                    <button
+                                                        className="btn-pagination"
+                                                        disabled={courseCurrentPage >= totalCoursePages}
+                                                        onClick={() => setCourseCurrentPage(prev => prev + 1)}
+                                                    >
+                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </>
                             )}
                         </div>
                     </>
                 )}
             </div>
-        </div >
+        </div>
     );
 }
