@@ -116,11 +116,18 @@ export default function CalendarView({ events, type }) {
     };
 
     const getEventLabel = (event) => {
-        if (type === 'course') {
-            const simName = event.course?.simulator?.name || event.simulator?.name || 'SIM';
-            return `SIM: ${simName} | ${event.course?.name || 'Curso'}`;
+        const simName = type === 'course'
+            ? (event.course?.simulator?.name || event.simulator?.name)
+            : event.simulator?.name;
+
+        const secondPart = type === 'course'
+            ? (event.course?.name || 'Curso')
+            : (event.maintenanceType?.name || 'Mantenimiento');
+
+        if (simName) {
+            return `${simName} | ${secondPart}`;
         }
-        return event.simulator?.name || event.maintenanceType?.name || 'Mantenimiento';
+        return secondPart;
     };
 
     const getEventTime = (event) => {
@@ -353,11 +360,11 @@ export default function CalendarView({ events, type }) {
                                             )}
                                             {type === 'course' && (
                                                 <>
-                                                    {ev.course?.name && (
-                                                        <div className="detail-meta">📚 Curso: {ev.course.name}</div>
-                                                    )}
                                                     {(ev.course?.simulator?.name || ev.simulator?.name) && (
                                                         <div className="detail-meta">🎮 Simulador: {ev.course?.simulator?.name || ev.simulator?.name}</div>
+                                                    )}
+                                                    {ev.course?.name && (
+                                                        <div className="detail-meta">📚 Curso: {ev.course.name}</div>
                                                     )}
                                                     {ev.course?.rooms && ev.course.rooms.length > 0 && (
                                                         <div className="detail-meta">🏫 Aula: {ev.course.rooms.map(r => r.name).join(', ')}</div>
@@ -378,9 +385,6 @@ export default function CalendarView({ events, type }) {
                                                     {ev.maintenanceType?.name && (
                                                         <div className="detail-meta">🔧 Mantenimiento: {ev.maintenanceType.name}</div>
                                                     )}
-                                                    {ev.description && (
-                                                        <div className="detail-desc">{ev.description}</div>
-                                                    )}
                                                     {ev.technician && (
                                                         <div className="detail-meta">👤 Técnico: {ev.technician.firstName} {ev.technician.lastname}</div>
                                                     )}
@@ -389,6 +393,9 @@ export default function CalendarView({ events, type }) {
                                                     )}
                                                     {ev.horas && (
                                                         <div className="detail-meta" style={{ color: 'var(--primary-color)', fontWeight: 'bold' }}>⏱️ Duración: {ev.horas}h</div>
+                                                    )}
+                                                    {ev.description && (
+                                                        <div className="detail-desc">📝 {ev.description}</div>
                                                     )}
                                                 </>
                                             )}

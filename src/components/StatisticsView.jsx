@@ -113,8 +113,7 @@ export default function StatisticsView({ users = [], courses = [], proCourses = 
             totalUsers: filteredData.users.length,
             totalCourses: filteredData.courses.length,
             totalMaintenances: filteredData.maintenances.length,
-            activeSimulators: simulators.filter(s => s.active && (!selectedSimulatorId || s.id === parseInt(selectedSimulatorId))).length,
-            roleDistribution
+            activeSimulators: simulators.filter(s => s.active && (!selectedSimulatorId || s.id === parseInt(selectedSimulatorId))).length
         };
     }, [simulators, selectedSimulatorId, filteredData, filterType]);
 
