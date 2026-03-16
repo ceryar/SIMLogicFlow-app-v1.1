@@ -322,31 +322,30 @@ export default function UserCoursesMenu() {
                         {currentUsers.length === 0 && (
                             <li className="uc-empty-list">No se encontraron usuarios</li>
                         )}
-
-                        {filteredUsers.length > userItemsPerPage && (
-                            <div className="uc-pagination-simple">
-                                <button
-                                    className="uc-page-btn"
-                                    disabled={userCurrentPage === 1}
-                                    onClick={(e) => { e.stopPropagation(); setUserCurrentPage(prev => prev - 1); }}
-                                    title="Anterior"
-                                >
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
-                                </button>
-                                <span className="uc-page-info">
-                                    Página <strong>{userCurrentPage}</strong> de {totalUserPages}
-                                </span>
-                                <button
-                                    className="uc-page-btn"
-                                    disabled={userCurrentPage >= totalUserPages}
-                                    onClick={(e) => { e.stopPropagation(); setUserCurrentPage(prev => prev + 1); }}
-                                    title="Siguiente"
-                                >
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                                </button>
-                            </div>
-                        )}
                     </ul>
+                )}
+                {filteredUsers.length > userItemsPerPage && (
+                    <div className="uc-pagination-simple">
+                        <button
+                            className="uc-page-btn"
+                            disabled={userCurrentPage === 1}
+                            onClick={(e) => { e.stopPropagation(); setUserCurrentPage(prev => prev - 1); }}
+                            title="Anterior"
+                        >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                        </button>
+                        <span className="uc-page-info">
+                            Página <strong>{userCurrentPage}</strong> de {totalUserPages}
+                        </span>
+                        <button
+                            className="uc-page-btn"
+                            disabled={userCurrentPage >= totalUserPages}
+                            onClick={(e) => { e.stopPropagation(); setUserCurrentPage(prev => prev + 1); }}
+                            title="Siguiente"
+                        >
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </button>
+                    </div>
                 )}
             </div>
 
@@ -526,6 +525,6 @@ export default function UserCoursesMenu() {
                     </>
                 )}
             </div>
-        </div>
+        </div >
     );
 }
