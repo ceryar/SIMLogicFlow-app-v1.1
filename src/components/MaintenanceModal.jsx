@@ -168,10 +168,18 @@ export default function MaintenanceModal({ isOpen, onClose, onSuccess, editMaint
         setFormData(next);
     };
 
+    const today = new Date().toISOString().split('T')[0];
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError(null);
+
+        if (!editMaintenance && formData.fecIni && formData.fecIni < today) {
+            setError('No se puede programar mantenimiento en fechas pasadas.');
+            setLoading(false);
+            return;
+        }
 
         if (formData.fecFin && formData.fecIni && formData.fecFin < formData.fecIni) {
             setError('La fecha de fin no puede ser anterior a la fecha de inicio.');
@@ -283,6 +291,7 @@ export default function MaintenanceModal({ isOpen, onClose, onSuccess, editMaint
                                 value={formData.fecIni}
                                 onChange={(e) => setFormData({ ...formData, fecIni: e.target.value })}
                                 placeholder="Seleccionar fecha inicio"
+                                minDate={editMaintenance ? null : today}
                             />
                         </div>
 
@@ -294,6 +303,7 @@ export default function MaintenanceModal({ isOpen, onClose, onSuccess, editMaint
                                 value={formData.fecFin}
                                 onChange={(e) => setFormData({ ...formData, fecFin: e.target.value })}
                                 placeholder="Seleccionar fecha fin"
+                                minDate={formData.fecIni || today}
                             />
                         </div>
 
