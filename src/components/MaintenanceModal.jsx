@@ -355,9 +355,11 @@ export default function MaintenanceModal({ isOpen, onClose, onSuccess, editMaint
                         <button type="button" className="btn-secondary" onClick={onClose} disabled={loading || fetchingData}>
                             Cancelar
                         </button>
-                        <button type="submit" className="btn-primary" disabled={loading || fetchingData || !isOnline}>
-                            {loading ? 'Guardando...' : (isOnline ? (editMaintenance ? 'Actualizar' : 'Crear Mantenimiento') : 'Modo Lectura')}
-                        </button>
+                        {isOnline && (
+                            <button type="submit" className="btn-primary" disabled={loading || fetchingData}>
+                                {loading ? 'Guardando...' : (editMaintenance ? 'Actualizar' : 'Crear Mantenimiento')}
+                            </button>
+                        )}
                     </div>
                 </form>
             </div>

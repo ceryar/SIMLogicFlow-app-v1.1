@@ -134,9 +134,11 @@ export default function RoomModal({ isOpen, onClose, onSuccess, editRoom, isOnli
                         <button type="button" className="btn-secondary" onClick={onClose} disabled={loading}>
                             Cancelar
                         </button>
-                        <button type="submit" className="btn-primary" disabled={loading || !isOnline}>
-                            {loading ? 'Guardando...' : (isOnline ? (editRoom ? 'Actualizar Aula' : 'Crear Aula') : 'Modo Lectura')}
-                        </button>
+                        {isOnline && (
+                            <button type="submit" className="btn-primary" disabled={loading}>
+                                {loading ? 'Guardando...' : (editRoom ? 'Actualizar Aula' : 'Crear Aula')}
+                            </button>
+                        )}
                     </div>
                 </form>
             </div>

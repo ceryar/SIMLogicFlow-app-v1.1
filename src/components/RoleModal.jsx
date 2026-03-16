@@ -99,9 +99,11 @@ export default function RoleModal({ isOpen, onClose, onSuccess, editRole, isOnli
                         <button type="button" className="btn-secondary" onClick={onClose} disabled={loading}>
                             Cancelar
                         </button>
-                        <button type="submit" className="btn-primary" disabled={loading || !isOnline}>
-                            {loading ? 'Guardando...' : (isOnline ? (editRole ? 'Actualizar Rol' : 'Crear Rol') : 'Modo Lectura')}
-                        </button>
+                        {isOnline && (
+                            <button type="submit" className="btn-primary" disabled={loading}>
+                                {loading ? 'Guardando...' : (editRole ? 'Actualizar Rol' : 'Crear Rol')}
+                            </button>
+                        )}
                     </div>
                 </form>
             </div>

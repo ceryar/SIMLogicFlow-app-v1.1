@@ -110,9 +110,11 @@ export default function SimulatorModal({ isOpen, onClose, onSuccess, editSimulat
                         <button type="button" className="btn-secondary" onClick={onClose} disabled={loading}>
                             Cancelar
                         </button>
-                        <button type="submit" className="btn-primary" disabled={loading || !isOnline}>
-                            {loading ? 'Guardando...' : (isOnline ? (editSimulator ? 'Actualizar Simulador' : 'Crear Simulador') : 'Modo Lectura')}
-                        </button>
+                        {isOnline && (
+                            <button type="submit" className="btn-primary" disabled={loading}>
+                                {loading ? 'Guardando...' : (editSimulator ? 'Actualizar Simulador' : 'Crear Simulador')}
+                            </button>
+                        )}
                     </div>
                 </form>
             </div>

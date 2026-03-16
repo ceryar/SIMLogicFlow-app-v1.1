@@ -278,9 +278,11 @@ export default function UserModal({ isOpen, onClose, onSuccess, editUser = null,
                         <button type="button" className="btn-secondary" onClick={onClose} disabled={loading}>
                             Cancel
                         </button>
-                        <button type="submit" className={`btn-primary ${loading ? 'loading' : ''}`} disabled={loading || !isOnline}>
-                            {loading ? (editUser ? 'Saving...' : 'Creating...') : (editUser ? (isOnline ? 'Save Changes' : 'Modo Lectura') : (isOnline ? 'Create User' : 'Modo Lectura'))}
-                        </button>
+                        {isOnline && (
+                            <button type="submit" className={`btn-primary ${loading ? 'loading' : ''}`} disabled={loading}>
+                                {loading ? (editUser ? 'Saving...' : 'Creating...') : (editUser ? 'Save Changes' : 'Create User')}
+                            </button>
+                        )}
                     </div>
                 </form>
             </div>

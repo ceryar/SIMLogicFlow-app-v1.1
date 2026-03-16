@@ -138,9 +138,11 @@ export default function MaintenanceHistoryModal({ isOpen, onClose, onSuccess, ed
                         <button type="button" className="btn-secondary" onClick={onClose} disabled={loading || fetchingMaintenances}>
                             Cancelar
                         </button>
-                        <button type="submit" className="btn-primary" disabled={loading || fetchingMaintenances || !isOnline}>
-                            {loading ? 'Guardando...' : (isOnline ? (editHistory ? 'Actualizar Registro' : 'Crear Registro') : 'Modo Lectura')}
-                        </button>
+                        {isOnline && (
+                            <button type="submit" className="btn-primary" disabled={loading || fetchingMaintenances}>
+                                {loading ? 'Guardando...' : (editHistory ? 'Actualizar Registro' : 'Crear Registro')}
+                            </button>
+                        )}
                     </div>
                 </form>
             </div>

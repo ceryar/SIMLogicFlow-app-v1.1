@@ -68,9 +68,11 @@ export default function ChangePasswordModal({ userId, onPasswordChanged, isOnlin
                             required
                         />
                     </div>
-                    <button type="submit" className="save-btn" disabled={loading || !isOnline}>
-                        {loading ? 'Cambiando...' : (isOnline ? 'Actualizar Contraseña' : 'Modo Lectura')}
-                    </button>
+                    {isOnline && (
+                        <button type="submit" className="save-btn" disabled={loading}>
+                            {loading ? 'Cambiando...' : 'Actualizar Contraseña'}
+                        </button>
+                    )}
                 </form>
             </div>
         </div>
