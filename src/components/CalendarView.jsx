@@ -107,7 +107,7 @@ export default function CalendarView({ events, type }) {
 
         let id = 0;
         if (type === 'course') {
-            id = event.course?.id || 0;
+            id = event.course?.simulator?.id || event.simulator?.id || 0;
         } else {
             id = event.simulator?.id || 0;
         }
@@ -117,7 +117,8 @@ export default function CalendarView({ events, type }) {
 
     const getEventLabel = (event) => {
         if (type === 'course') {
-            return event.course?.name || 'Curso';
+            const simName = event.course?.simulator?.name || event.simulator?.name || 'SIM';
+            return `SIM: ${simName} | ${event.course?.name || 'Curso'}`;
         }
         return event.simulator?.name || event.maintenanceType?.name || 'Mantenimiento';
     };
@@ -350,13 +351,18 @@ export default function CalendarView({ events, type }) {
                                                     {timeStr}
                                                 </div>
                                             )}
-                                            {type === 'course' && ev.course?.name && (
+                                            {type === 'course' && (
                                                 <>
-                                                    <div className="detail-meta">📚 {ev.course.name}</div>
-                                                    {ev.course.rooms && ev.course.rooms.length > 0 && (
+                                                    {ev.course?.name && (
+                                                        <div className="detail-meta">📚 Curso: {ev.course.name}</div>
+                                                    )}
+                                                    {(ev.course?.simulator?.name || ev.simulator?.name) && (
+                                                        <div className="detail-meta">🎮 Simulador: {ev.course?.simulator?.name || ev.simulator?.name}</div>
+                                                    )}
+                                                    {ev.course?.rooms && ev.course.rooms.length > 0 && (
                                                         <div className="detail-meta">🏫 Aula: {ev.course.rooms.map(r => r.name).join(', ')}</div>
                                                     )}
-                                                    {ev.course.users && ev.course.users.filter(u => u.role?.name === 'COORACAD' || u.role?.name === 'ADMINISTRADOR' || u.role?.name === 'COORDINADOR ACADÉMICO').length > 0 && (
+                                                    {ev.course?.users && ev.course.users.filter(u => u.role?.name === 'COORACAD' || u.role?.name === 'ADMINISTRADOR' || u.role?.name === 'COORDINADOR ACADÉMICO').length > 0 && (
                                                         <div className="detail-meta">👤 Coords: {ev.course.users
                                                             .filter(u => u.role?.name === 'COORACAD' || u.role?.name === 'ADMINISTRADOR' || u.role?.name === 'COORDINADOR ACADÉMICO')
                                                             .map(u => `${u.firstName} ${u.lastname}`).join(', ')}
@@ -366,8 +372,11 @@ export default function CalendarView({ events, type }) {
                                             )}
                                             {type === 'maint' && (
                                                 <>
+                                                    {ev.simulator?.name && (
+                                                        <div className="detail-meta">🎮 Simulador: {ev.simulator.name}</div>
+                                                    )}
                                                     {ev.maintenanceType?.name && (
-                                                        <div className="detail-meta">🔧 {ev.maintenanceType.name}</div>
+                                                        <div className="detail-meta">🔧 Mantenimiento: {ev.maintenanceType.name}</div>
                                                     )}
                                                     {ev.description && (
                                                         <div className="detail-desc">{ev.description}</div>
