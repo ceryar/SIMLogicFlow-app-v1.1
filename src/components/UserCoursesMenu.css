@@ -15,11 +15,12 @@
     min-width: 280px;
     display: flex;
     flex-direction: column;
-    background: var(--card-bg, #1e293b);
-    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
     border-radius: 12px;
     overflow: hidden;
     flex-shrink: 0;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
 }
 
 .uc-panel-header {
@@ -40,8 +41,8 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    background: rgba(0, 0, 0, 0.2);
-    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
     border-radius: 8px;
     padding: 8px 12px;
 }
@@ -120,8 +121,8 @@
 
 .uc-user-name {
     font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--text-primary, #f1f5f9);
+    font-weight: 700;
+    color: #1e293b;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -129,7 +130,7 @@
 
 .uc-user-email {
     font-size: 0.75rem;
-    color: var(--text-secondary, #64748b);
+    color: #64748b;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -196,10 +197,11 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    background: var(--card-bg, #1e293b);
-    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
     border-radius: 12px;
     overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
 }
 
 .uc-placeholder {
@@ -226,8 +228,8 @@
 
 .uc-course-header {
     padding: 20px 24px;
-    border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
-    background: rgba(99, 102, 241, 0.05);
+    border-bottom: 1px solid #f1f5f9;
+    background: rgba(99, 102, 241, 0.03);
 }
 
 .uc-selected-user-info {
@@ -239,7 +241,7 @@
 .uc-selected-user-info h3 {
     font-size: 1.125rem;
     font-weight: 700;
-    color: var(--text-primary, #f1f5f9);
+    color: #1e293b;
     margin: 0 0 4px 0;
 }
 
@@ -265,24 +267,25 @@
 
 .uc-form-row select {
     flex: 1;
-    background: rgba(0, 0, 0, 0.2);
-    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.12));
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
     border-radius: 8px;
     padding: 10px 14px;
-    color: var(--text-primary, #f1f5f9);
+    color: #1e293b;
     font-size: 0.875rem;
     outline: none;
     cursor: pointer;
-    transition: border-color 0.2s;
+    transition: all 0.2s;
 }
 
 .uc-form-row select option {
-    background: #1e293b;
-    color: #f1f5f9;
+    background: #ffffff;
+    color: #1e293b;
 }
 
 .uc-form-row select:focus {
     border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
 .uc-form-row .btn-primary {
@@ -300,8 +303,8 @@
     align-items: center;
     padding: 12px 8px;
     margin-top: 8px;
-    border-top: 1px solid var(--border-color, rgba(255, 255, 255, 0.08));
-    background: rgba(0, 0, 0, 0.1);
+    border-top: 1px solid #f1f5f9;
+    background: #ffffff;
     position: sticky;
     bottom: -8px;
     /* Offset the padding of the list */
@@ -315,13 +318,13 @@
 }
 
 .uc-page-info strong {
-    color: var(--text-primary, #f1f5f9);
+    color: #1e293b;
 }
 
 .uc-page-btn {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
-    color: var(--text-primary, #f1f5f9);
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    color: #1e293b;
     width: 28px;
     height: 28px;
     display: flex;
