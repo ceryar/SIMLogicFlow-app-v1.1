@@ -152,25 +152,13 @@ export default function ConsultationMenu() {
     // Memoized filtered data to prevent unnecessary calculations and flickering
     const filteredStudents = useMemo(() => {
         if (!selectedCourseId) return [];
-        const course = courses.find(c => String(c.id) === String(selectedCourseId));
-        if (!course) return [];
 
-        let courseRelatedUsers = [];
-        if (course.users) courseRelatedUsers = [...course.users];
-        if (course.coordinator) courseRelatedUsers.push(course.coordinator);
-        if (course.instructor) courseRelatedUsers.push(course.instructor);
-        if (course.pseudoPilot) courseRelatedUsers.push(course.pseudoPilot);
-
-        let uniqueUsers = courseRelatedUsers.reduce((acc, current) => {
-            if (!current) return acc;
-            const x = acc.find(item => item.id === current.id);
-            if (!x) return acc.concat([current]);
-            else return acc;
-        }, []);
-
-        let filtered = uniqueUsers.filter(u =>
-            u.role?.name?.toUpperCase().includes('ESTUDIANTE')
-        );
+        // Robust filtering: Check global users list and their assigned courses
+        let filtered = users.filter(u => {
+            const hasCourse = u.courses?.some(c => String(c.id) === String(selectedCourseId));
+            const isStudent = u.role?.name?.toUpperCase().includes('ESTUDIANTE');
+            return hasCourse && isStudent;
+        });
 
         if (searchTerm) {
             const q = searchTerm.toLowerCase();
@@ -181,29 +169,17 @@ export default function ConsultationMenu() {
             );
         }
         return filtered;
-    }, [selectedCourseId, courses, searchTerm]);
+    }, [selectedCourseId, users, searchTerm]);
 
     const filteredPseudos = useMemo(() => {
         if (!selectedCourseId) return [];
-        const course = courses.find(c => String(c.id) === String(selectedCourseId));
-        if (!course) return [];
 
-        let courseRelatedUsers = [];
-        if (course.users) courseRelatedUsers = [...course.users];
-        if (course.coordinator) courseRelatedUsers.push(course.coordinator);
-        if (course.instructor) courseRelatedUsers.push(course.instructor);
-        if (course.pseudoPilot) courseRelatedUsers.push(course.pseudoPilot);
-
-        let uniqueUsers = courseRelatedUsers.reduce((acc, current) => {
-            if (!current) return acc;
-            const x = acc.find(item => item.id === current.id);
-            if (!x) return acc.concat([current]);
-            else return acc;
-        }, []);
-
-        let filtered = uniqueUsers.filter(u =>
-            u.role?.name?.toUpperCase().includes('PSEUDO')
-        );
+        // Robust filtering: Check global users list for Pseudo pilots
+        let filtered = users.filter(u => {
+            const hasCourse = u.courses?.some(c => String(c.id) === String(selectedCourseId));
+            const isPseudo = u.role?.name?.toUpperCase().includes('PSEUDO');
+            return hasCourse && isPseudo;
+        });
 
         if (searchTerm) {
             const q = searchTerm.toLowerCase();
@@ -214,7 +190,7 @@ export default function ConsultationMenu() {
             );
         }
         return filtered;
-    }, [selectedCourseId, courses, searchTerm]);
+    }, [selectedCourseId, users, searchTerm]);
 
     const filteredRolesCourses = useMemo(() => {
         return courses.filter(c => {
@@ -245,21 +221,23 @@ export default function ConsultationMenu() {
         if (totalPages <= 1) return null;
 
         return (
-            <div className="pagination-container" style={{ padding: '15px', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div className="pagination-info" style={{ color: '#64748b', fontSize: '14px' }}>
+            <div className="pagination-container" style={{ padding: '15px', borderTop: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div className="pagination-info" style={{ color: 'var(--text-muted)', fontSize: '14px' }}>
                     Mostrando <strong>{((currentPage - 1) * itemsPerPage) + 1}</strong> - <strong>{Math.min(currentPage * itemsPerPage, totalItems)}</strong> de {totalItems}
                 </div>
                 <div className="pagination-buttons" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                     <button
                         className="btn-pagination"
+                        style={{ background: 'var(--bg-input)', color: 'var(--text-main)', border: '1px solid var(--border-color)' }}
                         disabled={currentPage === 1}
                         onClick={() => setCurrentPage(p => p - 1)}
                     >
                         Anterior
                     </button>
-                    <span className="current-page" style={{ fontSize: '14px', fontWeight: '600' }}>{currentPage} / {totalPages}</span>
+                    <span className="current-page" style={{ fontSize: '14px', fontWeight: '700', color: 'var(--text-main)' }}>{currentPage} / {totalPages}</span>
                     <button
                         className="btn-pagination"
+                        style={{ background: 'var(--bg-input)', color: 'var(--text-main)', border: '1px solid var(--border-color)' }}
                         disabled={currentPage === totalPages}
                         onClick={() => setCurrentPage(p => p + 1)}
                     >
@@ -271,14 +249,14 @@ export default function ConsultationMenu() {
     };
 
     const renderSearchBar = (placeholder) => (
-        <div className="search-container" style={{ padding: '15px', borderBottom: '1px solid #e2e8f0', display: 'flex', gap: '15px' }}>
+        <div className="search-container" style={{ padding: '15px', borderBottom: '1px solid var(--border-color)', display: 'flex', gap: '15px', background: 'var(--bg-surface)' }}>
             <div style={{ flex: 1, position: 'relative' }}>
                 <input
                     type="text"
                     placeholder={placeholder || "Buscar..."}
                     value={searchTerm}
                     onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-                    style={{ width: '100%', padding: '10px 40px 10px 12px', borderRadius: '8px', border: '1px solid #e2e8f0', outline: 'none' }}
+                    style={{ width: '100%', padding: '10px 40px 10px 12px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-input)', color: 'var(--text-main)', outline: 'none' }}
                 />
             </div>
         </div>
@@ -289,12 +267,12 @@ export default function ConsultationMenu() {
 
         return (
             <div className="table-card">
-                <div style={{ padding: '15px', borderBottom: '1px solid #e2e8f0', background: '#f8fafc' }}>
+                <div style={{ padding: '15px', borderBottom: '1px solid var(--border-color)', background: 'var(--bg-surface)' }}>
                     <select
                         value={selectedCourseId}
                         onChange={(e) => { setSelectedCourseId(e.target.value); setCurrentPage(1); setSearchTerm(''); }}
                         className="modal-select"
-                        style={{ width: '100%', maxWidth: '400px', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}
+                        style={{ width: '100%', maxWidth: '400px', padding: '10px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-input)', color: 'var(--text-main)' }}
                     >
                         <option value="">Seleccione un curso para ver estudiantes...</option>
                         {courses.map(c => (
@@ -345,12 +323,12 @@ export default function ConsultationMenu() {
 
         return (
             <div className="table-card">
-                <div style={{ padding: '15px', borderBottom: '1px solid #e2e8f0', background: '#f8fafc' }}>
+                <div style={{ padding: '15px', borderBottom: '1px solid var(--border-color)', background: 'var(--bg-surface)' }}>
                     <select
                         value={selectedCourseId}
                         onChange={(e) => { setSelectedCourseId(e.target.value); setCurrentPage(1); setSearchTerm(''); }}
                         className="modal-select"
-                        style={{ width: '100%', maxWidth: '400px', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}
+                        style={{ width: '100%', maxWidth: '400px', padding: '10px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-input)', color: 'var(--text-main)' }}
                     >
                         <option value="">Seleccione un curso para ver pseudopilotos...</option>
                         {courses.map(c => (
@@ -395,14 +373,14 @@ export default function ConsultationMenu() {
 
         return (
             <div className="table-card">
-                <div className="search-container" style={{ padding: '15px', borderBottom: '1px solid #e2e8f0', display: 'flex', gap: '15px', background: '#f8fafc' }}>
+                <div className="search-container" style={{ padding: '15px', borderBottom: '1px solid var(--border-color)', display: 'flex', gap: '15px', background: 'var(--bg-surface)' }}>
                     <div style={{ flex: 1 }}>
                         <input
                             type="text"
                             placeholder="Filtrar cursos..."
                             value={searchTerm}
                             onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-                            style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}
+                            style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-input)', color: 'var(--text-main)' }}
                         />
                     </div>
                 </div>
@@ -443,7 +421,7 @@ export default function ConsultationMenu() {
                                             const pseudo = c.pseudoPilot || (c.users || []).find(u => (u.role?.name || '').toUpperCase().includes('PSEUDO'));
                                             return pseudo ? `${pseudo.firstName} ${pseudo.lastname}` : '—';
                                         })()}</td>
-                                        <td><span className="status-badge" style={{ background: '#eff6ff', color: '#1e40af' }}>{students.length}</span></td>
+                                        <td><span className="status-badge" style={{ background: 'var(--primary-color)', opacity: 0.8, color: '#fff' }}>{students.length}</span></td>
                                     </tr>
                                 );
                             })
@@ -495,9 +473,9 @@ export default function ConsultationMenu() {
                             background: 'none',
                             whiteSpace: 'nowrap',
                             cursor: 'pointer',
-                            borderBottom: activeSubTab === tab.id ? '3px solid #3b82f6' : '3px solid transparent',
-                            color: activeSubTab === tab.id ? '#3b82f6' : '#64748b',
-                            fontWeight: activeSubTab === tab.id ? '600' : '300' // Using thin weight for consistency
+                            borderBottom: activeSubTab === tab.id ? '3px solid var(--primary-color)' : '3px solid transparent',
+                            color: activeSubTab === tab.id ? 'var(--primary-color)' : 'var(--text-muted)',
+                            fontWeight: activeSubTab === tab.id ? '700' : '400'
                         }}
                     >
                         {tab.label}
@@ -508,7 +486,7 @@ export default function ConsultationMenu() {
             {loading ? (
                 <div style={{ textAlign: 'center', padding: '50px' }}>
                     <div className="loading-spinner" style={{ margin: '0 auto' }}></div>
-                    <p style={{ marginTop: '10px', color: '#64748b' }}>Sincronizando datos...</p>
+                    <p style={{ marginTop: '10px', color: 'var(--text-muted)' }}>Sincronizando datos...</p>
                 </div>
             ) : error ? (
                 <div className="error-alert">{error}</div>
@@ -519,12 +497,12 @@ export default function ConsultationMenu() {
                     {activeSubTab === 'all-roles' && renderAllRolesIntervening()}
                     {activeSubTab === 'simulators-status' && (
                         <div className="table-card">
-                            <div className="search-container" style={{ padding: '15px', borderBottom: '1px solid #e2e8f0', background: '#f8fafc' }}>
+                            <div className="search-container" style={{ padding: '15px', borderBottom: '1px solid var(--border-color)', background: 'var(--bg-surface)' }}>
                                 <select
                                     value={selectedSimulatorId}
                                     onChange={(e) => setSelectedSimulatorId(e.target.value)}
                                     className="modal-select"
-                                    style={{ width: '100%', maxWidth: '400px', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}
+                                    style={{ width: '100%', maxWidth: '400px', padding: '10px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-input)', color: 'var(--text-main)' }}
                                 >
                                     <option value="">Todos los simuladores...</option>
                                     {simulators.map(s => (

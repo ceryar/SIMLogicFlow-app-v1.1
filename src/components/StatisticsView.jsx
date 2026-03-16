@@ -113,7 +113,8 @@ export default function StatisticsView({ users = [], courses = [], proCourses = 
             totalUsers: filteredData.users.length,
             totalCourses: filteredData.courses.length,
             totalMaintenances: filteredData.maintenances.length,
-            activeSimulators: simulators.filter(s => s.active && (!selectedSimulatorId || s.id === parseInt(selectedSimulatorId))).length
+            activeSimulators: simulators.filter(s => s.active && (!selectedSimulatorId || s.id === parseInt(selectedSimulatorId))).length,
+            roleDistribution
         };
     }, [simulators, selectedSimulatorId, filteredData, filterType]);
 
@@ -425,6 +426,29 @@ export default function StatisticsView({ users = [], courses = [], proCourses = 
                                 );
                             })}
                         </div>
+                    </div>
+                </div>
+
+                {/* User Role Distribution */}
+                <div style={{ padding: '24px', background: 'var(--bg-surface)', borderRadius: '16px', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-md)' }}>
+                    <h3 style={{ marginBottom: '20px', fontSize: '18px', fontWeight: '800', color: 'var(--text-main)', letterSpacing: '-0.025em' }}>Distribución de Usuarios por Rol</h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        {Object.entries(stats.roleDistribution).map(([role, count], i) => {
+                            const total = stats.totalUsers || 1;
+                            const colors = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+                            return (
+                                <div key={role} style={{ background: 'var(--bg-body)', padding: '12px 16px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                        <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: colors[i % colors.length] }}></div>
+                                        <span style={{ fontWeight: '700', fontSize: '14px', color: 'var(--text-main)' }}>{role}</span>
+                                    </div>
+                                    <div style={{ textAlign: 'right' }}>
+                                        <div style={{ fontWeight: '800', fontSize: '16px', color: 'var(--text-main)' }}>{count}</div>
+                                        <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{Math.round((count / total) * 100)}% del total</div>
+                                    </div>
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
 
