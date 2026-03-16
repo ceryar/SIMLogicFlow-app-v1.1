@@ -107,7 +107,8 @@
     transform: rotate(180deg);
 }
 
-.admin-content {
+.admin-content,
+.admin-main {
     flex: 1;
     padding: 2.5rem;
     width: 100%;
@@ -335,7 +336,8 @@
         padding: 0.5rem 0.85rem;
     }
 
-    .admin-content {
+    .admin-content,
+    .admin-main {
         padding: 1rem;
     }
 

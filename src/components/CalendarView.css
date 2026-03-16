@@ -22,6 +22,8 @@
     min-width: 0;
     position: relative;
     box-shadow: var(--shadow-sm);
+    overflow-x: auto;
+    /* Allow horizontal scroll if grid is too squeezed */
 }
 
 .calendar-header {
@@ -181,6 +183,7 @@
     }
 
     .calendar-selectors-menu {
+        display: flex;
         flex-wrap: wrap;
         gap: 8px;
     }
@@ -351,7 +354,6 @@
     font-size: 0.7rem;
     font-weight: 700;
     white-space: nowrap;
-    overflow: hidden;
     text-overflow: ellipsis;
     border-left: 3px solid;
     cursor: pointer;
