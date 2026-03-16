@@ -210,6 +210,19 @@
     box-sizing: border-box;
 }
 
+.search-container {
+    background-color: #ffffff !important;
+}
+
+.search-container input {
+    background-color: #ffffff !important;
+    color: #1e293b !important;
+}
+
+.search-container input::placeholder {
+    color: #94a3b8 !important;
+}
+
 @media (prefers-color-scheme: dark) {
     .table-card {
         background: white;

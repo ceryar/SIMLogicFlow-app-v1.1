@@ -56,7 +56,7 @@
     background: transparent;
     border: none;
     outline: none;
-    color: var(--text-primary, #f1f5f9);
+    color: #1e293b;
     font-size: 0.875rem;
     width: 100%;
 }
