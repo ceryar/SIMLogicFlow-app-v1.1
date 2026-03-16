@@ -107,7 +107,8 @@ export default function CalendarView({ events, type }) {
 
         let id = 0;
         if (type === 'course') {
-            id = event.course?.simulator?.id || event.simulator?.id || 0;
+            // Priority: Session level simulator -> Course level simulator -> Course ID (fallback)
+            id = event.simulator?.id || event.course?.simulator?.id || event.course?.id || 0;
         } else {
             id = event.simulator?.id || 0;
         }
@@ -116,18 +117,20 @@ export default function CalendarView({ events, type }) {
     };
 
     const getEventLabel = (event) => {
-        const simName = type === 'course'
-            ? (event.course?.simulator?.name || event.simulator?.name)
-            : event.simulator?.name;
+        // Support different property paths for course/maint
+        const simName = event.simulator?.name || event.course?.simulator?.name || '';
 
-        const secondPart = type === 'course'
-            ? (event.course?.name || 'Curso')
-            : (event.maintenanceType?.name || 'Mantenimiento');
+        let eventName = '';
+        if (type === 'course') {
+            eventName = event.course?.name || 'Curso';
+        } else {
+            eventName = event.maintenanceType?.name || 'Mantenimiento';
+        }
 
         if (simName) {
-            return `${simName} | ${secondPart}`;
+            return `${simName} | ${eventName}`;
         }
-        return secondPart;
+        return eventName;
     };
 
     const getEventTime = (event) => {
@@ -369,8 +372,14 @@ export default function CalendarView({ events, type }) {
                                                     {ev.course?.rooms && ev.course.rooms.length > 0 && (
                                                         <div className="detail-meta">🏫 Aula: {ev.course.rooms.map(r => r.name).join(', ')}</div>
                                                     )}
+                                                    {ev.instructor && (
+                                                        <div className="detail-meta">👤 Instructor: {ev.instructor.firstName} {ev.instructor.lastname}</div>
+                                                    )}
+                                                    {ev.pseudoPilot && (
+                                                        <div className="detail-meta">👤 Pseudopiloto: {ev.pseudoPilot.firstName} {ev.pseudoPilot.lastname}</div>
+                                                    )}
                                                     {ev.course?.users && ev.course.users.filter(u => u.role?.name === 'COORACAD' || u.role?.name === 'ADMINISTRADOR' || u.role?.name === 'COORDINADOR ACADÉMICO').length > 0 && (
-                                                        <div className="detail-meta">👤 Coords: {ev.course.users
+                                                        <div className="detail-meta">📁 Gestión: {ev.course.users
                                                             .filter(u => u.role?.name === 'COORACAD' || u.role?.name === 'ADMINISTRADOR' || u.role?.name === 'COORDINADOR ACADÉMICO')
                                                             .map(u => `${u.firstName} ${u.lastname}`).join(', ')}
                                                         </div>
