@@ -324,9 +324,10 @@ export default function TecnicoMenu({ isOnline }) {
                                     )}
                                     {!isOnline && <span className="read-only-badge">Sólo lectura</span>}
                                 </td>
-                                ))
+                            </tr>
+                        ))
                     )}
-                            </tbody>
+                </tbody>
             </table>
 
             {/* Pagination Controls */}
@@ -457,9 +458,10 @@ export default function TecnicoMenu({ isOnline }) {
                                     )}
                                     {!isOnline && <span className="read-only-badge">Sólo lectura</span>}
                                 </td>
-                                ))
+                            </tr>
+                        ))
                     )}
-                            </tbody>
+                </tbody>
             </table>
 
             {/* Pagination Controls */}

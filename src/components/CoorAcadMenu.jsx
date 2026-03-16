@@ -335,7 +335,8 @@ export default function CoorAcadMenu({ isOnline }) {
                                     {!isOnline && <span className="read-only-badge">Sólo lectura</span>}
                                 </td>
                             </tr>
-                        ))}
+                        ))
+                    )}
                 </tbody>
             </table>
         </div>
@@ -497,7 +498,8 @@ export default function CoorAcadMenu({ isOnline }) {
                                     {!isOnline && <span className="read-only-badge">Sólo lectura</span>}
                                 </td>
                             </tr>
-                        ))}
+                        ))
+                    )}
                 </tbody>
             </table>
 
