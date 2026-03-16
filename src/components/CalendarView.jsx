@@ -117,14 +117,24 @@ export default function CalendarView({ events, type }) {
     };
 
     const getEventsForDay = (dateString) => {
-        return events.filter(event => {
-            let eventDate = event.fecha || event.fecIni;
-            if (!eventDate) return false;
-            // If it's a full ISO string, take only the date part
-            if (eventDate.includes('T')) {
-                eventDate = eventDate.split('T')[0];
-            }
-            return eventDate === dateString;
+        const filtered = events.filter(event => {
+            const start = event.fecha || event.fecIni;
+            const end = event.fecFin || event.fecha; // Maintenance has ranges, courses are single-day
+
+            if (!start) return false;
+
+            const target = dateString;
+            const startDate = start.includes('T') ? start.split('T')[0] : start;
+            const endDate = end.includes('T') ? end.split('T')[0] : end;
+
+            return target >= startDate && target <= endDate;
+        });
+
+        // Chronological sort by start time
+        return filtered.sort((a, b) => {
+            const timeA = a.horaini || a.horaIni || '00:00';
+            const timeB = b.horaini || b.horaIni || '00:00';
+            return timeA.localeCompare(timeB);
         });
     };
 
