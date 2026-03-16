@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import './UserModal.css'; // Reusing established modal styles
 
-export default function RoomModal({ isOpen, onClose, onSuccess, editRoom }) {
+export default function RoomModal({ isOpen, onClose, onSuccess, editRoom, isOnline = true }) {
     const [formData, setFormData] = useState({
         name: '',
         description: '',
@@ -134,8 +134,8 @@ export default function RoomModal({ isOpen, onClose, onSuccess, editRoom }) {
                         <button type="button" className="btn-secondary" onClick={onClose} disabled={loading}>
                             Cancelar
                         </button>
-                        <button type="submit" className="btn-primary" disabled={loading}>
-                            {loading ? 'Guardando...' : (editRoom ? 'Actualizar Aula' : 'Crear Aula')}
+                        <button type="submit" className="btn-primary" disabled={loading || !isOnline}>
+                            {loading ? 'Guardando...' : (isOnline ? (editRoom ? 'Actualizar Aula' : 'Crear Aula') : 'Modo Lectura')}
                         </button>
                     </div>
                 </form>

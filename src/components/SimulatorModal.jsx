@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import './UserModal.css'; // Reusing modal styles for consistency
 
-export default function SimulatorModal({ isOpen, onClose, onSuccess, editSimulator }) {
+export default function SimulatorModal({ isOpen, onClose, onSuccess, editSimulator, isOnline = true }) {
     const [formData, setFormData] = useState({
         name: '',
         description: '',
@@ -110,8 +110,8 @@ export default function SimulatorModal({ isOpen, onClose, onSuccess, editSimulat
                         <button type="button" className="btn-secondary" onClick={onClose} disabled={loading}>
                             Cancelar
                         </button>
-                        <button type="submit" className="btn-primary" disabled={loading}>
-                            {loading ? 'Guardando...' : (editSimulator ? 'Actualizar Simulador' : 'Crear Simulador')}
+                        <button type="submit" className="btn-primary" disabled={loading || !isOnline}>
+                            {loading ? 'Guardando...' : (isOnline ? (editSimulator ? 'Actualizar Simulador' : 'Crear Simulador') : 'Modo Lectura')}
                         </button>
                     </div>
                 </form>

@@ -158,6 +158,7 @@ function App() {
             setMustChangePassword(false);
             checkAuth();
           }}
+          isOnline={isOnline}
         />
       )}
     </div>

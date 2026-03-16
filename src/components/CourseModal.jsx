@@ -3,7 +3,7 @@ import axios from 'axios';
 import DatePicker from './DatePicker';
 import './UserModal.css';
 
-export default function CourseModal({ isOpen, onClose, onSuccess, editCourse }) {
+export default function CourseModal({ isOpen, onClose, onSuccess, editCourse, isOnline = true }) {
     const [formData, setFormData] = useState({
         name: '',
         description: '',
@@ -248,8 +248,8 @@ export default function CourseModal({ isOpen, onClose, onSuccess, editCourse }) 
                         <button type="button" className="btn-secondary" onClick={onClose} disabled={loading || fetchingData} style={{ padding: '10px 20px' }}>
                             Cancelar
                         </button>
-                        <button type="submit" className="btn-primary" disabled={loading || fetchingData} style={{ padding: '10px 24px', minWidth: '160px' }}>
-                            {loading ? 'Guardando...' : (editCourse ? 'Actualizar Curso' : 'Crear Curso')}
+                        <button type="submit" className="btn-primary" disabled={loading || fetchingData || !isOnline} style={{ padding: '10px 24px', minWidth: '160px' }}>
+                            {loading ? 'Guardando...' : (isOnline ? (editCourse ? 'Actualizar Curso' : 'Crear Curso') : 'Modo Lectura')}
                         </button>
                     </div>
                 </form>

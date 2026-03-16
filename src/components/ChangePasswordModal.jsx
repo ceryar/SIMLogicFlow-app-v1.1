@@ -2,7 +2,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import './ChangePasswordModal.css';
 
-export default function ChangePasswordModal({ userId, onPasswordChanged }) {
+export default function ChangePasswordModal({ userId, onPasswordChanged, isOnline = true }) {
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [loading, setLoading] = useState(false);
@@ -68,8 +68,8 @@ export default function ChangePasswordModal({ userId, onPasswordChanged }) {
                             required
                         />
                     </div>
-                    <button type="submit" className="save-btn" disabled={loading}>
-                        {loading ? 'Cambiando...' : 'Actualizar Contraseña'}
+                    <button type="submit" className="save-btn" disabled={loading || !isOnline}>
+                        {loading ? 'Cambiando...' : (isOnline ? 'Actualizar Contraseña' : 'Modo Lectura')}
                     </button>
                 </form>
             </div>

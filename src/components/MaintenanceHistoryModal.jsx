@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import './UserModal.css';
 
-export default function MaintenanceHistoryModal({ isOpen, onClose, onSuccess, editHistory }) {
+export default function MaintenanceHistoryModal({ isOpen, onClose, onSuccess, editHistory, isOnline = true }) {
     const [formData, setFormData] = useState({
         observation: '',
         changeDate: '',
@@ -138,8 +138,8 @@ export default function MaintenanceHistoryModal({ isOpen, onClose, onSuccess, ed
                         <button type="button" className="btn-secondary" onClick={onClose} disabled={loading || fetchingMaintenances}>
                             Cancelar
                         </button>
-                        <button type="submit" className="btn-primary" disabled={loading || fetchingMaintenances}>
-                            {loading ? 'Guardando...' : (editHistory ? 'Actualizar Registro' : 'Crear Registro')}
+                        <button type="submit" className="btn-primary" disabled={loading || fetchingMaintenances || !isOnline}>
+                            {loading ? 'Guardando...' : (isOnline ? (editHistory ? 'Actualizar Registro' : 'Crear Registro') : 'Modo Lectura')}
                         </button>
                     </div>
                 </form>

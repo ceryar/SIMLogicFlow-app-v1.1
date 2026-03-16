@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import './UserModal.css';
 
-export default function MaintenanceTypeModal({ isOpen, onClose, onSuccess, editType }) {
+export default function MaintenanceTypeModal({ isOpen, onClose, onSuccess, editType, isOnline = true }) {
     const [formData, setFormData] = useState({ name: '', description: '' });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -81,8 +81,8 @@ export default function MaintenanceTypeModal({ isOpen, onClose, onSuccess, editT
                         <button type="button" className="btn-secondary" onClick={onClose} disabled={loading}>
                             Cancelar
                         </button>
-                        <button type="submit" className="btn-primary" disabled={loading}>
-                            {loading ? 'Guardando...' : (editType ? 'Actualizar' : 'Crear Tipo')}
+                        <button type="submit" className="btn-primary" disabled={loading || !isOnline}>
+                            {loading ? 'Guardando...' : (isOnline ? (editType ? 'Actualizar' : 'Crear Tipo') : 'Modo Lectura')}
                         </button>
                     </div>
                 </form>

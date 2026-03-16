@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import './UserModal.css'; // Reusing modal styles for consistency
 
-export default function RoleModal({ isOpen, onClose, onSuccess, editRole }) {
+export default function RoleModal({ isOpen, onClose, onSuccess, editRole, isOnline = true }) {
     const [formData, setFormData] = useState({
         name: '',
         description: ''
@@ -99,8 +99,8 @@ export default function RoleModal({ isOpen, onClose, onSuccess, editRole }) {
                         <button type="button" className="btn-secondary" onClick={onClose} disabled={loading}>
                             Cancelar
                         </button>
-                        <button type="submit" className="btn-primary" disabled={loading}>
-                            {loading ? 'Guardando...' : (editRole ? 'Actualizar Rol' : 'Crear Rol')}
+                        <button type="submit" className="btn-primary" disabled={loading || !isOnline}>
+                            {loading ? 'Guardando...' : (isOnline ? (editRole ? 'Actualizar Rol' : 'Crear Rol') : 'Modo Lectura')}
                         </button>
                     </div>
                 </form>

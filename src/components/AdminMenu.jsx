@@ -1516,6 +1516,7 @@ export default function AdminMenu({ isOnline }) {
                 onSuccess={handleUserSaved}
                 editUser={editingUser}
                 currentUserRole="ADMINISTRADOR"
+                isOnline={isOnline}
             />
 
             <RoomModal
@@ -1523,6 +1524,7 @@ export default function AdminMenu({ isOnline }) {
                 onClose={() => { setIsRoomModalOpen(false); setEditingRoom(null); }}
                 onSuccess={handleRoomSaved}
                 editRoom={editingRoom}
+                isOnline={isOnline}
             />
 
             <RoleModal
@@ -1530,6 +1532,7 @@ export default function AdminMenu({ isOnline }) {
                 onClose={() => { setIsRoleModalOpen(false); setEditingRole(null); }}
                 onSuccess={handleRoleSaved}
                 editRole={editingRole}
+                isOnline={isOnline}
             />
 
             <SimulatorModal
@@ -1537,12 +1540,43 @@ export default function AdminMenu({ isOnline }) {
                 onClose={() => { setIsSimulatorModalOpen(false); setEditingSimulator(null); }}
                 onSuccess={handleSimulatorSaved}
                 editSimulator={editingSimulator}
+                isOnline={isOnline}
             />
-            <CourseModal isOpen={isCourseModalOpen} onClose={() => { setIsCourseModalOpen(false); setEditingCourse(null); }} onSuccess={handleCourseSaved} editCourse={editingCourse} />
-            <ProCourseModal isOpen={isProCourseModalOpen} onClose={() => { setIsProCourseModalOpen(false); setEditingProCourse(null); }} onSuccess={handleProCourseSaved} editProCourse={editingProCourse} />
-            <MaintenanceModal isOpen={isMaintenanceModalOpen} onClose={() => { setIsMaintenanceModalOpen(false); setEditingMaintenance(null); }} onSuccess={handleMaintenanceSaved} editMaintenance={editingMaintenance} />
-            <MaintenanceHistoryModal isOpen={isHistoryModalOpen} onClose={() => { setIsHistoryModalOpen(false); setEditingHistory(null); }} onSuccess={handleHistorySaved} editHistory={editingHistory} />
-            <MaintenanceTypeModal isOpen={isMaintenanceTypeModalOpen} onClose={() => { setIsMaintenanceTypeModalOpen(false); setEditingMaintenanceType(null); }} onSuccess={handleMaintenanceTypeSaved} editType={editingMaintenanceType} />
+            <CourseModal
+                isOpen={isCourseModalOpen}
+                onClose={() => { setIsCourseModalOpen(false); setEditingCourse(null); }}
+                onSuccess={handleCourseSaved}
+                editCourse={editingCourse}
+                isOnline={isOnline}
+            />
+            <ProCourseModal
+                isOpen={isProCourseModalOpen}
+                onClose={() => { setIsProCourseModalOpen(false); setEditingProCourse(null); }}
+                onSuccess={handleProCourseSaved}
+                editProCourse={editingProCourse}
+                isOnline={isOnline}
+            />
+            <MaintenanceModal
+                isOpen={isMaintenanceModalOpen}
+                onClose={() => { setIsMaintenanceModalOpen(false); setEditingMaintenance(null); }}
+                onSuccess={handleMaintenanceSaved}
+                editMaintenance={editingMaintenance}
+                isOnline={isOnline}
+            />
+            <MaintenanceHistoryModal
+                isOpen={isHistoryModalOpen}
+                onClose={() => { setIsHistoryModalOpen(false); setEditingHistory(null); }}
+                onSuccess={handleHistorySaved}
+                editHistory={editingHistory}
+                isOnline={isOnline}
+            />
+            <MaintenanceTypeModal
+                isOpen={isMaintenanceTypeModalOpen}
+                onClose={() => { setIsMaintenanceTypeModalOpen(false); setEditingMaintenanceType(null); }}
+                onSuccess={handleMaintenanceTypeSaved}
+                editType={editingMaintenanceType}
+                isOnline={isOnline}
+            />
         </div >
     );
 }

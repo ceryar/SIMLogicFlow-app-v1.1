@@ -582,8 +582,20 @@ export default function TecnicoMenu({ isOnline }) {
                 )}
             </div>
 
-            <MaintenanceModal isOpen={isMaintenanceModalOpen} onClose={() => { setIsMaintenanceModalOpen(false); setEditingMaintenance(null); }} onSuccess={handleMaintenanceSaved} editMaintenance={editingMaintenance} />
-            <MaintenanceHistoryModal isOpen={isHistoryModalOpen} onClose={() => { setIsHistoryModalOpen(false); setEditingHistory(null); }} onSuccess={handleHistorySaved} editHistory={editingHistory} />
+            <MaintenanceModal
+                isOpen={isMaintenanceModalOpen}
+                onClose={() => { setIsMaintenanceModalOpen(false); setEditingMaintenance(null); }}
+                onSuccess={handleMaintenanceSaved}
+                editMaintenance={editingMaintenance}
+                isOnline={isOnline}
+            />
+            <MaintenanceHistoryModal
+                isOpen={isHistoryModalOpen}
+                onClose={() => { setIsHistoryModalOpen(false); setEditingHistory(null); }}
+                onSuccess={handleHistorySaved}
+                editHistory={editingHistory}
+                isOnline={isOnline}
+            />
         </div>
     );
 }

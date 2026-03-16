@@ -74,7 +74,7 @@ function TimePicker({ value, onChange, label, required }) {
 }
 
 // ---- Main modal ----
-export default function ProCourseModal({ isOpen, onClose, onSuccess, editProCourse }) {
+export default function ProCourseModal({ isOpen, onClose, onSuccess, editProCourse, isOnline = true }) {
     const [courseId, setCourseId] = useState('');
     const [sessions, setSessions] = useState([]); // Array of { id, fecha, horaini, horafin, horas }
 
@@ -561,8 +561,8 @@ export default function ProCourseModal({ isOpen, onClose, onSuccess, editProCour
                         <button type="button" className="btn-secondary" onClick={onClose} disabled={loading} style={{ padding: '10px 20px' }}>
                             Cancelar
                         </button>
-                        <button type="submit" className="btn-primary" disabled={loading || sessions.length === 0} style={{ padding: '10px 24px', minWidth: '160px' }}>
-                            {loading ? 'Guardando...' : (editProCourse ? 'Actualizar Sesión' : `Guardar ${sessions.length} Sesiones`)}
+                        <button type="submit" className="btn-primary" disabled={loading || sessions.length === 0 || !isOnline} style={{ padding: '10px 24px', minWidth: '160px' }}>
+                            {loading ? 'Guardando...' : (isOnline ? (editProCourse ? 'Actualizar Sesión' : `Guardar ${sessions.length} Sesiones`) : 'Modo Lectura')}
                         </button>
                     </div>
                 </form>

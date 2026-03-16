@@ -753,7 +753,8 @@ export default function CoorAcadMenu({ isOnline }) {
                 onClose={() => { setIsUserModalOpen(false); setEditingUser(null); }}
                 onSuccess={handleUserSaved}
                 editUser={editingUser}
-                currentUserRole="ADMINISTRADOR"
+                currentUserRole="COORACAD"
+                isOnline={isOnline}
             />
 
             <CourseModal
@@ -761,6 +762,7 @@ export default function CoorAcadMenu({ isOnline }) {
                 onClose={() => { setIsCourseModalOpen(false); setEditingCourse(null); }}
                 onSuccess={handleCourseSaved}
                 editCourse={editingCourse}
+                isOnline={isOnline}
             />
 
             <ProCourseModal
@@ -768,6 +770,7 @@ export default function CoorAcadMenu({ isOnline }) {
                 onClose={() => { setIsProCourseModalOpen(false); setEditingProCourse(null); }}
                 onSuccess={handleProCourseSaved}
                 editProCourse={editingProCourse}
+                isOnline={isOnline}
             />
         </div>
     );
