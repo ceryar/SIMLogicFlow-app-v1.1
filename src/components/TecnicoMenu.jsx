@@ -291,41 +291,48 @@ export default function TecnicoMenu({ isOnline }) {
                                 Cargando mantenimientos...
                             </td>
                         </tr>
-                    ) : currentMaintenances.length === 0 ? (
-                        <tr>
-                            <td colSpan="6" style={{ textAlign: 'center', padding: '2rem' }}>
-                                No se encontraron mantenimientos que coincidan con la búsqueda.
-                            </td>
-                        </tr>
                     ) : (
-                        currentMaintenances.map(m => (
-                            <tr key={m.id}>
-                                <td data-label="Simulador" className="font-medium">
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                        <span className="course-color-dot" style={{ backgroundColor: getCourseColor(m.simulator?.id || 0) }}></span>
-                                        {m.simulator?.name || '-'}
-                                    </div>
-                                </td>
-                                <td data-label="Tipo"><span className="status-badge status-active">{m.maintenanceType?.name || 'N/A'}</span></td>
-                                <td data-label="Fecha">{m.fecIni}</td>
-                                <td data-label="Horario">{m.horaIni} - {m.horaFin}</td>
-                                <td data-label="Técnico">{m.technician ? `${m.technician.firstName} ${m.technician.lastname}` : 'Sin asignar'}</td>
-                                <td data-label="Descripción">{m.description}</td>
-                                <td data-label="Acciones" className="actions-cell">
-                                    {isOnline && (
-                                        <>
-                                            <button className="btn-icon btn-edit" title="Editar" onClick={() => { setEditingMaintenance(m); setIsMaintenanceModalOpen(true); }}>
-                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                                            </button>
-                                            <button className="btn-icon btn-delete" title="Eliminar" onClick={() => handleDeleteMaintenance(m.id)}>
-                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                                            </button>
-                                        </>
-                                    )}
-                                    {!isOnline && <span className="read-only-badge">Sólo lectura</span>}
-                                </td>
-                            </tr>
-                        ))
+                        <>
+                            {currentMaintenances.length === 0 ? (
+                                <tr>
+                                    <td colSpan="6" style={{ textAlign: 'center', padding: '2rem' }}>
+                                        No se encontraron mantenimientos que coincidan con la búsqueda.
+                                    </td>
+                                </tr>
+                            ) : (
+                                currentMaintenances.map(m => {
+                                    return (
+                                        <tr key={m.id}>
+                                            <td data-label="Simulador" className="font-medium">
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                    <span className="course-color-dot" style={{ backgroundColor: getCourseColor(m.simulator?.id || 0) }}></span>
+                                                    {m.simulator?.name || '-'}
+                                                </div>
+                                            </td>
+                                            <td data-label="Tipo"><span className="status-badge status-active">{m.maintenanceType?.name || 'N/A'}</span></td>
+                                            <td data-label="Fecha">{m.fecIni}</td>
+                                            <td data-label="Horario">{m.horaIni} - {m.horaFin}</td>
+                                            <td data-label="Técnico">{m.technician ? `${m.technician.firstName} ${m.technician.lastname}` : 'Sin asignar'}</td>
+                                            <td data-label="Descripción">{m.description}</td>
+                                            <td data-label="Acciones" className="actions-cell">
+                                                {isOnline ? (
+                                                    <div style={{ display: 'flex', gap: '8px' }}>
+                                                        <button className="btn-icon btn-edit" title="Editar" onClick={() => { setEditingMaintenance(m); setIsMaintenanceModalOpen(true); }}>
+                                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                                        </button>
+                                                        <button className="btn-icon btn-delete" title="Eliminar" onClick={() => handleDeleteMaintenance(m.id)}>
+                                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <span className="read-only-badge">Sólo lectura</span>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    );
+                                })
+                            )}
+                        </>
                     )}
                 </tbody>
             </table>
@@ -422,44 +429,51 @@ export default function TecnicoMenu({ isOnline }) {
                                 Cargando historial...
                             </td>
                         </tr>
-                    ) : currentHistory.length === 0 ? (
-                        <tr>
-                            <td colSpan="5" style={{ textAlign: 'center', padding: '2rem' }}>
-                                No se encontraron registros en el historial que coincidan con la búsqueda.
-                            </td>
-                        </tr>
                     ) : (
-                        currentHistory.map(h => (
-                            <tr key={h.id}>
-                                <td data-label="Fecha">{new Date(h.changeDate).toLocaleString()}</td>
-                                <td data-label="Simulador" className="font-medium">
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                        <span className="course-color-dot" style={{ backgroundColor: getCourseColor(h.maintenance?.simulator?.id || 0) }}></span>
-                                        {h.maintenance?.simulator?.name || '-'}
-                                    </div>
-                                </td>
-                                <td data-label="Tipo">
-                                    <span className="status-badge status-active">
-                                        {h.maintenance?.maintenanceType?.name || 'Mantenimiento'}
-                                    </span>
-                                </td>
-                                <td data-label="Técnico">{h.maintenance?.technician ? `${h.maintenance.technician.firstName} ${h.maintenance.technician.lastname}` : 'Sin asignar'}</td>
-                                <td data-label="Observación">{h.observation}</td>
-                                <td data-label="Acciones" className="actions-cell">
-                                    {isOnline && (
-                                        <>
-                                            <button className="btn-icon btn-edit" title="Editar" onClick={() => { setEditingHistory(h); setIsHistoryModalOpen(true); }}>
-                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                                            </button>
-                                            <button className="btn-icon btn-delete" title="Eliminar" onClick={() => handleDeleteHistory(h.id)}>
-                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                                            </button>
-                                        </>
-                                    )}
-                                    {!isOnline && <span className="read-only-badge">Sólo lectura</span>}
-                                </td>
-                            </tr>
-                        ))
+                        <>
+                            {currentHistory.length === 0 ? (
+                                <tr>
+                                    <td colSpan="5" style={{ textAlign: 'center', padding: '2rem' }}>
+                                        No se encontraron registros en el historial que coincidan con la búsqueda.
+                                    </td>
+                                </tr>
+                            ) : (
+                                currentHistory.map(h => {
+                                    return (
+                                        <tr key={h.id}>
+                                            <td data-label="Fecha">{new Date(h.changeDate).toLocaleString()}</td>
+                                            <td data-label="Simulador" className="font-medium">
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                    <span className="course-color-dot" style={{ backgroundColor: getCourseColor(h.maintenance?.simulator?.id || 0) }}></span>
+                                                    {h.maintenance?.simulator?.name || '-'}
+                                                </div>
+                                            </td>
+                                            <td data-label="Tipo">
+                                                <span className="status-badge status-active">
+                                                    {h.maintenance?.maintenanceType?.name || 'Mantenimiento'}
+                                                </span>
+                                            </td>
+                                            <td data-label="Técnico">{h.maintenance?.technician ? `${h.maintenance.technician.firstName} ${h.maintenance.technician.lastname}` : 'Sin asignar'}</td>
+                                            <td data-label="Observación">{h.observation}</td>
+                                            <td data-label="Acciones" className="actions-cell">
+                                                {isOnline ? (
+                                                    <div style={{ display: 'flex', gap: '8px' }}>
+                                                        <button className="btn-icon btn-edit" title="Editar" onClick={() => { setEditingHistory(h); setIsHistoryModalOpen(true); }}>
+                                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                                        </button>
+                                                        <button className="btn-icon btn-delete" title="Eliminar" onClick={() => handleDeleteHistory(h.id)}>
+                                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <span className="read-only-badge">Sólo lectura</span>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    );
+                                })
+                            )}
+                        </>
                     )}
                 </tbody>
             </table>

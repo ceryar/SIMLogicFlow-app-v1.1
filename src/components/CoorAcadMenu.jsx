@@ -293,49 +293,56 @@ export default function CoorAcadMenu({ isOnline }) {
                                 Cargando usuarios...
                             </td>
                         </tr>
-                    ) : filteredUsers.length === 0 ? (
-                        <tr>
-                            <td colSpan="6" style={{ textAlign: 'center', padding: '2rem' }}>
-                                No se encontraron usuarios.
-                            </td>
-                        </tr>
                     ) : (
-                        filteredUsers.map(user => (
-                            <tr key={user.id}>
-                                <td data-label="ID">#{user.id}</td>
-                                <td data-label="Nombre Completo" className="font-medium">{`${user.firstName} ${user.lastname}`}</td>
-                                <td data-label="Email">{user.email}</td>
-                                <td data-label="Rol">
-                                    <span className={`role-badge role-${user.role?.name?.toLowerCase() || 'unknown'}`}>
-                                        {user.role?.name || 'UNKNOWN'}
-                                    </span>
-                                </td>
-                                <td data-label="Estado">
-                                    <span className={`status-badge ${user.active ? 'status-active' : 'status-inactive'}`}>
-                                        {user.active ? 'Activo' : 'Inactivo'}
-                                    </span>
-                                </td>
-                                <td data-label="Acciones" className="actions-cell">
-                                    {isOnline && (
-                                        <>
-                                            <button className="btn-icon btn-edit" title="Editar" onClick={() => { setEditingUser(user); setIsUserModalOpen(true); }}>
-                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                                                </svg>
-                                            </button>
-                                            <button className="btn-icon btn-delete" title="Eliminar" onClick={(e) => handleDeleteUser(e, user.id, user.email)}>
-                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                                    <polyline points="3 6 5 6 21 6"></polyline>
-                                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                                </svg>
-                                            </button>
-                                        </>
-                                    )}
-                                    {!isOnline && <span className="read-only-badge">Sólo lectura</span>}
-                                </td>
-                            </tr>
-                        ))
+                        <>
+                            {filteredUsers.length === 0 ? (
+                                <tr>
+                                    <td colSpan="6" style={{ textAlign: 'center', padding: '2rem' }}>
+                                        No se encontraron usuarios.
+                                    </td>
+                                </tr>
+                            ) : (
+                                filteredUsers.map(user => {
+                                    return (
+                                        <tr key={user.id}>
+                                            <td data-label="ID">#{user.id}</td>
+                                            <td data-label="Nombre Completo" className="font-medium">{`${user.firstName} ${user.lastname}`}</td>
+                                            <td data-label="Email">{user.email}</td>
+                                            <td data-label="Rol">
+                                                <span className={`role-badge role-${user.role?.name?.toLowerCase() || 'unknown'}`}>
+                                                    {user.role?.name || 'UNKNOWN'}
+                                                </span>
+                                            </td>
+                                            <td data-label="Estado">
+                                                <span className={`status-badge ${user.active ? 'status-active' : 'status-inactive'}`}>
+                                                    {user.active ? 'Activo' : 'Inactivo'}
+                                                </span>
+                                            </td>
+                                            <td data-label="Acciones" className="actions-cell">
+                                                {isOnline ? (
+                                                    <div style={{ display: 'flex', gap: '8px' }}>
+                                                        <button className="btn-icon btn-edit" title="Editar" onClick={() => { setEditingUser(user); setIsUserModalOpen(true); }}>
+                                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                                            </svg>
+                                                        </button>
+                                                        <button className="btn-icon btn-delete" title="Eliminar" onClick={(e) => handleDeleteUser(e, user.id, user.email)}>
+                                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                                <polyline points="3 6 5 6 21 6"></polyline>
+                                                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                                            </svg>
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <span className="read-only-badge">Sólo lectura</span>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    );
+                                })
+                            )}
+                        </>
                     )}
                 </tbody>
             </table>
@@ -391,114 +398,110 @@ export default function CoorAcadMenu({ isOnline }) {
                                 Cargando cursos...
                             </td>
                         </tr>
-                    ) : currentCourses.length === 0 ? (
-                        <tr>
-                            <td colSpan="7" style={{ textAlign: 'center', padding: '2rem' }}>
-                                No se encontraron cursos que coincidan con la búsqueda.
-                            </td>
-                        </tr>
                     ) : (
-                        currentCourses.map(course => (
-                            <tr key={course.id}>
-                                <td data-label="ID">#{course.id}</td>
-                                <td data-label="Curso" className="font-medium">
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                        <span className="course-color-dot" style={{ backgroundColor: getCourseColor(course.id) }}></span>
-                                        <div>
-                                            <div>{course.name}</div>
-                                            <small style={{ color: '#64748b' }}>{course.description || '-'}</small>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td data-label="Inicio / Fin">
-                                    {course.fecInicio} <br /> {course.fecFin}
-                                </td>
-                                <td data-label="Horas">{course.horas}h</td>
-                                <td data-label="Recursos">
-                                    <div className="entity-indicator" title="Simulator">
-                                        ✈️ {course.simulator?.name || 'N/A'}
-                                    </div>
-                                    <div className="entity-indicator" title="Rooms">
-                                        🏫 {course.rooms?.length || 0} aulas
-                                    </div>
-                                </td>
-                                <td data-label="Personal">
-                                    <div className="entity-indicator" title="Coordinador">
-                                        👤 Coord: {(() => {
-                                            const directCoord = course.coordinator;
-                                            // Search in global users list as backup
-                                            const coordsFromUsers = users.filter(u => {
-                                                const r = (u.role?.name || '').toUpperCase();
-                                                const isCoord = r.includes('COORDINADOR') || r === 'COORACAD' || r === 'ADMINISTRADOR';
-                                                const isInCourse = (u.courses || []).some(uc => uc.id === course.id);
-                                                return isCoord && isInCourse;
-                                            });
-                                            const allCoords = directCoord ? [directCoord, ...coordsFromUsers.filter(u => u.id !== directCoord.id)] : coordsFromUsers;
-                                            return allCoords.length > 0 ? allCoords.map(u => `${u.firstName} ${u.lastname}`).join(', ') : 'Sin asignar';
-                                        })()}
-                                    </div>
-                                    <div className="entity-indicator" title="Pseudopiloto">
-                                        👤 Pseudo: {(() => {
-                                            const directPseudo = course.pseudoPilot;
-                                            // 1. Search in participants list
-                                            const pseudosFromUsers = (course.users || []).filter(u => (u.role?.name || '').toUpperCase().includes('PSEUDO'));
-                                            // 2. Search in sessions (proCourses) as backup
-                                            const pseudosFromSessions = proCourses
-                                                .filter(pc => pc.course?.id === course.id && pc.pseudoPilot)
-                                                .map(pc => pc.pseudoPilot);
-
-                                            // Combine all unique pseudos
-                                            const all = [...(directPseudo ? [directPseudo] : []), ...pseudosFromUsers, ...pseudosFromSessions];
-                                            const unique = all.reduce((acc, curr) => {
-                                                if (!acc.find(u => u.id === curr.id)) acc.push(curr);
-                                                return acc;
-                                            }, []);
-
-                                            return unique.length > 0 ? unique.map(u => `${u.firstName} ${u.lastname}`).join(', ') : 'Sin asignar';
-                                        })()}
-                                    </div>
-                                    <div className="entity-indicator" title="Instructor">
-                                        👤 Instr: {(() => {
-                                            const directInstr = course.instructor;
-                                            // 1. Search in participants list
-                                            const instrsFromUsers = (course.users || []).filter(u => (u.role?.name || '').toUpperCase().includes('INSTRUCTOR'));
-                                            // 2. Search in sessions (proCourses) as backup
-                                            const instrsFromSessions = proCourses
-                                                .filter(pc => pc.course?.id === course.id && pc.instructor)
-                                                .map(pc => pc.instructor);
-
-                                            // Combine all unique instrs
-                                            const all = [...(directInstr ? [directInstr] : []), ...instrsFromUsers, ...instrsFromSessions];
-                                            const unique = all.reduce((acc, curr) => {
-                                                if (!acc.find(u => u.id === curr.id)) acc.push(curr);
-                                                return acc;
-                                            }, []);
-
-                                            return unique.length > 0 ? unique.map(u => `${u.firstName} ${u.lastname}`).join(', ') : 'Sin asignar';
-                                        })()}
-                                    </div>
-                                </td>
-                                <td data-label="Acciones" className="actions-cell">
-                                    {isOnline && (
-                                        <>
-                                            <button className="btn-icon btn-edit" title="Editar" onClick={() => { setEditingCourse(course); setIsCourseModalOpen(true); }}>
-                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                                                </svg>
-                                            </button>
-                                            <button className="btn-icon btn-delete" title="Eliminar" onClick={() => handleDeleteCourse(course.id, course.name)}>
-                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                                    <polyline points="3 6 5 6 21 6"></polyline>
-                                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                                </svg>
-                                            </button>
-                                        </>
-                                    )}
-                                    {!isOnline && <span className="read-only-badge">Sólo lectura</span>}
-                                </td>
-                            </tr>
-                        ))
+                        <>
+                            {currentCourses.length === 0 ? (
+                                <tr>
+                                    <td colSpan="7" style={{ textAlign: 'center', padding: '2rem' }}>
+                                        No se encontraron cursos que coincidan con la búsqueda.
+                                    </td>
+                                </tr>
+                            ) : (
+                                currentCourses.map(course => {
+                                    return (
+                                        <tr key={course.id}>
+                                            <td data-label="ID">#{course.id}</td>
+                                            <td data-label="Curso" className="font-medium">
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                    <span className="course-color-dot" style={{ backgroundColor: getCourseColor(course.id) }}></span>
+                                                    <div>
+                                                        <div>{course.name}</div>
+                                                        <small style={{ color: '#64748b' }}>{course.description || '-'}</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td data-label="Inicio / Fin">
+                                                {course.fecInicio} <br /> {course.fecFin}
+                                            </td>
+                                            <td data-label="Horas">{course.horas}h</td>
+                                            <td data-label="Recursos">
+                                                <div className="entity-indicator" title="Simulator">
+                                                    ✈️ {course.simulator?.name || 'N/A'}
+                                                </div>
+                                                <div className="entity-indicator" title="Rooms">
+                                                    🏫 {course.rooms?.length || 0} aulas
+                                                </div>
+                                            </td>
+                                            <td data-label="Personal">
+                                                <div className="entity-indicator" title="Coordinador">
+                                                    👤 Coord: {(() => {
+                                                        const directCoord = course.coordinator;
+                                                        const coordsFromUsers = users.filter(u => {
+                                                            const r = (u.role?.name || '').toUpperCase();
+                                                            const isCoord = r.includes('COORDINADOR') || r === 'COORACAD' || r === 'ADMINISTRADOR';
+                                                            const isInCourse = (u.courses || []).some(uc => uc.id === course.id);
+                                                            return isCoord && isInCourse;
+                                                        });
+                                                        const allCoords = directCoord ? [directCoord, ...coordsFromUsers.filter(u => u.id !== directCoord.id)] : coordsFromUsers;
+                                                        return allCoords.length > 0 ? allCoords.map(u => `${u.firstName} ${u.lastname}`).join(', ') : 'Sin asignar';
+                                                    })()}
+                                                </div>
+                                                <div className="entity-indicator" title="Pseudopiloto">
+                                                    👤 Pseudo: {(() => {
+                                                        const directPseudo = course.pseudoPilot;
+                                                        const pseudosFromUsers = (course.users || []).filter(u => (u.role?.name || '').toUpperCase().includes('PSEUDO'));
+                                                        const pseudosFromSessions = proCourses
+                                                            .filter(pc => pc.course?.id === course.id && pc.pseudoPilot)
+                                                            .map(pc => pc.pseudoPilot);
+                                                        const all = [...(directPseudo ? [directPseudo] : []), ...pseudosFromUsers, ...pseudosFromSessions];
+                                                        const unique = all.reduce((acc, curr) => {
+                                                            if (!acc.find(u => u.id === curr.id)) acc.push(curr);
+                                                            return acc;
+                                                        }, []);
+                                                        return unique.length > 0 ? unique.map(u => `${u.firstName} ${u.lastname}`).join(', ') : 'Sin asignar';
+                                                    })()}
+                                                </div>
+                                                <div className="entity-indicator" title="Instructor">
+                                                    👤 Instr: {(() => {
+                                                        const directInstr = course.instructor;
+                                                        const instrsFromUsers = (course.users || []).filter(u => (u.role?.name || '').toUpperCase().includes('INSTRUCTOR'));
+                                                        const instrsFromSessions = proCourses
+                                                            .filter(pc => pc.course?.id === course.id && pc.instructor)
+                                                            .map(pc => pc.instructor);
+                                                        const all = [...(directInstr ? [directInstr] : []), ...instrsFromUsers, ...instrsFromSessions];
+                                                        const unique = all.reduce((acc, curr) => {
+                                                            if (!acc.find(u => u.id === curr.id)) acc.push(curr);
+                                                            return acc;
+                                                        }, []);
+                                                        return unique.length > 0 ? unique.map(u => `${u.firstName} ${u.lastname}`).join(', ') : 'Sin asignar';
+                                                    })()}
+                                                </div>
+                                            </td>
+                                            <td data-label="Acciones" className="actions-cell">
+                                                {isOnline ? (
+                                                    <div style={{ display: 'flex', gap: '8px' }}>
+                                                        <button className="btn-icon btn-edit" title="Editar" onClick={() => { setEditingCourse(course); setIsCourseModalOpen(true); }}>
+                                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                                            </svg>
+                                                        </button>
+                                                        <button className="btn-icon btn-delete" title="Eliminar" onClick={(e) => handleDeleteCourse(e, course.id, course.name)}>
+                                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                                <polyline points="3 6 5 6 21 6"></polyline>
+                                                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                                            </svg>
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <span className="read-only-badge">Sólo lectura</span>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    );
+                                })
+                            )}
+                        </>
                     )}
                 </tbody>
             </table>
