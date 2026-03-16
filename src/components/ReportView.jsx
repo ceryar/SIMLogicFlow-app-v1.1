@@ -261,15 +261,17 @@ export default function ReportView({ type, data, courses = [], simulators = [], 
                 let tableBody = [];
 
                 if (type === 'courses') {
-                    tableHead = [['Nombre del Curso', 'Fecha Inicio', 'Fecha Fin', 'Simulador', 'Horas', 'Instructor', 'Pseudopiloto']];
+                    tableHead = [['Nombre del Curso', 'Simulador', 'Sala', 'Fecha Inicio', 'Fecha Fin', 'Horas', 'Instructor', 'Pseudopiloto']];
                     tableBody = filteredData.map(c => {
                         const instr = c.instructor || (c.users || []).find(u => (u.role?.name || '').toUpperCase().includes('INSTRUCTOR'));
                         const pseudo = c.pseudoPilot || (c.users || []).find(u => (u.role?.name || '').toUpperCase().includes('PSEUDO'));
+                        const salaStr = (c.rooms && c.rooms.length > 0) ? c.rooms.map(r => r.name).join(', ') : 'N/A';
                         return [
                             c.name,
+                            c.simulator?.name || 'N/A',
+                            salaStr,
                             c.fecInicio || '—',
                             c.fecFin || '—',
-                            c.simulator?.name || 'N/A',
                             c.horas || 0,
                             instr ? `${instr.firstName} ${instr.lastname}` : '—',
                             pseudo ? `${pseudo.firstName} ${pseudo.lastname}` : '—'
@@ -286,15 +288,25 @@ export default function ReportView({ type, data, courses = [], simulators = [], 
                         m.description || '—'
                     ]);
                 } else if (type === 'sessions') {
-                    tableHead = [['Curso', 'Simulador', 'Fecha', 'Horario', 'Instructor', 'Pseudopiloto']];
-                    tableBody = filteredData.map(s => [
-                        s.course?.name || 'N/A',
-                        s.simulator?.name || 'N/A',
-                        s.fecha || s.fecIni,
-                        `${s.horaini || s.horaIni} - ${s.horafin || s.horaFin}`,
-                        s.instructor ? `${s.instructor.firstName} ${s.instructor.lastname}` : '—',
-                        s.pseudoPilot ? `${s.pseudoPilot.firstName} ${s.pseudoPilot.lastname}` : '—'
-                    ]);
+                    tableHead = [['Curso', 'Simulador', 'Sala', 'Fecha', 'Horario', 'Instructor', 'Pseudopiloto']];
+                    tableBody = filteredData.map(s => {
+                        const courseObj = s.course || {};
+                        const sim = s.simulator || courseObj.simulator;
+                        const instr = s.instructor || courseObj.instructor;
+                        const pseudo = s.pseudoPilot || courseObj.pseudoPilot;
+                        const rooms = courseObj.rooms || [];
+                        const salaStr = rooms.length > 0 ? rooms.map(r => r.name).join(', ') : 'N/A';
+
+                        return [
+                            courseObj.name || 'N/A',
+                            sim?.name || 'N/A',
+                            salaStr,
+                            s.fecha || s.fecIni,
+                            `${s.horaini || s.horaIni} - ${s.horafin || s.horaFin}`,
+                            instr ? `${instr.firstName} ${instr.lastname}` : '—',
+                            pseudo ? `${pseudo.firstName} ${pseudo.lastname}` : '—'
+                        ];
+                    });
                 }
 
                 autoTable(doc, {
