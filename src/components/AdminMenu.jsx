@@ -808,6 +808,7 @@ export default function AdminMenu() {
                         <th>Horario</th>
                         <th>Técnico</th>
                         <th>Descripción</th>
+                        <th>Horas</th>
                         <th className="text-right">Acciones</th>
                     </tr>
                 </thead>
@@ -846,6 +847,7 @@ export default function AdminMenu() {
                                 </td>
                                 <td data-label="Técnico">{m.technician ? `${m.technician.firstName} ${m.technician.lastname}` : 'Sin asignar'}</td>
                                 <td data-label="Descripción">{m.description || '-'}</td>
+                                <td data-label="Horas">{m.horas ? `${m.horas}h` : '-'}</td>
                                 <td data-label="Acciones" className="actions-cell">
                                     <button className="btn-icon btn-edit" title="Editar" onClick={() => { setEditingMaintenance(m); setIsMaintenanceModalOpen(true); }}>
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

@@ -231,6 +231,25 @@ input:checked+.slider:before {
 }
 
 /* DatePicker Styles */
+.datepicker-container {
+    position: relative;
+    width: 100%;
+}
+
+.datepicker-input-wrapper {
+    position: relative;
+    cursor: pointer;
+}
+
+.datepicker-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    pointer-events: none;
+}
+
 .datepicker-dropdown {
     position: absolute;
     top: calc(100% + 8px);
@@ -254,7 +273,36 @@ input:checked+.slider:before {
     color: var(--text-main);
 }
 
-.datepicker-day:hover:not(.empty) {
+.datepicker-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+}
+
+.weekday {
+    text-align: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    padding: 5px 0;
+}
+
+.datepicker-day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.datepicker-day.empty {
+    cursor: default;
+}
+
+.datepicker-day:hover:not(.empty):not(.disabled) {
     background: var(--bg-hover);
     color: var(--primary-color);
 }
@@ -262,6 +310,26 @@ input:checked+.slider:before {
 .datepicker-day.selected {
     background: var(--primary-color) !important;
     color: white !important;
+}
+
+.datepicker-day.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.btn-nav {
+    background: none;
+    border: none;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border-radius: 4px;
+}
+
+.btn-nav:hover {
+    background: var(--bg-hover);
 }
 
 /* Progress Bars */

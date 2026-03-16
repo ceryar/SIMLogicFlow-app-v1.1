@@ -373,6 +373,9 @@ export default function CalendarView({ events, type }) {
                                                     {ev.fecFin && ev.fecFin !== ev.fecIni && (
                                                         <div className="detail-meta">📅 Hasta: {ev.fecFin}</div>
                                                     )}
+                                                    {ev.horas && (
+                                                        <div className="detail-meta" style={{ color: 'var(--primary-color)', fontWeight: 'bold' }}>⏱️ Duración: {ev.horas}h</div>
+                                                    )}
                                                 </>
                                             )}
                                         </div>

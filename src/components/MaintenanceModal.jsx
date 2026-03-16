@@ -2,6 +2,76 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import DatePicker from './DatePicker';
 import './UserModal.css';
+import './TimePicker.css';
+
+// ---- TimePicker sub-component (dropdown style) ----
+function TimePicker({ value, onChange, label, required }) {
+    const [open, setOpen] = useState(false);
+
+    const hours = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
+    const minutes = ['00', '15', '30', '45'];
+
+    const [selH, selM] = value ? value.split(':') : ['', ''];
+
+    const handleSelect = (h, m) => {
+        onChange({ target: { value: `${h}:${m}` } });
+        setOpen(false);
+    };
+
+    return (
+        <div className="timepicker-wrapper" style={{ position: 'relative' }}>
+            <div
+                className={`timepicker-input ${open ? 'open' : ''}`}
+                onClick={() => setOpen(o => !o)}
+            >
+                {value ? (
+                    <span className="timepicker-value">{value}</span>
+                ) : (
+                    <span className="timepicker-placeholder">Seleccionar hora</span>
+                )}
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+            </div>
+
+            {open && (
+                <div className="timepicker-dropdown">
+                    <div className="timepicker-cols">
+                        <div className="timepicker-col">
+                            <div className="timepicker-col-header">Hora</div>
+                            <div className="timepicker-col-body">
+                                {hours.map(h => (
+                                    <div
+                                        key={h}
+                                        className={`timepicker-option ${selH === h ? 'selected' : ''}`}
+                                        onClick={() => handleSelect(h, selM || '00')}
+                                    >
+                                        {h}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                        <div className="timepicker-col">
+                            <div className="timepicker-col-header">Min</div>
+                            <div className="timepicker-col-body">
+                                {minutes.map(m => (
+                                    <div
+                                        key={m}
+                                        className={`timepicker-option ${selM === m ? 'selected' : ''}`}
+                                        onClick={() => handleSelect(selH || '08', m)}
+                                    >
+                                        {m}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}
 
 export default function MaintenanceModal({ isOpen, onClose, onSuccess, editMaintenance }) {
     const [formData, setFormData] = useState({
@@ -12,7 +82,8 @@ export default function MaintenanceModal({ isOpen, onClose, onSuccess, editMaint
         horaFin: '',
         simulatorId: '',
         maintenanceTypeId: '',
-        technicianId: ''
+        technicianId: '',
+        horas: ''
     });
     const [simulators, setSimulators] = useState([]);
     const [types, setTypes] = useState([]);
@@ -28,14 +99,17 @@ export default function MaintenanceModal({ isOpen, onClose, onSuccess, editMaint
             try {
                 const token = localStorage.getItem('token');
                 const config = { headers: { Authorization: `Bearer ${token}` } };
-                const [simsRes, typesRes, techsRes] = await Promise.all([
+                const [simsRes, typesRes, usersRes] = await Promise.all([
                     axios.get('/api/v1/simulators', config),
                     axios.get('/api/v1/maintenance-types', config),
-                    axios.get('/api/v1/users/role/TÉCNICO MANTENIMIENTO', config)
+                    axios.get('/api/v1/users', config)
                 ]);
                 setSimulators(simsRes.data);
                 setTypes(typesRes.data);
-                setTechnicians(techsRes.data);
+                setTechnicians(usersRes.data.filter(u => {
+                    const r = u.role?.name?.toUpperCase() || '';
+                    return r.includes('TÉCNICO') || r.includes('TECNICO') || r.includes('MANTENIMIENTO');
+                }));
             } catch (err) {
                 console.error('Error fetching maintenance dependencies:', err);
                 setError('Error al cargar simuladores o tipos de mantenimiento.');
@@ -56,7 +130,8 @@ export default function MaintenanceModal({ isOpen, onClose, onSuccess, editMaint
                 horaFin: editMaintenance.horaFin || '',
                 simulatorId: editMaintenance.simulator ? editMaintenance.simulator.id : '',
                 maintenanceTypeId: editMaintenance.maintenanceType ? editMaintenance.maintenanceType.id : '',
-                technicianId: editMaintenance.technician ? editMaintenance.technician.id : ''
+                technicianId: editMaintenance.technician ? editMaintenance.technician.id : '',
+                horas: editMaintenance.horas || ''
             });
         } else {
             setFormData({
@@ -67,11 +142,31 @@ export default function MaintenanceModal({ isOpen, onClose, onSuccess, editMaint
                 horaFin: '',
                 simulatorId: '',
                 maintenanceTypeId: '',
-                technicianId: ''
+                technicianId: '',
+                horas: ''
             });
         }
         setError(null);
     }, [editMaintenance, isOpen]);
+
+    const calculateHours = (ini, fin) => {
+        if (!ini || !fin) return '';
+        const [hI, mI] = ini.split(':').map(Number);
+        const [hF, mF] = fin.split(':').map(Number);
+        const totalMin = (hF * 60 + mF) - (hI * 60 + mI);
+        if (totalMin <= 0) return '';
+        return Math.round(totalMin / 60 * 10) / 10;
+    };
+
+    const handleTimeChange = (field, val) => {
+        const next = { ...formData, [field]: val };
+        const h = calculateHours(
+            field === 'horaIni' ? val : formData.horaIni,
+            field === 'horaFin' ? val : formData.horaFin
+        );
+        if (h) next.horas = h;
+        setFormData(next);
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -84,15 +179,20 @@ export default function MaintenanceModal({ isOpen, onClose, onSuccess, editMaint
             return;
         }
 
+        const payload = {
+            ...formData,
+            horas: formData.horas ? Number(formData.horas) : null
+        };
+
         try {
             const token = localStorage.getItem('token');
             const config = { headers: { Authorization: `Bearer ${token}` } };
 
             let response;
             if (editMaintenance) {
-                response = await axios.put(`/api/v1/maintenances/${editMaintenance.id}`, formData, config);
+                response = await axios.put(`/api/v1/maintenances/${editMaintenance.id}`, payload, config);
             } else {
-                response = await axios.post('/api/v1/maintenances', formData, config);
+                response = await axios.post('/api/v1/maintenances', payload, config);
             }
 
             onSuccess(response.data, !!editMaintenance);
@@ -200,22 +300,32 @@ export default function MaintenanceModal({ isOpen, onClose, onSuccess, editMaint
                         {/* Hora Inicio */}
                         <div className="form-group">
                             <label>Hora Inicio *</label>
-                            <input
-                                type="time"
+                            <TimePicker
                                 required
                                 value={formData.horaIni}
-                                onChange={(e) => setFormData({ ...formData, horaIni: e.target.value })}
+                                onChange={(e) => handleTimeChange('horaIni', e.target.value)}
                             />
                         </div>
 
                         {/* Hora Fin */}
                         <div className="form-group">
                             <label>Hora Fin *</label>
-                            <input
-                                type="time"
+                            <TimePicker
                                 required
                                 value={formData.horaFin}
-                                onChange={(e) => setFormData({ ...formData, horaFin: e.target.value })}
+                                onChange={(e) => handleTimeChange('horaFin', e.target.value)}
+                            />
+                        </div>
+
+                        {/* Horas */}
+                        <div className="form-group">
+                            <label>Horas de Trabajo</label>
+                            <input
+                                type="number"
+                                step="0.1"
+                                value={formData.horas}
+                                onChange={(e) => setFormData({ ...formData, horas: e.target.value })}
+                                placeholder="Auto-calculado"
                             />
                         </div>
 
