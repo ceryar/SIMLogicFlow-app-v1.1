@@ -130,8 +130,17 @@ export default function ConsultationMenu() {
                 finalUsers = finalUsers.filter(u => u.id === uid);
             }
 
+            // Filter courses to only show those that have at least one real assignment
+            // (either users assigned, main roles defined, or scheduled sessions)
+            const assignedCourses = finalCourses.filter(c => {
+                const hasUsers = (c.users && c.users.length > 0);
+                const hasMainRoles = c.coordinator || c.instructor || c.pseudoPilot;
+                const hasSessions = finalProCourses.some(pc => pc.course?.id === c.id);
+                return hasUsers || hasMainRoles || hasSessions;
+            });
+
             setUsers(finalUsers);
-            setCourses(finalCourses);
+            setCourses(assignedCourses);
             setProCourses(finalProCourses);
             setMaintenances(finalMaintenances);
             setSimulators(simsRes.data || []);
