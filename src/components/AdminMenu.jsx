@@ -38,6 +38,7 @@ export default function AdminMenu({ isOnline }) {
     const [editingMaintenanceType, setEditingMaintenanceType] = useState(null);
     const [isReportsMenuOpen, setIsReportsMenuOpen] = useState(false);
     const [isCalendarMenuOpen, setIsCalendarMenuOpen] = useState(false);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [users, setUsers] = useState([]);
     const [rooms, setRooms] = useState([]);
     const [roles, setRoles] = useState([]);
@@ -1407,22 +1408,27 @@ export default function AdminMenu({ isOnline }) {
     );
 
     return (
-        <div className="admin-container">
-            <div className="admin-sidebar">
-                <h2 className="admin-title">Panel Admin</h2>
+        <div className={`admin-container ${isSidebarOpen ? 'sidebar-open' : ''}`}>
+            <div className={`admin-sidebar ${isSidebarOpen ? 'open' : ''}`}>
+                <div className="sidebar-mobile-header">
+                    <h2 className="admin-title">Menú</h2>
+                    <button className="btn-close-sidebar" onClick={() => setIsSidebarOpen(false)}>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
                 <ul className="admin-nav">
-                    <li className={`admin-nav-item ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => setActiveTab('dashboard')}>📈 Estadísticas</li>
-                    <li className={`admin-nav-item ${activeTab === 'users' ? 'active' : ''}`} onClick={() => setActiveTab('users')}>Usuarios</li>
-                    <li className={`admin-nav-item ${activeTab === 'user-courses' ? 'active' : ''}`} onClick={() => setActiveTab('user-courses')}>Usuarios Cursos</li>
-                    <li className={`admin-nav-item ${activeTab === 'rooms' ? 'active' : ''}`} onClick={() => setActiveTab('rooms')}>Aulas</li>
-                    <li className={`admin-nav-item ${activeTab === 'roles' ? 'active' : ''}`} onClick={() => setActiveTab('roles')}>Roles</li>
-                    <li className={`admin-nav-item ${activeTab === 'simulators' ? 'active' : ''}`} onClick={() => setActiveTab('simulators')}>Simuladores</li>
-                    <li className={`admin-nav-item ${activeTab === 'courses' ? 'active' : ''}`} onClick={() => setActiveTab('courses')}>Cursos</li>
-                    <li className={`admin-nav-item ${activeTab === 'pro-courses' ? 'active' : ''}`} onClick={() => setActiveTab('pro-courses')}>Programación</li>
-                    <li className={`admin-nav-item ${activeTab === 'maintenances' ? 'active' : ''}`} onClick={() => setActiveTab('maintenances')}>Mantenimiento</li>
-                    <li className={`admin-nav-item ${activeTab === 'maintenance-types' ? 'active' : ''}`} onClick={() => setActiveTab('maintenance-types')}>Tipos de Mantenimiento</li>
-                    <li className={`admin-nav-item ${activeTab === 'maintenance-history' ? 'active' : ''}`} onClick={() => setActiveTab('maintenance-history')}>Historial Técnico</li>
-                    <li className={`admin-nav-item ${activeTab === 'consultations' ? 'active' : ''}`} onClick={() => setActiveTab('consultations')}>🔍 Consultas y Reportes</li>
+                    <li className={`admin-nav-item ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => { setActiveTab('dashboard'); setIsSidebarOpen(false); }}>📈 Estadísticas</li>
+                    <li className={`admin-nav-item ${activeTab === 'users' ? 'active' : ''}`} onClick={() => { setActiveTab('users'); setIsSidebarOpen(false); }}>Usuarios</li>
+                    <li className={`admin-nav-item ${activeTab === 'user-courses' ? 'active' : ''}`} onClick={() => { setActiveTab('user-courses'); setIsSidebarOpen(false); }}>Usuarios Cursos</li>
+                    <li className={`admin-nav-item ${activeTab === 'rooms' ? 'active' : ''}`} onClick={() => { setActiveTab('rooms'); setIsSidebarOpen(false); }}>Aulas</li>
+                    <li className={`admin-nav-item ${activeTab === 'roles' ? 'active' : ''}`} onClick={() => { setActiveTab('roles'); setIsSidebarOpen(false); }}>Roles</li>
+                    <li className={`admin-nav-item ${activeTab === 'simulators' ? 'active' : ''}`} onClick={() => { setActiveTab('simulators'); setIsSidebarOpen(false); }}>Simuladores</li>
+                    <li className={`admin-nav-item ${activeTab === 'courses' ? 'active' : ''}`} onClick={() => { setActiveTab('courses'); setIsSidebarOpen(false); }}>Cursos</li>
+                    <li className={`admin-nav-item ${activeTab === 'pro-courses' ? 'active' : ''}`} onClick={() => { setActiveTab('pro-courses'); setIsSidebarOpen(false); }}>Programación</li>
+                    <li className={`admin-nav-item ${activeTab === 'maintenances' ? 'active' : ''}`} onClick={() => { setActiveTab('maintenances'); setIsSidebarOpen(false); }}>Mantenimiento</li>
+                    <li className={`admin-nav-item ${activeTab === 'maintenance-types' ? 'active' : ''}`} onClick={() => { setActiveTab('maintenance-types'); setIsSidebarOpen(false); }}>Tipos de Mantenimiento</li>
+                    <li className={`admin-nav-item ${activeTab === 'maintenance-history' ? 'active' : ''}`} onClick={() => { setActiveTab('maintenance-history'); setIsSidebarOpen(false); }}>Historial Técnico</li>
+                    <li className={`admin-nav-item ${activeTab === 'consultations' ? 'active' : ''}`} onClick={() => { setActiveTab('consultations'); setIsSidebarOpen(false); }}>🔍 Consultas y Reportes</li>
 
                     <li className="admin-nav-group">
                         <div className="admin-nav-group-header" onClick={() => setIsCalendarMenuOpen(!isCalendarMenuOpen)}>
@@ -1431,32 +1437,39 @@ export default function AdminMenu({ isOnline }) {
                         </div>
                         {isCalendarMenuOpen && (
                             <div className="admin-nav-group-content">
-                                <li className={`admin-nav-item ${activeTab === 'calendar-courses' ? 'active' : ''}`} onClick={() => setActiveTab('calendar-courses')}>Calendario Cursos</li>
-                                <li className={`admin-nav-item ${activeTab === 'calendar-maint' ? 'active' : ''}`} onClick={() => setActiveTab('calendar-maint')}>Calendario Mantenimientos</li>
+                                <li className={`admin-nav-item ${activeTab === 'calendar-courses' ? 'active' : ''}`} onClick={() => { setActiveTab('calendar-courses'); setIsSidebarOpen(false); }}>Calendario Cursos</li>
+                                <li className={`admin-nav-item ${activeTab === 'calendar-maint' ? 'active' : ''}`} onClick={() => { setActiveTab('calendar-maint'); setIsSidebarOpen(false); }}>Calendario Mantenimientos</li>
                             </div>
                         )}
                     </li>
                 </ul>
             </div>
 
+            {isSidebarOpen && <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)}></div>}
+
             <div className="admin-content">
                 <div className="admin-header">
-                    <h2>
-                        {activeTab === 'dashboard' ? 'Panel de Estadísticas y Toma de Decisiones' :
-                            activeTab === 'users' ? 'Gestionar Usuarios' :
-                                activeTab === 'user-courses' ? 'Usuarios — Asignación de Cursos' :
-                                    activeTab === 'rooms' ? 'Gestionar Aulas' :
-                                        activeTab === 'roles' ? 'Gestionar Roles' :
-                                            activeTab === 'simulators' ? 'Gestionar Simuladores' :
-                                                activeTab === 'courses' ? 'Gestionar Cursos' :
-                                                    activeTab === 'pro-courses' ? 'Programación de Cursos' :
-                                                        activeTab === 'maintenances' ? 'Gestionar Mantenimientos' :
-                                                            activeTab === 'maintenance-types' ? 'Tipos de Mantenimiento' :
-                                                                activeTab === 'maintenance-history' ? 'Historial Técnico' :
-                                                                    activeTab === 'calendar-courses' ? 'Calendario de Cursos' :
-                                                                        activeTab === 'calendar-maint' ? 'Calendario de Mantenimientos' :
-                                                                            activeTab === 'consultations' ? 'Consultas y Reportes' : ''}
-                    </h2>
+                    <div className="admin-header-title-box">
+                        <button className="btn-menu-toggle" onClick={() => setIsSidebarOpen(true)}>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                        </button>
+                        <h2>
+                            {activeTab === 'dashboard' ? 'Panel de Estadísticas y Toma de Decisiones' :
+                                activeTab === 'users' ? 'Gestionar Usuarios' :
+                                    activeTab === 'user-courses' ? 'Usuarios — Asignación de Cursos' :
+                                        activeTab === 'rooms' ? 'Gestionar Aulas' :
+                                            activeTab === 'roles' ? 'Gestionar Roles' :
+                                                activeTab === 'simulators' ? 'Gestionar Simuladores' :
+                                                    activeTab === 'courses' ? 'Gestionar Cursos' :
+                                                        activeTab === 'pro-courses' ? 'Programación de Cursos' :
+                                                            activeTab === 'maintenances' ? 'Gestionar Mantenimientos' :
+                                                                activeTab === 'maintenance-types' ? 'Tipos de Mantenimiento' :
+                                                                    activeTab === 'maintenance-history' ? 'Historial Técnico' :
+                                                                        activeTab === 'calendar-courses' ? 'Calendario de Cursos' :
+                                                                            activeTab === 'calendar-maint' ? 'Calendario de Mantenimientos' :
+                                                                                activeTab === 'consultations' ? 'Consultas y Reportes' : ''}
+                        </h2>
+                    </div>
                     <div className="admin-header-actions">
                         {isOnline && activeTab !== 'dashboard' && !activeTab.startsWith('calendar-') && !activeTab.startsWith('reports-') && activeTab !== 'consultations' && activeTab !== 'user-courses' && activeTab !== 'roles' && (
                             <button className="btn-primary" onClick={() => {
@@ -1577,6 +1590,7 @@ export default function AdminMenu({ isOnline }) {
                 editType={editingMaintenanceType}
                 isOnline={isOnline}
             />
-        </div >
+        </div>
     );
 }
+
