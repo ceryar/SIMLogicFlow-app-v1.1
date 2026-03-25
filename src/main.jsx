@@ -2,8 +2,8 @@ import React, { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import axios from 'axios'
 import './index.css'
-import './mobile-experience.css'
 import App from './App.jsx'
+import './mobile-experience.css'
 
 // ── Error Handling ────────────────────────────────────────────────────────
 // Este manejador captura errores que ocurren durante la ejecución

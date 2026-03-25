@@ -44,8 +44,9 @@
         position: sticky;
         top: 0;
         z-index: 1001;
-        height: 60px;
-        padding: 0 16px !important;
+        min-height: 60px;
+        height: auto !important;
+        padding: 8px 16px !important;
         display: flex !important;
         flex-direction: row !important;
         align-items: center !important;
@@ -55,19 +56,41 @@
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
         border-bottom: 1px solid var(--border-color) !important;
+        gap: 8px !important;
     }
 
     .nav-brand {
-        font-size: 1.1rem !important;
+        font-size: 1rem !important;
         color: var(--text-main) !important;
+        white-space: nowrap;
+        font-weight: 800 !important;
+    }
+
+    .nav-user {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 8px !important;
+        width: auto !important;
+    }
+
+    .user-email {
+        display: none !important;
+        /* Ocultar email en móviles para ganar espacio */
+    }
+
+    .user-role.badge {
+        font-size: 10px !important;
+        padding: 2px 8px !important;
     }
 
     .logout-btn {
-        padding: 8px 14px !important;
-        font-size: 12px !important;
-        border-radius: 10px !important;
+        padding: 6px 10px !important;
+        font-size: 11px !important;
+        border-radius: 8px !important;
         background: var(--error-color) !important;
         color: white !important;
+        width: auto !important;
     }
 
     .admin-sidebar {
@@ -127,12 +150,31 @@
     }
 
     .admin-content {
-        padding: 16px !important;
+        padding: 20px 16px !important;
+        margin-top: 0 !important;
+    }
+
+    .main-content {
+        padding: 20px 16px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    .main-content h1 {
+        font-size: 1.5rem !important;
+        margin-bottom: 1.5rem !important;
+        text-align: center;
+    }
+
+    .dashboard-card {
+        padding: 20px 15px !important;
     }
 
     .admin-header h2 {
         background: var(--primary-gradient);
         -webkit-background-clip: text;
+        background-clip: text;
         -webkit-text-fill-color: transparent;
         font-weight: 800 !important;
     }
