@@ -150,49 +150,8 @@
     }
 }
 
-@media (max-width: 1024px) {
-    .calendar-wrapper {
-        flex-direction: column;
-        max-height: none;
-        height: auto;
-    }
+/* Estilos responsivos centralizados en mobile-experience.css */
 
-    .calendar-header h3 {
-        font-size: 1.15rem;
-    }
-
-    .calendar-header {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 15px;
-    }
-
-    .calendar-detail {
-        width: 100%;
-        margin-top: 25px;
-        max-height: none;
-        position: relative;
-        bottom: auto;
-        z-index: 10;
-        box-shadow: var(--shadow-xl);
-        border-radius: 20px;
-        background: var(--bg-surface);
-        padding-bottom: 20px;
-        animation: slideInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    @keyframes slideInUp {
-        from {
-            transform: translateY(30px);
-            opacity: 0;
-        }
-
-        to {
-            transform: translateY(0);
-            opacity: 1;
-        }
-    }
-}
 
 @media (max-width: 768px) {
     .calendar-wrapper {

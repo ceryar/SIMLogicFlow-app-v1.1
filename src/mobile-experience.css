@@ -80,8 +80,10 @@
     }
 
     .user-role.badge {
-        font-size: 10px !important;
-        padding: 2px 8px !important;
+        font-size: 11px !important;
+        padding: 4px 10px !important;
+        font-weight: 800 !important;
+        letter-spacing: 0.03em !important;
     }
 
     .logout-btn {
@@ -193,19 +195,33 @@
         display: flex !important;
         justify-content: space-between !important;
         align-items: center !important;
-        padding: 10px 0 !important;
+        padding: 12px 0 !important;
         border-bottom: 1px solid var(--border-color) !important;
         color: var(--text-main) !important;
-        font-size: 0.9rem !important;
+        font-size: 0.95rem !important;
+        gap: 15px !important;
     }
 
     .admin-table td::before {
         content: attr(data-label);
-        font-weight: 700;
+        font-weight: 800;
         color: var(--text-muted);
-        font-size: 0.7rem;
+        font-size: 0.65rem;
         text-transform: uppercase;
         margin-right: 15px;
+        flex-shrink: 0;
+        opacity: 0.8;
+    }
+
+    /* Especial para badges en tablas móviles */
+    .admin-table td .role-badge,
+    .admin-table td .status-badge {
+        font-size: 11px !important;
+        padding: 4px 10px !important;
+        white-space: normal !important;
+        text-align: right !important;
+        max-width: 60% !important;
+        line-height: 1.2 !important;
     }
 
     .btn-icon {
@@ -223,6 +239,65 @@
         border-radius: 28px 28px 0 0 !important;
         padding-bottom: calc(30px + var(--safe-area-bottom)) !important;
         box-shadow: var(--shadow-lg) !important;
+    }
+
+    /* CALENDAR BOTTOM SHEET */
+    .calendar-detail {
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        margin-top: 0 !important;
+        max-height: 75vh !important;
+        z-index: 3000 !important;
+        box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.2) !important;
+        border-radius: 24px 24px 0 0 !important;
+        background: var(--bg-surface) !important;
+        padding-bottom: calc(var(--safe-area-bottom) + 80px) !important;
+        animation: slideInUpSheet 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        border: none !important;
+        border-top: 1px solid var(--border-color) !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+
+    .calendar-detail::before {
+        content: "";
+        width: 40px;
+        height: 4px;
+        background: var(--border-color);
+        border-radius: 2px;
+        margin: 12px auto 0;
+        flex-shrink: 0;
+    }
+
+    .calendar-detail-header {
+        padding: 15px 20px !important;
+    }
+
+    .calendar-detail-list {
+        padding: 12px 16px !important;
+        gap: 12px !important;
+    }
+
+    .calendar-detail-item {
+        border-radius: 14px !important;
+    }
+
+    .calendar-wrapper {
+        padding-bottom: 20px !important;
+    }
+}
+
+@keyframes slideInUpSheet {
+    from {
+        transform: translateY(100%);
+        opacity: 0.5;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
     }
 }
 
