@@ -303,6 +303,14 @@
     background: rgba(239, 68, 68, 0.05);
 }
 
+/* Hide mobile specific elements by default on desktop */
+.btn-menu-toggle,
+.sidebar-mobile-header,
+.sidebar-overlay,
+.desktop-only-title {
+    display: none;
+}
+
 /* Responsive Adjustments */
 @media (max-width: 1024px) {
     .admin-content {

@@ -1,0 +1,84 @@
+================================================================================
+           GUIA DE IMPLEMENTACION PWA - SIMLOGICFLOW (V1.1)
+================================================================================
+
+Esta guia explica como se ha implementado la Progressive Web App (PWA) en
+SimLogicFlow, permitiendo que la aplicacion sea instalable, rapida y funcional 
+incluso sin conexion a internet (modo lectura).
+
+--------------------------------------------------------------------------------
+1. CONFIGURACION DE BASE (VITE)
+--------------------------------------------------------------------------------
+Archivo: vite.config.js
+
+Se utiliza el plugin 'vite-plugin-pwa' con la estrategia 'injectManifest'. 
+Esto nos da el control total sobre el Service Worker (SW) permitiendo logica 
+personalizada de cache para la API.
+
+Puntos clave:
+- Manifest dinamico: Define iconos, colores corporativos (#6366f1) y el nombre.
+- devOptions: Habilitado para depuracion en entorno de desarrollo.
+- InjectionPoint: El plugin inyecta la lista de assets precargados en el SW.
+
+--------------------------------------------------------------------------------
+2. EL CEREBRO: SERVICE WORKER (SW.JS)
+--------------------------------------------------------------------------------
+Archivo: src/sw.js
+
+El SW actua como un 'proxy' entre la app y el servidor. Sus funciones son:
+
+A. PRECARGA DE ASSETS (Workbox):
+   Usa 'precacheAndRoute' para guardar imagenes, scripts y estilos CSS en el 
+   navegador. Esto permite que la interfaz cargue instantaneamente.
+
+B. ESTRATEGIAS DE CACHE PARA LA API:
+   Intercepta las peticiones '/api/v1/' y aplica:
+   - Stale-While-Revalidate: Para catalogos (cursos, simuladores, salas). 
+     Muestra datos instantaneos desde cache y actualiza por detras.
+   - Network-First (15s timeout): Para datos prioritarios (mantenimientos, 
+     usuarios). Prioriza red para ver lo mas reciente, pero cae a cache si 
+     falla la conexion o el servidor tarda demasiado.
+
+C. OFFINE FALLBACK:
+   Si una peticion falla y no hay nada en cache, el SW devuelve un JSON
+   personalizado con { "offline": true } para que la app informe al usuario.
+
+--------------------------------------------------------------------------------
+3. GESTION DEL CICLO DE VIDA (HOOK USEPWA)
+--------------------------------------------------------------------------------
+Archivo: src/hooks/usePWA.js
+
+Este hook centraliza la logica para que los componentes reaccionen a la PWA:
+
+- Monitoreo de Red: Detecta eventos 'online' y 'offline' de forma reactiva.
+- Actualizaciones: Escucha cambios en el Service Worker y notifica cuando hay
+  una version nueva lista para aplicar (Skip Waiting).
+- Instalacion: Gestiona el 'deferredPrompt' para permitir que el usuario 
+  instale la app en su escritorio o movil (A2HS).
+- Cache Warm-up: Funcion 'triggerCacheWarmUp' que descarga todos los datos 
+  criticos de la API tras el login exitoso, garantizando que el modo lectura
+  este listo desde el minuto uno.
+
+--------------------------------------------------------------------------------
+4. INTERFAZ DE USUARIO (COMPONENTES)
+--------------------------------------------------------------------------------
+Archivo: src/components/PWABanner.jsx
+
+Es el encargado de comunicarse con el usuario:
+- Banner Offline: Aparece cuando se pierde la conexion, informando que se
+  estan viendo datos en cache.
+- Banner de Actualizacion: Aparece cuando hay mejoras en el codigo.
+- Banner de Instalacion: Invita al usuario a instalar la app de forma nativa.
+
+--------------------------------------------------------------------------------
+5. RESUMEN DE ARCHIVOS IMPORTANTES
+--------------------------------------------------------------------------------
+- vite.config.js    -> Configuracion de registro y manifiesto.
+- src/sw.js         -> Logica de interceptacion de red y cache.
+- src/hooks/usePWA.js -> Comunicacion entre React y el Service Worker.
+- src/components/PWABanner.jsx -> Alertas visuales para el usuario.
+- src/main.jsx      -> Punto de entrada donde se activa la logica PWA.
+
+================================================================================
+GUIA GENERADA POR ANTIGRAVITY - MARZO 2026
+================================================================================

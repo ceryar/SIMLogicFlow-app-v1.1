@@ -1416,6 +1416,7 @@ export default function AdminMenu({ isOnline }) {
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                     </button>
                 </div>
+                <h2 className="admin-title desktop-only-title">Panel Administrador</h2>
                 <ul className="admin-nav">
                     <li className={`admin-nav-item ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => { setActiveTab('dashboard'); setIsSidebarOpen(false); }}>📈 Estadísticas</li>
                     <li className={`admin-nav-item ${activeTab === 'users' ? 'active' : ''}`} onClick={() => { setActiveTab('users'); setIsSidebarOpen(false); }}>Usuarios</li>

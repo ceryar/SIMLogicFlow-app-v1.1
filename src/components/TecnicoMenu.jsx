@@ -17,6 +17,8 @@ export default function TecnicoMenu({ isOnline }) {
 
     const [editingMaintenance, setEditingMaintenance] = useState(null);
     const [editingHistory, setEditingHistory] = useState(null);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
 
     const [maintenances, setMaintenances] = useState([]);
     const [maintenanceHistory, setMaintenanceHistory] = useState([]);
@@ -525,30 +527,42 @@ export default function TecnicoMenu({ isOnline }) {
 
 
     return (
-        <div className="admin-container">
-            <div className="admin-sidebar">
-                <h2 className="admin-title">Panel Coordinador Técnico</h2>
+        <div className={`admin-container ${isSidebarOpen ? 'sidebar-open' : ''}`}>
+            <div className={`admin-sidebar ${isSidebarOpen ? 'open' : ''}`}>
+                <div className="sidebar-mobile-header">
+                    <h2 className="admin-title">Menú</h2>
+                    <button className="btn-close-sidebar" onClick={() => setIsSidebarOpen(false)}>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+                <h2 className="admin-title desktop-only-title">Panel Coordinador Técnico</h2>
                 <ul className="admin-nav">
-                    <li className={`admin-nav-item ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => setActiveTab('dashboard')}>📈 Estadísticas</li>
-                    <li className={`admin-nav-item ${activeTab === 'maintenances' ? 'active' : ''}`} onClick={() => setActiveTab('maintenances')}>Mantenimientos</li>
-                    <li className={`admin-nav-item ${activeTab === 'maintenance-history' ? 'active' : ''}`} onClick={() => setActiveTab('maintenance-history')}>Historial</li>
-                    <li className={`admin-nav-item ${activeTab === 'calendar-maint' ? 'active' : ''}`} onClick={() => setActiveTab('calendar-maint')}>Calendario Mantenimientos</li>
-                    <li className={`admin-nav-item ${activeTab === 'calendar-courses' ? 'active' : ''}`} onClick={() => setActiveTab('calendar-courses')}>Calendario Cursos</li>
-                    <li className={`admin-nav-item ${activeTab === 'consultations' ? 'active' : ''}`} onClick={() => setActiveTab('consultations')}>🔍 Consultas y Reportes</li>
-
+                    <li className={`admin-nav-item ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => { setActiveTab('dashboard'); setIsSidebarOpen(false); }}>📈 Estadísticas</li>
+                    <li className={`admin-nav-item ${activeTab === 'maintenances' ? 'active' : ''}`} onClick={() => { setActiveTab('maintenances'); setIsSidebarOpen(false); }}>Mantenimientos</li>
+                    <li className={`admin-nav-item ${activeTab === 'maintenance-history' ? 'active' : ''}`} onClick={() => { setActiveTab('maintenance-history'); setIsSidebarOpen(false); }}>Historial</li>
+                    <li className={`admin-nav-item ${activeTab === 'calendar-maint' ? 'active' : ''}`} onClick={() => { setActiveTab('calendar-maint'); setIsSidebarOpen(false); }}>Calendario Mantenimientos</li>
+                    <li className={`admin-nav-item ${activeTab === 'calendar-courses' ? 'active' : ''}`} onClick={() => { setActiveTab('calendar-courses'); setIsSidebarOpen(false); }}>Calendario Cursos</li>
+                    <li className={`admin-nav-item ${activeTab === 'consultations' ? 'active' : ''}`} onClick={() => { setActiveTab('consultations'); setIsSidebarOpen(false); }}>🔍 Consultas y Reportes</li>
                 </ul>
             </div>
 
+            {isSidebarOpen && <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)}></div>}
+
             <div className="admin-content">
                 <div className="admin-header">
-                    <h2>
-                        {activeTab === 'dashboard' ? 'Panel de Estadísticas y Control Técnico' :
-                            activeTab === 'maintenances' ? 'Gestión de Mantenimientos' :
-                                activeTab === 'maintenance-history' ? 'Historial Técnico' :
-                                    activeTab === 'calendar-maint' ? 'Calendario de Mantenimientos' :
-                                        activeTab === 'consultations' ? 'Consultas y Reportes' :
-                                            'Calendario de Cursos'}
-                    </h2>
+                    <div className="admin-header-title-box">
+                        <button className="btn-menu-toggle" onClick={() => setIsSidebarOpen(true)}>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                        </button>
+                        <h2>
+                            {activeTab === 'dashboard' ? 'Panel de Estadísticas y Control Técnico' :
+                                activeTab === 'maintenances' ? 'Gestión de Mantenimientos' :
+                                    activeTab === 'maintenance-history' ? 'Historial Técnico' :
+                                        activeTab === 'calendar-maint' ? 'Calendario de Mantenimientos' :
+                                            activeTab === 'consultations' ? 'Consultas y Reportes' :
+                                                'Calendario de Cursos'}
+                        </h2>
+                    </div>
                     <div className="admin-header-actions">
                         {isOnline && activeTab !== 'calendar-maint' && activeTab !== 'calendar-courses' && activeTab !== 'consultations' && !activeTab.startsWith('reports-') && (
                             <button className="btn-primary" onClick={() => {

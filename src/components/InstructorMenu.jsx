@@ -10,6 +10,7 @@ export default function InstructorMenu({ userId }) {
     const [proCourses, setProCourses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     const fetchMyCourses = useCallback(async (isSilent = false) => {
         if (!userId) {
@@ -125,29 +126,42 @@ export default function InstructorMenu({ userId }) {
     );
 
     return (
-        <div className="admin-container">
-            <div className="admin-sidebar">
-                <h2 className="admin-title">Panel Instructor</h2>
+        <div className={`admin-container ${isSidebarOpen ? 'sidebar-open' : ''}`}>
+            <div className={`admin-sidebar ${isSidebarOpen ? 'open' : ''}`}>
+                <div className="sidebar-mobile-header">
+                    <h2 className="admin-title">Menú</h2>
+                    <button className="btn-close-sidebar" onClick={() => setIsSidebarOpen(false)}>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+                <h2 className="admin-title desktop-only-title">Panel Instructor</h2>
                 <ul className="admin-nav">
-                    <li className={`admin-nav-item ${activeTab === 'my-courses' ? 'active' : ''}`} onClick={() => setActiveTab('my-courses')}>
+                    <li className={`admin-nav-item ${activeTab === 'my-courses' ? 'active' : ''}`} onClick={() => { setActiveTab('my-courses'); setIsSidebarOpen(false); }}>
                         Cursos Asignados
                     </li>
-                    <li className={`admin-nav-item ${activeTab === 'calendar' ? 'active' : ''}`} onClick={() => setActiveTab('calendar')}>
+                    <li className={`admin-nav-item ${activeTab === 'calendar' ? 'active' : ''}`} onClick={() => { setActiveTab('calendar'); setIsSidebarOpen(false); }}>
                         Calendario
                     </li>
-                    <li className={`admin-nav-item ${activeTab === 'consultations' ? 'active' : ''}`} onClick={() => setActiveTab('consultations')}>
+                    <li className={`admin-nav-item ${activeTab === 'consultations' ? 'active' : ''}`} onClick={() => { setActiveTab('consultations'); setIsSidebarOpen(false); }}>
                         🔍 Consultas y Reportes
                     </li>
                 </ul>
             </div>
 
+            {isSidebarOpen && <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)}></div>}
+
             <div className="admin-content">
                 <div className="admin-header">
-                    <h2>
-                        {activeTab === 'my-courses' ? 'Mis Cursos Programados' :
-                            activeTab === 'calendar' ? 'Calendario de Instrucción' :
-                                'Consultas y Reportes'}
-                    </h2>
+                    <div className="admin-header-title-box">
+                        <button className="btn-menu-toggle" onClick={() => setIsSidebarOpen(true)}>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                        </button>
+                        <h2>
+                            {activeTab === 'my-courses' ? 'Mis Cursos Programados' :
+                                activeTab === 'calendar' ? 'Calendario de Instrucción' :
+                                    'Consultas y Reportes'}
+                        </h2>
+                    </div>
                 </div>
 
                 {activeTab === 'my-courses' ? renderCoursesTable() :

@@ -20,6 +20,8 @@ export default function CoorAcadMenu({ isOnline }) {
     const [editingUser, setEditingUser] = useState(null);
     const [editingCourse, setEditingCourse] = useState(null);
     const [editingProCourse, setEditingProCourse] = useState(null);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
 
     const [users, setUsers] = useState([]);
     const [courses, setCourses] = useState([]);
@@ -688,34 +690,46 @@ export default function CoorAcadMenu({ isOnline }) {
     );
 
     return (
-        <div className="admin-container">
-            <div className="admin-sidebar">
-                <h2 className="admin-title">Panel Coordinador Académico</h2>
+        <div className={`admin-container ${isSidebarOpen ? 'sidebar-open' : ''}`}>
+            <div className={`admin-sidebar ${isSidebarOpen ? 'open' : ''}`}>
+                <div className="sidebar-mobile-header">
+                    <h2 className="admin-title">Menú</h2>
+                    <button className="btn-close-sidebar" onClick={() => setIsSidebarOpen(false)}>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
+                <h2 className="admin-title desktop-only-title">Panel Coordinador Académico</h2>
                 <ul className="admin-nav">
-                    <li className={`admin-nav-item ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => setActiveTab('dashboard')}>📈 Estadísticas</li>
-                    <li className={`admin-nav-item ${activeTab === 'users' ? 'active' : ''}`} onClick={() => setActiveTab('users')}>Usuarios</li>
-                    <li className={`admin-nav-item ${activeTab === 'user-courses' ? 'active' : ''}`} onClick={() => setActiveTab('user-courses')}>Asignar Cursos</li>
-                    <li className={`admin-nav-item ${activeTab === 'courses' ? 'active' : ''}`} onClick={() => setActiveTab('courses')}>Cursos</li>
-                    <li className={`admin-nav-item ${activeTab === 'pro-courses' ? 'active' : ''}`} onClick={() => setActiveTab('pro-courses')}>Programación</li>
-                    <li className={`admin-nav-item ${activeTab === 'calendar' ? 'active' : ''}`} onClick={() => setActiveTab('calendar')}>Calendario</li>
-                    <li className={`admin-nav-item ${activeTab === 'consultations' ? 'active' : ''}`} onClick={() => setActiveTab('consultations')}>🔍 Consultas y Reportes</li>
-
+                    <li className={`admin-nav-item ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => { setActiveTab('dashboard'); setIsSidebarOpen(false); }}>📈 Estadísticas</li>
+                    <li className={`admin-nav-item ${activeTab === 'users' ? 'active' : ''}`} onClick={() => { setActiveTab('users'); setIsSidebarOpen(false); }}>Usuarios</li>
+                    <li className={`admin-nav-item ${activeTab === 'user-courses' ? 'active' : ''}`} onClick={() => { setActiveTab('user-courses'); setIsSidebarOpen(false); }}>Asignar Cursos</li>
+                    <li className={`admin-nav-item ${activeTab === 'courses' ? 'active' : ''}`} onClick={() => { setActiveTab('courses'); setIsSidebarOpen(false); }}>Cursos</li>
+                    <li className={`admin-nav-item ${activeTab === 'pro-courses' ? 'active' : ''}`} onClick={() => { setActiveTab('pro-courses'); setIsSidebarOpen(false); }}>Programación</li>
+                    <li className={`admin-nav-item ${activeTab === 'calendar' ? 'active' : ''}`} onClick={() => { setActiveTab('calendar'); setIsSidebarOpen(false); }}>Calendario</li>
+                    <li className={`admin-nav-item ${activeTab === 'consultations' ? 'active' : ''}`} onClick={() => { setActiveTab('consultations'); setIsSidebarOpen(false); }}>🔍 Consultas y Reportes</li>
                 </ul>
             </div>
 
+            {isSidebarOpen && <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)}></div>}
+
             <main className="admin-main">
                 <header className="admin-header">
-                    <div>
-                        <h1 className="admin-main-title">
-                            {activeTab === 'dashboard' ? 'Panel de Estadísticas Académicas' :
-                                activeTab === 'users' ? 'Gestión de Usuarios' :
-                                    activeTab === 'courses' ? 'Gestión de Cursos' :
-                                        activeTab === 'user-courses' ? 'Usuarios — Asignación de Cursos' :
-                                            activeTab === 'pro-courses' ? 'Programación de Cursos' :
-                                                activeTab === 'calendar' ? 'Calendario Académico' :
-                                                    activeTab === 'reports-users' ? 'Reporte de Usuarios' : ''}
-                        </h1>
-                        <p className="admin-subtitle">Panel de control de recursos académicos</p>
+                    <div className="admin-header-title-box">
+                        <button className="btn-menu-toggle" onClick={() => setIsSidebarOpen(true)}>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                        </button>
+                        <div>
+                            <h1 className="admin-main-title">
+                                {activeTab === 'dashboard' ? 'Panel de Estadísticas Académicas' :
+                                    activeTab === 'users' ? 'Gestión de Usuarios' :
+                                        activeTab === 'courses' ? 'Gestión de Cursos' :
+                                            activeTab === 'user-courses' ? 'Usuarios — Asignación de Cursos' :
+                                                activeTab === 'pro-courses' ? 'Programación de Cursos' :
+                                                    activeTab === 'calendar' ? 'Calendario Académico' :
+                                                        activeTab === 'reports-users' ? 'Reporte de Usuarios' : ''}
+                            </h1>
+                            <p className="admin-subtitle">Panel de control de recursos académicos</p>
+                        </div>
                     </div>
                     {isOnline && activeTab !== 'calendar' && activeTab !== 'user-courses' && activeTab !== 'consultations' && !activeTab.startsWith('reports-') && (
                         <button className="btn-primary" onClick={() => {
