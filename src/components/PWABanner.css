@@ -6,15 +6,16 @@
     position: fixed;
     z-index: 10001;
     pointer-events: none;
-    /* Default for Desktop: Top-Right */
-    top: 24px;
-    right: 24px;
+    /* Center at bottom */
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
     flex-direction: column;
     gap: 12px;
     width: auto;
-    min-width: 320px;
-    max-width: 380px;
+    min-width: 340px;
+    max-width: 420px;
 }
 
 .pwa-banner {
@@ -25,12 +26,12 @@
     padding: 16px;
     border-radius: 16px;
     box-shadow:
-        0 10px 25px -5px rgba(0, 0, 0, 0.3),
+        0 10px 25px -5px rgba(0, 0, 0, 0.4),
         0 8px 10px -6px rgba(0, 0, 0, 0.3),
         inset 0 0 0 1px rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(16px) saturate(180%);
     -webkit-backdrop-filter: blur(16px) saturate(180%);
-    animation: pwa-slide-in-right 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: pwa-slide-in-bottom 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
@@ -155,17 +156,16 @@
 
 @media (max-width: 768px) {
     .pwa-container {
-        top: auto;
-        right: 16px;
         left: 16px;
+        right: 16px;
         bottom: 80px;
-        /* Space for bottom nav if any */
+        /* Space for mobile nav if any */
+        transform: none;
+        min-width: 0;
         max-width: none;
-        animation: none;
     }
 
     .pwa-banner {
-        animation: pwa-slide-in-bottom 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         padding: 14px;
         border-radius: 20px;
     }
